@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>कृषकमैत्री व्यवसायिक प्रस्तावना</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- LETTERHEAD -->
+<header class="letterhead">
+  <div class="lh-title" id="lhOrg">FarmerBase Initiative</div>
+  <div class="lh-sub">कृषकमैत्री व्यवसाय प्रवर्द्धन कार्यक्रम</div>
+  <div class="lh-address" id="lhAddress">कालिका गाउँपालिका–५, रसुवा</div>
+</header>
+
+<footer class="letterfoot">
+  FarmerBase Initiative • Official Proposal
+</footer>
+
+<!-- COVER PAGE -->
+<section class="cover">
+  <h1 id="bizName">कृषकमैत्री व्यवसायिक प्रस्तावना</h1>
+
+  <div class="sign-block">
+    <img id="signImage" style="display:none;max-height:90px;">
+    <div id="textSign">
+      <div class="sign-name" id="ownerName">प्रेमप्रसाद पौडेल</div>
+      <div class="sign-post" id="ownerPost">सञ्चालक</div>
+    </div>
+    <input type="file" id="signUpload" accept="image/*">
+  </div>
+
+  <iframe
+    src="https://www.google.com/maps?q=Kalika%20Rasuwa&output=embed"
+    loading="lazy"></iframe>
+
+  <div class="final-date">
+    मिति: <span id="nepDate"></span> (<span id="engDate"></span>)
+  </div>
+
+  <div id="orgName">FarmerBase Initiative</div>
+  <div id="orgAddress">कालिका गाउँपालिका–५, रसुवा</div>
+</section>
+
+<!-- TABLE OF CONTENTS -->
+<section class="toc">
+  <h2>विषयसूची</h2>
+  <ul id="tocList"></ul>
+</section>
+
+<!-- PROPOSAL BODY -->
+<section class="proposal">
+
+<h2>परिचय</h2>
+<p>यस प्रस्तावनाले कृषकमैत्री व्यवसायिक योजना प्रस्तुत गर्दछ।</p>
+
+<h2>उद्देश्य</h2>
+<h3>मुख्य उद्देश्य</h3>
+<p>कृषकलाई सुलभ सेवा प्रदान गर्नु।</p>
+
+<h3>विशेष उद्देश्य</h3>
+<p>उत्पादन लागत घटाउनु।</p>
+
+<h2>आय विवरण</h2>
+<table class="budget">
+<tr><th>क्र.सं.</th><th>आय स्रोत</th><th>रकम</th></tr>
+<tr><td>१</td><td>उत्पादन बिक्री</td><td class="amount income">500000</td></tr>
+<tr><td>२</td><td>सेवा शुल्क</td><td class="amount income">80000</td></tr>
+</table>
+
+<h2>खर्च विवरण</h2>
+<table class="budget">
+<tr><th>क्र.सं.</th><th>शीर्षक</th><th>रकम</th></tr>
+<tr><td>१</td><td>मेसिन</td><td class="amount">250000</td></tr>
+<tr><td>२</td><td>तालिम</td><td class="amount">50000</td></tr>
+<tr><td>३</td><td>ढुवानी</td><td class="amount">30000</td></tr>
+</table>
+
+<h2 class="page-break">आय–व्यय सारांश</h2>
+<table class="summary">
+<tr><th>विवरण</th><th>रकम</th></tr>
+<tr><td>कुल आय</td><td id="totalIncome"></td></tr>
+<tr><td>कुल खर्च</td><td id="totalExpense"></td></tr>
+<tr><td><strong>नाफा / नोक्सान</strong></td><td id="profitLoss"></td></tr>
+</table>
+
+<h3>आय बनाम खर्च (Chart)</h3>
+<div class="ie-chart">
+  <div class="ie-bar income-bar"><span>आय</span><strong id="incomeBarVal"></strong></div>
+  <div class="ie-bar expense-bar"><span>खर्च</span><strong id="expenseBarVal"></strong></div>
+</div>
+
+<h2 class="page-break">आय–व्यय प्रवृत्ति विश्लेषण</h2>
+<table class="trend">
+<tr><th>वर्ष</th><th>आय</th><th>खर्च</th></tr>
+<tr><td>२०८०</td><td class="trend-income">300000</td><td class="trend-expense">250000</td></tr>
+<tr><td>२०८१</td><td class="trend-income">450000</td><td class="trend-expense">300000</td></tr>
+<tr><td>२०८२</td><td class="trend-income">600000</td><td class="trend-expense">350000</td></tr>
+</table>
+
+<ul id="trendSummary"></ul>
+
+</section>
+
+<!-- ANNEX -->
+<section class="annex">
+<h2>Annex</h2>
+<h3>उपकरण सूची</h3>
+<p>उपकरणहरूको विवरण।</p>
+
+<h3>प्राविधिक विवरण</h3>
+<p>प्राविधिक विवरण।</p>
+</section>
+
+<script src="script.js"></script>
+</body>
+</html>
