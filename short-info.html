@@ -1,15 +1,15 @@
 <!DOCTYPE html>
 <html lang="ne">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>संक्षिप्त विवरण | FarmerBase BP Engine</title>
 
 <style>
 *{box-sizing:border-box}
 body{
   margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto,Ubuntu;
+  font-family:system-ui,-apple-system,Segoe UI,Roboto;
   background:#f6f7f9;
   color:#222;
 }
@@ -31,11 +31,9 @@ header{
   padding:10px 14px;
   display:flex; align-items:center; justify-content:space-between;
 }
-.brand{
-  font-weight:700; color:#1b5e20; font-size:14px;
-}
-.biz-name{
-  font-size:13px; color:#333;
+.brand{font-weight:700;color:var(--g);font-size:14px}
+.biz-name select{
+  font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid #ccc;
 }
 
 /* Page */
@@ -51,87 +49,54 @@ header{
   margin-bottom:16px;
 }
 .card h3{
-  margin:0;
-  padding:10px 12px;
+  margin:0;padding:10px 12px;
   font-size:14px;
   background:#f3f5f7;
   border-bottom:1px solid var(--b);
 }
-.card .body{ padding:12px }
+.card .body{padding:12px}
 
 /* Form */
 .row{
-  display:grid; gap:10px;
+  display:grid;gap:10px;
   grid-template-columns:repeat(12,1fr);
   margin-bottom:10px
 }
-.col-12{grid-column:span 12}
 .col-6{grid-column:span 6}
 .col-4{grid-column:span 4}
 .col-3{grid-column:span 3}
-
-label{font-size:12px; color:#444}
-input, select{
-  width:100%;
-  padding:8px 9px;
-  font-size:13px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  background:#fff;
+label{font-size:12px;color:#444}
+input,select{
+  width:100%;padding:8px 9px;
+  font-size:13px;border:1px solid #ccc;
+  border-radius:6px;background:#fff;
 }
-small{font-size:11px; color:#777}
 
 /* Toggle */
-.toggle{
-  display:inline-flex;
-  border:1px solid #ccc;
-  border-radius:20px;
-  overflow:hidden;
-}
+.toggle{display:inline-flex;border:1px solid #ccc;border-radius:20px;overflow:hidden}
 .toggle button{
-  border:0;
-  padding:6px 10px;
-  font-size:12px;
-  cursor:pointer;
-  background:#fff;
+  border:0;padding:6px 10px;font-size:12px;
+  cursor:pointer;background:#fff
 }
-.toggle button.active{
-  background:#e8f5e9;
-  color:#1b5e20;
-}
+.toggle button.active{background:#e8f5e9;color:var(--g)}
 
 /* Footer */
 .footer-nav{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-  padding:10px 14px;
-  border-top:1px solid var(--b);
-  background:#fff;
-  position:sticky;
-  bottom:0;
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px 14px;border-top:1px solid var(--b);
+  background:#fff;position:sticky;bottom:0
 }
-.status{font-size:12px; color:#2e7d32}
+.status{font-size:12px;color:#2e7d32}
 .btn{
-  padding:8px 12px;
-  border-radius:6px;
-  font-size:13px;
-  cursor:pointer;
-  border:1px solid #ccc;
-  background:#fafafa;
+  padding:8px 12px;border-radius:6px;
+  font-size:13px;cursor:pointer;
+  border:1px solid #ccc;background:#fafafa
 }
-.btn.primary{
-  background:#1b5e20;
-  color:#fff;
-  border-color:#1b5e20
-}
-.btn[disabled]{
-  opacity:.5;
-  cursor:not-allowed
-}
+.btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.btn[disabled]{opacity:.5;cursor:not-allowed}
 
 /* Responsive */
-@media (max-width:720px){
+@media(max-width:720px){
   .col-6,.col-4,.col-3{grid-column:span 12}
 }
 </style>
@@ -142,151 +107,72 @@ small{font-size:11px; color:#777}
 <header>
   <div class="h-wrap">
     <div class="brand">FarmerBase BP Engine</div>
-    <div class="biz-name" id="bizNamePreview">व्यवसायको नाम</div>
+    <div class="biz-name">
+      <select id="businessSwitcher"></select>
+    </div>
   </div>
 </header>
 
 <main class="main">
 
-  <!-- Business Basic -->
-  <section class="card">
-    <h3>📌 व्यवसायको आधारभूत जानकारी</h3>
-    <div class="body">
-      <div class="row">
-        <div class="col-6">
-          <label>व्यवसायको नाम *</label>
-          <input id="businessName" placeholder="उदाहरण: मेरो कृषि फार्म" />
-        </div>
-        <div class="col-6">
-          <label>व्यवसायको प्रकार</label>
-          <select id="businessType">
-            <option>कृषि</option>
-            <option>पशुपालन</option>
-            <option>व्यापार</option>
-            <option>सेवा</option>
-          </select>
-        </div>
-        <div class="col-6">
-          <label>व्यवसाय सुरु मिति</label>
-          <input id="startDate" type="date" />
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Business -->
+<section class="card">
+<h3>📌 व्यवसायको आधारभूत जानकारी</h3>
+<div class="body">
+<div class="row">
+  <div class="col-6">
+    <label>व्यवसायको नाम *</label>
+    <input id="businessName">
+  </div>
+  <div class="col-6">
+    <label>व्यवसायको प्रकार</label>
+    <select id="businessType">
+      <option>कृषि</option><option>पशुपालन</option>
+      <option>व्यापार</option><option>सेवा</option>
+    </select>
+  </div>
+</div>
+</div>
+</section>
 
-  <!-- Address -->
-  <section class="card">
-    <h3>📍 ठेगाना विवरण</h3>
-    <div class="body">
-      <div class="row">
-        <div class="col-3">
-          <label>प्रदेश</label>
-          <select id="province"></select>
-        </div>
-        <div class="col-3">
-          <label>जिल्ला</label>
-          <select id="district"></select>
-        </div>
-        <div class="col-3">
-          <label>न.पा./गा.पा.</label>
-          <input id="municipality" />
-        </div>
-        <div class="col-3">
-          <label>वडा नं.</label>
-          <input id="ward" />
-        </div>
-        <div class="col-6">
-          <label>टोल / बस्ती</label>
-          <input id="locality" />
-        </div>
-        <div class="col-6">
-          <label>गुगल म्याप लिङ्क</label>
-          <input id="mapLink" placeholder="https://maps.google.com/..." />
-        </div>
-      </div>
-    </div>
-  </section>
+<!-- Address -->
+<section class="card">
+<h3>📍 ठेगाना विवरण</h3>
+<div class="body">
+<div class="row">
+  <div class="col-3"><label>प्रदेश</label><select id="province"></select></div>
+  <div class="col-3"><label>जिल्ला</label><select id="district"></select></div>
+  <div class="col-3"><label>न.पा./गा.पा.</label><input id="municipality"></div>
+  <div class="col-3"><label>वडा नं.</label><input id="ward"></div>
+</div>
+</div>
+</section>
 
-  <!-- Ownership -->
-  <section class="card">
-    <h3>👤 स्वामित्व तथा सम्पर्क</h3>
-    <div class="body">
-      <div class="row">
-        <div class="col-6">
-          <label>प्रोपाइटरको नाम</label>
-          <input id="propName" />
-        </div>
-        <div class="col-6">
-          <label>सम्पर्क नम्बर</label>
-          <input id="propPhone" />
-        </div>
-        <div class="col-6">
-          <label>सम्पर्क व्यक्ति</label>
-          <input id="contactName" />
-        </div>
-        <div class="col-6">
-          <label>सम्पर्क व्यक्ति नम्बर</label>
-          <input id="contactPhone" />
-        </div>
-      </div>
+<!-- Preferences -->
+<section class="card">
+<h3>⚙️ प्राथमिकता</h3>
+<div class="body">
+<div class="row">
+  <div class="col-4">
+    <label>भाषा</label><br>
+    <div class="toggle" id="langToggle">
+      <button class="active" data-v="np">नेपाली</button>
+      <button data-v="en">English</button>
     </div>
-  </section>
-
-  <!-- Registration -->
-  <section class="card">
-    <h3>🏢 दर्ता विवरण (ऐच्छिक)</h3>
-    <div class="body">
-      <div class="row">
-        <div class="col-6">
-          <label>दर्ता निकाय</label>
-          <input id="regAuthority" />
-        </div>
-        <div class="col-6">
-          <label>दर्ता नं.</label>
-          <input id="regNo" />
-        </div>
-        <div class="col-6">
-          <label>प्यान नं.</label>
-          <input id="panNo" />
-        </div>
-      </div>
+  </div>
+  <div class="col-4">
+    <label>मुद्रा</label><br>
+    <div class="toggle" id="curToggle">
+      <button class="active" data-v="NPR">ने.रु.</button>
+      <button data-v="USD">USD</button>
     </div>
-  </section>
-
-  <!-- Preferences -->
-  <section class="card">
-    <h3>⚙️ प्राथमिकता सेटिङ</h3>
-    <div class="body">
-      <div class="row">
-        <div class="col-4">
-          <label>भाषा</label><br/>
-          <div class="toggle" id="langToggle">
-            <button class="active" data-v="np">नेपाली</button>
-            <button data-v="en">English</button>
-          </div>
-        </div>
-        <div class="col-4">
-          <label>मुद्रा</label><br/>
-          <div class="toggle" id="curToggle">
-            <button class="active" data-v="NPR">ने.रु.</button>
-            <button data-v="USD">USD</button>
-          </div>
-        </div>
-        <div class="col-4">
-          <label>मिति प्रणाली</label><br/>
-          <div class="toggle" id="dateToggle">
-            <button class="active" data-v="BS">वि.सं.</button>
-            <button data-v="AD">ई.सं.</button>
-          </div>
-        </div>
-      </div>
-      <small>यी सेटिङहरू सम्पूर्ण प्रणालीमा लागू हुनेछन्।</small>
-    </div>
-  </section>
+  </div>
+</div>
+</div>
+</section>
 
 </main>
 
-<!-- Footer -->
 <div class="footer-nav">
   <div class="status" id="saveStatus">अन्तिम सेभ: —</div>
   <div>
@@ -294,6 +180,97 @@ small{font-size:11px; color:#777}
     <button class="btn primary" id="continueBtn" disabled>अगाडि बढ्नुहोस् ➜</button>
   </div>
 </div>
+
+<script>
+/* ===== Province → District ===== */
+const NEPAL_P_D={
+"बागमती":["काठमाडौँ","ललितपुर","भक्तपुर","नुवाकोट","रसुवा","धादिङ","चितवन"],
+"गण्डकी":["कास्की","गोरखा","लमजुङ"],
+"लुम्बिनी":["रुपन्देही","दाङ","बाँके"],
+"कर्णाली":["सुर्खेत","जुम्ला"],
+"सुदूरपश्चिम":["कैलाली","कञ्चनपुर"]
+};
+const province=document.getElementById("province");
+const district=document.getElementById("district");
+province.innerHTML='<option value="">प्रदेश</option>'+Object.keys(NEPAL_P_D).map(p=>`<option>${p}</option>`).join("");
+province.onchange=()=>{
+ district.innerHTML='<option value="">जिल्ला</option>';
+ (NEPAL_P_D[province.value]||[]).forEach(d=>district.innerHTML+=`<option>${d}</option>`);
+ save();
+};
+
+/* ===== Business Registry ===== */
+const $=id=>document.getElementById(id);
+function getBiz(){return JSON.parse(localStorage.getItem("fb_businesses")||'{"list":{}}')}
+function setBiz(b){localStorage.setItem("fb_businesses",JSON.stringify(b))}
+let B=getBiz();
+if(!B.activeId){
+ const id="b"+Date.now();
+ B.activeId=id;B.list[id]={name:""};setBiz(B);
+}
+const BID=B.activeId,KEY="fb_business_info_"+BID;
+
+/* Switcher */
+function loadSwitcher(){
+ const s=$("businessSwitcher");s.innerHTML="";
+ Object.entries(B.list).forEach(([id,v])=>{
+  s.innerHTML+=`<option value="${id}" ${id===BID?"selected":""}>${v.name||"नाम नभएको व्यवसाय"}</option>`;
+ });
+ s.innerHTML+=`<option value="__new__">➕ नयाँ व्यवसाय</option>`;
+}
+$("businessSwitcher").onchange=e=>{
+ if(e.target.value==="__new__"){
+  const id="b"+Date.now();B.list[id]={name:""};B.activeId=id;setBiz(B);location.reload();
+ }else{B.activeId=e.target.value;setBiz(B);location.reload();}
+};
+loadSwitcher();
+
+/* Save / Load */
+function collect(){
+ return{
+  name:$("businessName").value,
+  type:$("businessType").value,
+  address:{province:province.value,district:district.value},
+  pref:{
+   lang:document.querySelector("#langToggle .active").dataset.v,
+   cur:document.querySelector("#curToggle .active").dataset.v
+  }
+ };
+}
+function save(){
+ const d=collect();localStorage.setItem(KEY,JSON.stringify(d));
+ B.list[BID].name=d.name;setBiz(B);
+ $("saveStatus").textContent="अन्तिम सेभ: ✔";
+ $("continueBtn").disabled=!d.name;
+}
+document.querySelectorAll("input,select").forEach(e=>{
+ e.oninput=save;e.onchange=save;
+});
+
+/* Toggle */
+document.querySelectorAll(".toggle button").forEach(b=>{
+ b.onclick=()=>{
+  b.parentElement.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
+  b.classList.add("active");save();
+ };
+});
+
+/* Load */
+const raw=localStorage.getItem(KEY);
+if(raw){
+ const d=JSON.parse(raw);
+ $("businessName").value=d.name||"";
+ $("businessType").value=d.type||"";
+ province.value=d.address?.province||"";
+ if(province.value){
+  province.onchange();
+  district.value=d.address?.district||"";
+ }
+}
+
+/* Continue */
+$("continueBtn").onclick=()=>location.href="existing-status.html";
+</script>
 
 </body>
 </html>
