@@ -39,13 +39,12 @@ textarea{resize:vertical}
 .btn.danger{color:#b71c1c}
 
 .small{font-size:11px;color:#555}
+.warn{color:#b71c1c;font-size:12px;margin-top:6px}
 
 /* TABLE */
 table{width:100%;border-collapse:collapse;margin-top:6px}
 th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:center}
 th{background:#f3f5f7}
-
-.warn{color:#b71c1c;font-size:12px;margin-top:6px}
 
 @media print{.nav-bar{display:none}}
 </style>
@@ -61,6 +60,7 @@ th{background:#f3f5f7}
   </div>
 </div>
 
+<!-- NAV -->
 <div class="nav-bar top-nav">
   <a href="expenses.html" class="nav-btn">⬅️ खर्च</a>
   <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
@@ -74,11 +74,12 @@ th{background:#f3f5f7}
   <div class="body" id="capitalSummary"></div>
 </div>
 
-<!-- CAPITAL SOURCE TABLE -->
+<!-- CAPITAL SOURCE -->
 <div class="card">
   <h3>🏦 पुँजीको स्रोत वितरण</h3>
   <div class="body">
-    <button class="btn primary" id="addRow">➕ स्रोत थप्नुहोस्</button>
+
+    <button class="btn primary" id="addRowBtn">➕ स्रोत थप्नुहोस्</button>
 
     <table>
       <thead>
@@ -110,6 +111,7 @@ th{background:#f3f5f7}
 
 </div>
 
+<!-- NAV -->
 <div class="nav-bar bottom-nav">
   <a href="expenses.html" class="nav-btn">⬅️ खर्च</a>
   <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
@@ -117,66 +119,86 @@ th{background:#f3f5f7}
 
 <script>
 /* ========= IDENTITY ========= */
-const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID=B.activeId||"b1";
-const info=JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
-pageTitle.textContent=info.projectName||"परियोजनाको नाम";
-pageSub.textContent=info.businessName||"व्यवसाय";
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+pageTitle.textContent = info.projectName || "परियोजनाको नाम";
+pageSub.textContent   = info.businessName || "व्यवसाय";
 
 /* ========= EXPENSE TOTAL ========= */
-const e=JSON.parse(localStorage.getItem("fb_expenses_"+BID)||"{}");
-let current=0,fixed=0;
+const e = JSON.parse(localStorage.getItem("fb_expenses_"+BID)||"{}");
+let current = 0, fixed = 0;
 (e.current||[]).forEach(x=>current+=(+x.qty||0)*(+x.rate||0));
 (e.fixed||[]).forEach(x=>fixed+=(+x.qty||0)*(+x.rate||0));
-const TOTAL=current+fixed;
+const TOTAL = current + fixed;
 
 /* ========= STORAGE ========= */
-const KEY="fb_capital_source_"+BID;
-let data=JSON.parse(localStorage.getItem(KEY)||"null");
+const KEY = "fb_capital_source_"+BID;
+let data = JSON.parse(localStorage.getItem(KEY)||"null");
 if(!data){
-  data={rows:[
-    {name:"स्वलगानी",pct:40,loan:false,rate:0},
-    {name:"बैंक ऋण",pct:40,loan:true,rate:12},
-    {name:"अनुदान",pct:20,loan:false,rate:0}
-  ],note:""};
+  data = {
+    rows:[
+      {name:"स्वलगानी",pct:40,loan:false,rate:0},
+      {name:"बैंक ऋण",pct:40,loan:true,rate:12},
+      {name:"अनुदान",pct:20,loan:false,rate:0}
+    ],
+    note:""
+  };
 }
 
+/* ========= SAVE ========= */
 function save(){
-  localStorage.setItem(KEY,JSON.stringify(data));
+  localStorage.setItem(KEY, JSON.stringify(data));
   render();
 }
 
-/* ========= RENDER SUMMARY ========= */
+/* ========= SUMMARY ========= */
 function renderSummary(){
-  capitalSummary.innerHTML=`
+  capitalSummary.innerHTML = `
     <div>कुल पुँजी: <b>रु ${TOTAL.toLocaleString()}</b></div>
     <div>चालु खर्च: रु ${current.toLocaleString()}</div>
     <div>स्थिर खर्च: रु ${fixed.toLocaleString()}</div>
   `;
 }
 
-/* ========= RENDER TABLE ========= */
+/* ========= RENDER ========= */
 function render(){
   renderSummary();
   sourceTable.innerHTML="";
-  let pctSum=0;
+  let pctSum = 0;
 
   data.rows.forEach((r,i)=>{
-    const amt=TOTAL*((+r.pct||0)/100);
-    const int=r.loan?amt*((+r.rate||0)/100):0;
-    pctSum+=(+r.pct||0);
+    const amt = TOTAL*((+r.pct||0)/100);
+    const interest = r.loan ? amt*((+r.rate||0)/100) : 0;
+    pctSum += (+r.pct||0);
 
-    sourceTable.innerHTML+=`
+    sourceTable.innerHTML += `
       <tr>
-        <td><input value="${r.name}" oninput="data.rows[${i}].name=this.value;save()"></td>
-        <td><input type="number" value="${r.pct}" oninput="data.rows[${i}].pct=this.value;save()"></td>
+        <td><input value="${r.name}"
+          oninput="data.rows[${i}].name=this.value;save()"></td>
+
+        <td><input type="number" value="${r.pct}"
+          oninput="data.rows[${i}].pct=this.value;save()"></td>
+
         <td>रु ${amt.toLocaleString()}</td>
-        <td><input type="checkbox" ${r.loan?"checked":""}
-              onchange="data.rows[${i}].loan=this.checked;save()"></td>
-        <td><input type="number" value="${r.rate}" ${r.loan?"":"readonly"}
-              oninput="data.rows[${i}].rate=this.value;save()"></td>
-        <td>रु ${int.toLocaleString()}</td>
-        <td><button class="btn danger" onclick="data.rows.splice(${i},1);save()">🗑️</button></td>
+
+        <td>
+          <input type="checkbox" ${r.loan?"checked":""}
+            onchange="data.rows[${i}].loan=this.checked;save()">
+        </td>
+
+        <td>
+          <input type="number" value="${r.rate}"
+            ${r.loan?"":"readonly"}
+            oninput="data.rows[${i}].rate=this.value;save()">
+        </td>
+
+        <td>रु ${interest.toLocaleString()}</td>
+
+        <td>
+          <button class="btn danger"
+            onclick="data.rows.splice(${i},1);save()">🗑️</button>
+        </td>
       </tr>
     `;
   });
@@ -185,13 +207,19 @@ function render(){
     pctSum===100 ? "" : "⚠️ स्रोत वितरणको कुल प्रतिशत 100% हुनुपर्छ";
 }
 
-addRow.onclick=()=>{
-  data.rows.push({name:"",pct:0,loan:false,rate:0});
-  save();
-};
+/* ========= ADD ROW (CLICK FIXED) ========= */
+document.getElementById("addRowBtn")
+  .addEventListener("click", ()=>{
+    data.rows.push({name:"",pct:0,loan:false,rate:0});
+    save();
+  });
 
-note.value=data.note||"";
-note.onblur=()=>{data.note=note.value;save();};
+/* ========= NOTE ========= */
+note.value = data.note || "";
+note.addEventListener("blur", ()=>{
+  data.note = note.value;
+  save();
+});
 
 render();
 </script>
