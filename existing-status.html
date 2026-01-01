@@ -3,62 +3,49 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>स्थिति अवलोकन | FarmerBase BP Engine</title>
+<title>स्थिति तथा पूर्वाधार | FarmerBase BP Engine</title>
 
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
-/* ===== NAV ===== */
+/* NAV */
 .nav-bar{
-  max-width:var(--w);
-  margin:8px auto;
-  padding:8px 14px;
-  display:flex;
-  justify-content:space-between;
+  max-width:var(--w);margin:8px auto;padding:8px 14px;
+  display:flex;justify-content:space-between
 }
 .nav-btn{
-  text-decoration:none;
-  font-size:13px;
-  padding:6px 14px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  background:#fafafa;
-  color:#222;
+  text-decoration:none;font-size:13px;padding:6px 14px;
+  border-radius:20px;border:1px solid #ccc;
+  background:#fafafa;color:#222
 }
-.nav-btn.primary{
-  background:var(--g);
-  color:#fff;
-  border-color:var(--g);
-}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
 .top-nav{position:sticky;top:0;background:#f6f7f9;z-index:9}
 .bottom-nav{position:sticky;bottom:0;background:#f6f7f9;z-index:9}
 
-/* ===== Layout ===== */
+/* Layout */
 .main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
 .card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{
-  margin:0;padding:10px 12px;
-  background:#f3f5f7;border-bottom:1px solid var(--b);
-  font-size:14px
+  margin:0;padding:10px 12px;background:#f3f5f7;
+  border-bottom:1px solid var(--b);font-size:14px
 }
 .card .body{padding:12px;font-size:13px}
 
 .status-row{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  border-bottom:1px dashed #eee;
+  display:flex;justify-content:space-between;
+  padding:6px 0;border-bottom:1px dashed #eee
 }
 .status-ok{color:#2e7d32;font-weight:600}
 .status-warn{color:#e65100;font-weight:600}
 
-.note{
-  font-size:12px;
-  color:#555;
-  margin-top:8px;
+textarea,input{
+  width:100%;padding:6px;margin:4px 0;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
 }
+
+.check{display:flex;align-items:center;gap:8px;margin:6px 0}
 </style>
 </head>
 
@@ -72,9 +59,9 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 
 <div class="main">
 
-<!-- BUSINESS SUMMARY -->
+<!-- 1️⃣ SHORT-INFO SUMMARY -->
 <div class="card">
-  <h3>🏢 व्यवसाय स्थिति</h3>
+  <h3>🏢 व्यवसायको आधारभूत स्थिति</h3>
   <div class="body">
     <div class="status-row">
       <span>व्यवसायको नाम</span>
@@ -92,11 +79,34 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
       <span>सम्पर्क विवरण</span>
       <strong id="contactStatus">—</strong>
     </div>
+  </div>
+</div>
 
-    <div class="note">
-      ℹ️ यो पेजले केवल स्थिति देखाउँछ।  
-      विवरण लेख्न <b>“व्यवसाय विवरण”</b> पेजमा जानुहोस्।
+<!-- 2️⃣ INFRASTRUCTURE (NEW) -->
+<div class="card">
+  <h3>🔌 व्यवसायसँग सम्बन्धित पूर्वाधार अवस्था</h3>
+  <div class="body">
+
+    <label>पूर्वाधारको समग्र अवस्था (संक्षेप Paragraph)</label>
+    <textarea id="infraText" rows="3"
+      placeholder="सडक, बिजुली, पानी, बजारको अवस्था संक्षेपमा..."></textarea>
+
+    <div class="check">
+      <input type="checkbox" id="road"> <label for="road">पक्की / कच्ची सडक पहुँच</label>
     </div>
+    <div class="check">
+      <input type="checkbox" id="electricity"> <label for="electricity">बिजुली सुविधा</label>
+    </div>
+    <div class="check">
+      <input type="checkbox" id="water"> <label for="water">पानी सुविधा</label>
+    </div>
+    <div class="check">
+      <input type="checkbox" id="market"> <label for="market">नजिकको बजार पहुँच</label>
+    </div>
+    <div class="check">
+      <input type="checkbox" id="internet"> <label for="internet">इन्टरनेट / मोबाइल सञ्जाल</label>
+    </div>
+
   </div>
 </div>
 
@@ -114,36 +124,63 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 ====================== */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
-const KEY = "fb_short_info_" + BID;
-const data = JSON.parse(localStorage.getItem(KEY)||"{}");
 
-/* Name */
-document.getElementById("bizName").textContent =
-  data.name || "भरिएको छैन";
+/* Short info */
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
 
-/* Intro */
-document.getElementById("introStatus").textContent =
-  data.intro ? "पूरा" : "अधूरो";
-document.getElementById("introStatus").className =
-  data.intro ? "status-ok" : "status-warn";
+bizName.textContent = info.name || "भरिएको छैन";
 
-/* Registration */
-const regOk = data.registration &&
-  (data.registration.office || data.registration.number || data.registration.pan);
+introStatus.textContent = info.intro ? "पूरा" : "अधूरो";
+introStatus.className = info.intro ? "status-ok" : "status-warn";
 
-document.getElementById("regStatus").textContent =
-  regOk ? "पूरा" : "अधूरो";
-document.getElementById("regStatus").className =
-  regOk ? "status-ok" : "status-warn";
+const regOk = info.registration &&
+  (info.registration.office || info.registration.number || info.registration.pan);
+regStatus.textContent = regOk ? "पूरा" : "अधूरो";
+regStatus.className = regOk ? "status-ok" : "status-warn";
 
-/* Contact */
-const contactOk = data.contact &&
-  (data.contact.owner || data.contact.phone);
+const contactOk = info.contact &&
+  (info.contact.owner || info.contact.phone);
+contactStatus.textContent = contactOk ? "पूरा" : "अधूरो";
+contactStatus.className = contactOk ? "status-ok" : "status-warn";
 
-document.getElementById("contactStatus").textContent =
-  contactOk ? "पूरा" : "अधूरो";
-document.getElementById("contactStatus").className =
-  contactOk ? "status-ok" : "status-warn";
+/* ======================
+   INFRASTRUCTURE SAVE
+====================== */
+const INFRA_KEY = "fb_infrastructure_" + BID;
+
+function collectInfra(){
+  return {
+    paragraph: infraText.value,
+    checklist:{
+      road: road.checked,
+      electricity: electricity.checked,
+      water: water.checked,
+      market: market.checked,
+      internet: internet.checked
+    }
+  };
+}
+
+function saveInfra(){
+  localStorage.setItem(INFRA_KEY, JSON.stringify(collectInfra()));
+}
+
+document.querySelectorAll("#infraText, #road, #electricity, #water, #market, #internet")
+  .forEach(e=>{
+    e.addEventListener("input", saveInfra);
+    e.addEventListener("change", saveInfra);
+  });
+
+/* Load infra */
+const infra = JSON.parse(localStorage.getItem(INFRA_KEY)||"{}");
+infraText.value = infra.paragraph || "";
+if(infra.checklist){
+  road.checked = !!infra.checklist.road;
+  electricity.checked = !!infra.checklist.electricity;
+  water.checked = !!infra.checklist.water;
+  market.checked = !!infra.checklist.market;
+  internet.checked = !!infra.checklist.internet;
+}
 </script>
 
 </body>
