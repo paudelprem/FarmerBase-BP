@@ -31,15 +31,14 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .card .body{padding:12px;font-size:13px}
 
 label{display:block;margin-top:6px;font-size:12px}
-input,textarea{width:100%;padding:6px;margin-top:4px;border:1px solid #ccc;border-radius:6px}
-input[readonly],textarea[readonly]{background:#f9f9f9}
+input{width:100%;padding:6px;margin-top:4px;border:1px solid #ccc;border-radius:6px}
+input[readonly]{background:#f9f9f9}
 
 .btn{font-size:12px;padding:4px 10px;margin:6px 4px 0 0;cursor:pointer}
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
 
 .block{border-left:3px solid var(--g);padding-left:10px;margin-top:10px}
-.summary-row{display:flex;justify-content:space-between;font-size:13px}
 .small{font-size:11px;color:#555}
 
 /* COLLAPSE */
@@ -47,7 +46,6 @@ input[readonly],textarea[readonly]{background:#f9f9f9}
 .collapsed .summary{display:block}
 .summary{display:none}
 
-/* PRINT */
 @media print{.nav-bar{display:none}}
 </style>
 </head>
@@ -70,6 +68,7 @@ input[readonly],textarea[readonly]{background:#f9f9f9}
 
 <div class="main">
 
+<!-- CURRENT -->
 <div class="card">
   <h3>💸 चालु खर्च</h3>
   <div class="body">
@@ -78,6 +77,7 @@ input[readonly],textarea[readonly]{background:#f9f9f9}
   </div>
 </div>
 
+<!-- FIXED -->
 <div class="card">
   <h3>🏗️ स्थिर (पुँजीगत) खर्च</h3>
   <div class="body">
@@ -88,87 +88,148 @@ input[readonly],textarea[readonly]{background:#f9f9f9}
 
 </div>
 
+<!-- NAV BOTTOM -->
 <div class="nav-bar bottom-nav">
   <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
   <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
 </div>
 
 <script>
-/* IDENTITY */
-const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID=B.activeId||"b1";
-const info=JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
-pageTitle.textContent=info.projectName||"परियोजनाको नाम";
-pageSub.textContent=info.businessName||"व्यवसाय";
+/* ================= IDENTITY ================= */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+pageTitle.textContent = info.projectName || "परियोजनाको नाम";
+pageSub.textContent   = info.businessName || "व्यवसाय";
 
-/* PRODUCTS */
-const PRODUCTS=JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+/* ================= PRODUCTS ================= */
+const PRODUCTS = JSON.parse(
+  localStorage.getItem("fb_production_items_"+BID) || "[]"
+);
 
-/* STORAGE */
-const KEY="fb_expenses_"+BID;
-let data=JSON.parse(localStorage.getItem(KEY)||"null");
-if(!data) data={current:[],fixed:[]};
+/* ================= STORAGE ================= */
+const KEY = "fb_expenses_"+BID;
+let data = JSON.parse(localStorage.getItem(KEY)||"null");
+if(!data) data = { current:[], fixed:[] };
 
-function save(){localStorage.setItem(KEY,JSON.stringify(data));render();}
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(data));
+  render();
+}
 
-/* ADD (PREPEND) */
+/* ================= ADD (PREPEND) ================= */
 function add(type){
   data[type].unshift({
-    title:"",unit:"",qty:"",rate:"",
-    applyType:"selected",products:[],
+    title:"",
+    unit:"",
+    qty:"",
+    rate:"",
+    applyType:"selected", // all | selected
+    products:[],
     edit:true
   });
   save();
 }
 
-/* EVENTS */
-addCurrent.onclick=()=>add("current");
-addFixed.onclick=()=>add("fixed");
+addCurrent.onclick = ()=>add("current");
+addFixed.onclick   = ()=>add("fixed");
 
-/* RENDER */
-function renderList(type,wrap){
+/* ================= RENDER ================= */
+function renderList(type, wrap){
   wrap.innerHTML="";
   data[type].forEach((e,i)=>{
-    const amt=(+e.qty||0)*(+e.rate||0);
-    const per=e.qty?amt/e.qty:0;
+    const qty = (+e.qty||0);
+    const rate = (+e.rate||0);
+    const amt = qty * rate;
+    const per = qty ? amt/qty : 0;
 
-    wrap.innerHTML+=`
+    wrap.innerHTML += `
     <div class="block ${!e.edit?'collapsed':''}">
       <div class="summary">
-        <div class="summary-row">
-          <b>${e.title||"(शीर्षक)"}</b>
-          <span>रु ${amt.toLocaleString()}</span>
-        </div>
-        <div class="small">इकाईगत: रु ${per.toLocaleString()}</div>
+        <b>${e.title || "(शीर्षक)"}</b><br>
+        <span class="small">
+          इकाईगत: रु ${per.toLocaleString()} |
+          कुल: रु ${amt.toLocaleString()}
+        </span>
       </div>
 
       <div class="edit-area">
-        <label>शीर्षक</label>
-        <input value="${e.title}" oninput="data.${type}[${i}].title=this.value">
+        <label>खर्च शीर्षक</label>
+        <input value="${e.title}"
+          oninput="data.${type}[${i}].title=this.value">
 
         <label>इकाई</label>
-        <input value="${e.unit}" oninput="data.${type}[${i}].unit=this.value">
+        <input value="${e.unit}"
+          oninput="data.${type}[${i}].unit=this.value">
 
         <label>परिमाण</label>
-        <input type="number" value="${e.qty}" oninput="data.${type}[${i}].qty=this.value">
+        <input type="number" value="${e.qty}"
+          oninput="data.${type}[${i}].qty=this.value">
 
         <label>दर</label>
-        <input type="number" value="${e.rate}" oninput="data.${type}[${i}].rate=this.value">
+        <input type="number" value="${e.rate}"
+          oninput="data.${type}[${i}].rate=this.value">
+
+        <label><b>खर्चको प्रकृति</b></label>
+        <label>
+          <input type="radio" name="ap_${type}_${i}"
+            ${e.applyType==="all"?"checked":""}
+            onchange="data.${type}[${i}].applyType='all';save()">
+          सबै उत्पादनमा लाग्ने
+        </label>
+        <label>
+          <input type="radio" name="ap_${type}_${i}"
+            ${e.applyType==="selected"?"checked":""}
+            onchange="data.${type}[${i}].applyType='selected';save()">
+          केही उत्पादनमा मात्र लाग्ने
+        </label>
+
+        ${
+          e.applyType==="selected"
+          ? (
+            PRODUCTS.length===0
+            ? `<div class="small" style="color:#b71c1c">
+                ⚠️ उत्पादन सूची खाली छ (पहिले production भर्नुहोस्)
+              </div>`
+            : `
+              <div class="small"><b>केमा लगानी?</b></div>
+              ${PRODUCTS.map(p=>`
+                <label>
+                  <input type="checkbox"
+                    ${e.products.includes(p.name)?"checked":""}
+                    onchange="
+                      const arr=data.${type}[${i}].products;
+                      this.checked
+                        ? arr.push('${p.name}')
+                        : arr.splice(arr.indexOf('${p.name}'),1);
+                      save();
+                    ">
+                  ${p.name}
+                </label>
+              `).join("")}
+            `
+          )
+          : ""
+        }
       </div>
 
-      ${e.edit?`
-        <button class="btn primary" onclick="data.${type}[${i}].edit=false;save()">💾 Save</button>
-      `:`
-        <button class="btn primary" onclick="data.${type}[${i}].edit=true;save()">✏️ Edit</button>
-      `}
-      <button class="btn danger" onclick="data.${type}.splice(${i},1);save()">🗑️</button>
-    </div>`;
+      ${
+        e.edit
+        ? `<button class="btn primary"
+             onclick="data.${type}[${i}].edit=false;save()">💾 Save</button>`
+        : `<button class="btn primary"
+             onclick="data.${type}[${i}].edit=true;save()">✏️ Edit</button>`
+      }
+      <button class="btn danger"
+        onclick="data.${type}.splice(${i},1);save()">🗑️ हटाउनुहोस्</button>
+    </div>
+    `;
   });
 }
 
 function render(){
-  renderList("current",currentList);
-  renderList("fixed",fixedList);
+  renderList("current", currentList);
+  renderList("fixed", fixedList);
 }
 render();
 </script>
