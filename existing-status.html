@@ -7,117 +7,73 @@
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#f6f7f9;
-  color:#222
-}
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
-/* ===== NAV ===== */
+/* NAV */
 .nav-bar{
-  max-width:var(--w);
-  margin:8px auto;
-  padding:8px 14px;
-  display:flex;
-  justify-content:space-between;
-  background:#f6f7f9;
+  max-width:var(--w);margin:8px auto;padding:8px 14px;
+  display:flex;justify-content:space-between;background:#f6f7f9
 }
 .nav-btn{
-  text-decoration:none;
-  font-size:13px;
-  padding:6px 14px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  background:#fafafa;
-  color:#222;
+  text-decoration:none;font-size:13px;padding:6px 14px;
+  border-radius:20px;border:1px solid #ccc;
+  background:#fafafa;color:#222
 }
-.nav-btn.primary{
-  background:var(--g);
-  color:#fff;
-  border-color:var(--g);
-}
-.top-nav{
-  position:sticky;
-  top:0;
-  z-index:100;
-}
-.bottom-nav{
-  position:sticky;
-  bottom:0;
-  z-index:100;
-}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.top-nav{position:sticky;top:0;z-index:100}
+.bottom-nav{position:sticky;bottom:0;z-index:100}
 
-/* ===== Layout ===== */
+/* Layout */
 .main{
-  max-width:var(--w);
-  margin:10px auto 20px;
-  padding:0 14px;
-  position:relative;
-  z-index:1;
+  max-width:var(--w);margin:10px auto 20px;
+  padding:0 14px;position:relative;z-index:1
 }
 .card{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:8px;
-  margin-bottom:16px;
+  background:#fff;border:1px solid var(--b);
+  border-radius:8px;margin-bottom:16px
 }
 .card h3{
-  margin:0;
-  padding:10px 12px;
-  background:#f3f5f7;
-  border-bottom:1px solid var(--b);
-  font-size:14px;
+  margin:0;padding:10px 12px;background:#f3f5f7;
+  border-bottom:1px solid var(--b);font-size:14px
 }
-.card .body{
-  padding:12px;
-  font-size:13px;
-}
+.card .body{padding:12px;font-size:13px}
 
 .status-row{
-  display:flex;
-  justify-content:space-between;
-  padding:6px 0;
-  border-bottom:1px dashed #eee;
+  display:flex;justify-content:space-between;
+  padding:6px 0;border-bottom:1px dashed #eee
 }
 .label{color:#555}
 .value{font-weight:600}
-
 .status-ok{color:#2e7d32}
 .status-warn{color:#e65100}
 
 input,textarea{
-  width:100%;
-  padding:6px;
-  margin:4px 0;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:13px;
+  width:100%;padding:6px;margin:4px 0;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
+}
+input[readonly],textarea[readonly]{
+  background:#f9f9f9;border-color:#eee
 }
 
-/* ===== Infra ===== */
+/* Infra */
 .infra-block{
   border-left:3px solid var(--g);
-  padding-left:10px;
-  margin-top:12px;
+  padding-left:10px;margin-top:12px
 }
-.infra-title{
-  font-weight:600;
-  margin-top:6px;
+.infra-title{font-weight:600;margin-top:6px}
+.btn{
+  font-size:12px;padding:4px 10px;margin:4px 4px 0 0;
+  cursor:pointer
 }
-.small-btn{
-  font-size:12px;
-  padding:4px 10px;
-  margin-top:6px;
-  cursor:pointer;
-}
+.btn.danger{color:#b71c1c}
+.btn.primary{color:#1b5e20;font-weight:600}
 </style>
 </head>
 
 <body>
 
-<!-- 🔼 TOP NAV -->
+<!-- TOP NAV -->
 <div class="nav-bar top-nav">
   <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
   <a href="business-detail.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
@@ -125,149 +81,119 @@ input,textarea{
 
 <div class="main">
 
-<!-- BUSINESS SUMMARY -->
+<!-- SUMMARY -->
 <div class="card">
   <h3>🏢 व्यवसायको आधारभूत विवरण</h3>
   <div class="body">
-
-    <div class="status-row">
-      <span class="label">व्यवसायको नाम</span>
-      <span class="value" id="bizName">—</span>
-    </div>
-
-    <div class="status-row">
-      <span class="label">प्रोप्राइटर / सञ्चालक</span>
-      <span class="value" id="ownerName">—</span>
-    </div>
-
-    <div class="status-row">
-      <span class="label">सम्पर्क नम्बर</span>
-      <span class="value" id="phone">—</span>
-    </div>
-
-    <div class="status-row">
-      <span class="label">ठेगाना</span>
-      <span class="value" id="address">—</span>
-    </div>
-
-    <div class="status-row">
-      <span class="label">संस्थागत परिचय</span>
-      <span class="value" id="introStatus">—</span>
-    </div>
-
-    <div class="status-row">
-      <span class="label">दर्ता / कानुनी स्थिति</span>
-      <span class="value" id="regStatus">—</span>
-    </div>
-
+    <div class="status-row"><span class="label">व्यवसाय</span><span class="value" id="bizName">—</span></div>
+    <div class="status-row"><span class="label">प्रोप्राइटर</span><span class="value" id="ownerName">—</span></div>
+    <div class="status-row"><span class="label">सम्पर्क</span><span class="value" id="phone">—</span></div>
+    <div class="status-row"><span class="label">ठेगाना</span><span class="value" id="address">—</span></div>
+    <div class="status-row"><span class="label">संस्थागत परिचय</span><span class="value" id="introStatus">—</span></div>
+    <div class="status-row"><span class="label">कानुनी स्थिति</span><span class="value" id="regStatus">—</span></div>
   </div>
 </div>
 
-<!-- INFRASTRUCTURE -->
+<!-- INFRA -->
 <div class="card">
   <h3>🔌 व्यवसायसँग सम्बन्धित पूर्वाधार अवस्था</h3>
   <div class="body">
-
-    <button class="small-btn" onclick="addInfra()">➕ नयाँ शीर्षक थप्नुहोस्</button>
-
+    <button class="btn primary" onclick="addInfra()">➕ नयाँ विषय थप्नुहोस्</button>
     <div id="infraList"></div>
-
   </div>
 </div>
 
 </div>
 
-<!-- 🔽 BOTTOM NAV -->
+<!-- BOTTOM NAV -->
 <div class="nav-bar bottom-nav">
   <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
   <a href="business-detail.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
 </div>
 
 <script>
-/* ======================
-   CONTEXT
-====================== */
-const B = JSON.parse(localStorage.getItem("fb_businesses") || "{}");
+/* CONTEXT */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
 
-/* ======================
-   LOAD SHORT INFO
-====================== */
-const info = JSON.parse(localStorage.getItem("fb_short_info_" + BID) || "{}");
-
-document.getElementById("bizName").textContent = info.name || "भरिएको छैन";
-document.getElementById("ownerName").textContent = info.contact?.owner || "—";
-document.getElementById("phone").textContent = info.contact?.phone || "—";
-
-document.getElementById("address").textContent = [
+/* LOAD SHORT INFO */
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+bizName.textContent = info.name || "—";
+ownerName.textContent = info.contact?.owner || "—";
+phone.textContent = info.contact?.phone || "—";
+address.textContent = [
   info.address?.province,
   info.address?.district,
   info.address?.municipality,
-  info.address?.ward ? "वडा " + info.address.ward : ""
+  info.address?.ward && "वडा "+info.address.ward
 ].filter(Boolean).join(", ") || "—";
 
-const introOk = !!info.intro;
-document.getElementById("introStatus").textContent = introOk ? "पूरा" : "अधूरो";
-document.getElementById("introStatus").className =
-  "value " + (introOk ? "status-ok" : "status-warn");
+introStatus.textContent = info.intro ? "पूरा" : "अधूरो";
+introStatus.className = "value " + (info.intro ? "status-ok":"status-warn");
 
 const regOk = info.registration &&
  (info.registration.office || info.registration.number || info.registration.pan);
-document.getElementById("regStatus").textContent = regOk ? "पूरा" : "अधूरो";
-document.getElementById("regStatus").className =
-  "value " + (regOk ? "status-ok" : "status-warn");
+regStatus.textContent = regOk ? "पूरा" : "अधूरो";
+regStatus.className = "value " + (regOk ? "status-ok":"status-warn");
 
-/* ======================
-   INFRASTRUCTURE LOGIC
-====================== */
-const INFRA_KEY = "fb_infrastructure_" + BID;
-let infra = JSON.parse(localStorage.getItem(INFRA_KEY) || "[]");
+/* INFRA DATA */
+const KEY = "fb_infrastructure_"+BID;
+let infra = JSON.parse(localStorage.getItem(KEY)||"[]");
 
-function saveInfra(){
-  localStorage.setItem(INFRA_KEY, JSON.stringify(infra));
-  renderInfra();
-}
+function save(){ localStorage.setItem(KEY,JSON.stringify(infra)); render(); }
 
 function addInfra(){
-  infra.push({ title:"", content:"" });
-  saveInfra();
+  infra.push({title:"",content:"",edit:true,backup:{}});
+  save();
 }
 
-function updateInfra(i,key,val){
-  infra[i][key] = val;
-  saveInfra();
+function editInfra(i){
+  infra[i].backup = {...infra[i]};
+  infra[i].edit = true;
+  render();
+}
+
+function cancelEdit(i){
+  infra[i] = {...infra[i].backup, edit:false};
+  save();
+}
+
+function saveEdit(i){
+  infra[i].edit = false;
+  save();
 }
 
 function deleteInfra(i){
-  if(!confirm("यो शीर्षक हटाउने?")) return;
-  infra.splice(i,1);
-  saveInfra();
+  if(!confirm("यो विषय हटाउने?")) return;
+  infra.splice(i,1); save();
 }
 
-function renderInfra(){
-  const wrap = document.getElementById("infraList");
-  wrap.innerHTML = "";
-
+function render(){
+  const wrap=document.getElementById("infraList");
+  wrap.innerHTML="";
   infra.forEach((b,i)=>{
-    const div = document.createElement("div");
-    div.className = "infra-block";
+    wrap.innerHTML+=`
+      <div class="infra-block">
+        <div class="infra-title">विषय</div>
+        <input ${b.edit?"":"readonly"} value="${b.title||""}"
+          oninput="infra[${i}].title=this.value">
 
-    div.innerHTML = `
-      <div class="infra-title">शीर्षक</div>
-      <input value="${b.title}"
-        oninput="updateInfra(${i},'title',this.value)">
+        <div class="infra-title">कुरा (विवरण)</div>
+        <textarea rows="3" ${b.edit?"":"readonly"}
+          oninput="infra[${i}].content=this.value">${b.content||""}</textarea>
 
-      <div class="infra-title">कुरा (विवरण)</div>
-      <textarea rows="3"
-        oninput="updateInfra(${i},'content',this.value)">${b.content}</textarea>
-
-      <button class="small-btn" onclick="deleteInfra(${i})">🗑️ हटाउनुहोस्</button>
+        ${b.edit ? `
+          <button class="btn primary" onclick="saveEdit(${i})">💾 Save</button>
+          <button class="btn" onclick="cancelEdit(${i})">↩️ Cancel</button>
+        ` : `
+          <button class="btn primary" onclick="editInfra(${i})">✏️ सच्याउनुहोस्</button>
+        `}
+        <button class="btn danger" onclick="deleteInfra(${i})">🗑️ हटाउनुहोस्</button>
+      </div>
     `;
-    wrap.appendChild(div);
   });
 }
-
-renderInfra();
+render();
 </script>
 
 </body>
