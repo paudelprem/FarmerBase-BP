@@ -40,12 +40,23 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .status-ok{color:#2e7d32;font-weight:600}
 .status-warn{color:#e65100;font-weight:600}
 
-textarea,input{
+input,textarea{
   width:100%;padding:6px;margin:4px 0;
   border:1px solid #ccc;border-radius:6px;font-size:13px
 }
 
-.check{display:flex;align-items:center;gap:8px;margin:6px 0}
+/* Infra blocks */
+.infra-block{
+  border-left:3px solid var(--g);
+  padding-left:10px;
+  margin-bottom:12px
+}
+.infra-head{
+  font-weight:600;margin-bottom:4px
+}
+.small-btn{
+  font-size:12px;padding:4px 8px;margin-right:4px
+}
 </style>
 </head>
 
@@ -59,7 +70,7 @@ textarea,input{
 
 <div class="main">
 
-<!-- 1️⃣ SHORT-INFO SUMMARY -->
+<!-- 1️⃣ SHORT-INFO SUMMARY (READ ONLY) -->
 <div class="card">
   <h3>🏢 व्यवसायको आधारभूत स्थिति</h3>
   <div class="body">
@@ -82,31 +93,12 @@ textarea,input{
   </div>
 </div>
 
-<!-- 2️⃣ INFRASTRUCTURE (NEW) -->
+<!-- 2️⃣ INFRASTRUCTURE (REFINED) -->
 <div class="card">
   <h3>🔌 व्यवसायसँग सम्बन्धित पूर्वाधार अवस्था</h3>
   <div class="body">
-
-    <label>पूर्वाधारको समग्र अवस्था (संक्षेप Paragraph)</label>
-    <textarea id="infraText" rows="3"
-      placeholder="सडक, बिजुली, पानी, बजारको अवस्था संक्षेपमा..."></textarea>
-
-    <div class="check">
-      <input type="checkbox" id="road"> <label for="road">पक्की / कच्ची सडक पहुँच</label>
-    </div>
-    <div class="check">
-      <input type="checkbox" id="electricity"> <label for="electricity">बिजुली सुविधा</label>
-    </div>
-    <div class="check">
-      <input type="checkbox" id="water"> <label for="water">पानी सुविधा</label>
-    </div>
-    <div class="check">
-      <input type="checkbox" id="market"> <label for="market">नजिकको बजार पहुँच</label>
-    </div>
-    <div class="check">
-      <input type="checkbox" id="internet"> <label for="internet">इन्टरनेट / मोबाइल सञ्जाल</label>
-    </div>
-
+    <button class="small-btn" onclick="addInfra()">➕ नयाँ शीर्षक थप्नुहोस्</button>
+    <div id="infraList"></div>
   </div>
 </div>
 
@@ -120,67 +112,72 @@ textarea,input{
 
 <script>
 /* ======================
-   LOAD SHORT-INFO STATUS
+   CONTEXT
 ====================== */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
 
-/* Short info */
+/* Short-info (read-only) */
 const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
-
 bizName.textContent = info.name || "भरिएको छैन";
 
 introStatus.textContent = info.intro ? "पूरा" : "अधूरो";
 introStatus.className = info.intro ? "status-ok" : "status-warn";
 
 const regOk = info.registration &&
-  (info.registration.office || info.registration.number || info.registration.pan);
+ (info.registration.office || info.registration.number || info.registration.pan);
 regStatus.textContent = regOk ? "पूरा" : "अधूरो";
 regStatus.className = regOk ? "status-ok" : "status-warn";
 
 const contactOk = info.contact &&
-  (info.contact.owner || info.contact.phone);
+ (info.contact.owner || info.contact.phone);
 contactStatus.textContent = contactOk ? "पूरा" : "अधूरो";
 contactStatus.className = contactOk ? "status-ok" : "status-warn";
 
 /* ======================
-   INFRASTRUCTURE SAVE
+   INFRASTRUCTURE (TEXT-FIRST)
 ====================== */
 const INFRA_KEY = "fb_infrastructure_" + BID;
-
-function collectInfra(){
-  return {
-    paragraph: infraText.value,
-    checklist:{
-      road: road.checked,
-      electricity: electricity.checked,
-      water: water.checked,
-      market: market.checked,
-      internet: internet.checked
-    }
-  };
-}
+let infra = JSON.parse(localStorage.getItem(INFRA_KEY) || "[]");
 
 function saveInfra(){
-  localStorage.setItem(INFRA_KEY, JSON.stringify(collectInfra()));
+  localStorage.setItem(INFRA_KEY, JSON.stringify(infra));
+  renderInfra();
 }
 
-document.querySelectorAll("#infraText, #road, #electricity, #water, #market, #internet")
-  .forEach(e=>{
-    e.addEventListener("input", saveInfra);
-    e.addEventListener("change", saveInfra);
+function addInfra(){
+  infra.push({ title:"", content:"" });
+  saveInfra();
+}
+function updateInfra(i,key,val){
+  infra[i][key]=val; saveInfra();
+}
+function deleteInfra(i){
+  if(!confirm("यो शीर्षक हटाउने?")) return;
+  infra.splice(i,1); saveInfra();
+}
+
+function renderInfra(){
+  const wrap=document.getElementById("infraList");
+  wrap.innerHTML="";
+  infra.forEach((b,i)=>{
+    wrap.innerHTML+=`
+      <div class="infra-block">
+        <div class="infra-head">शीर्षक</div>
+        <input value="${b.title}"
+          oninput="updateInfra(${i},'title',this.value)">
+
+        <div class="infra-head">कुरा (विवरण)</div>
+        <textarea rows="3"
+          oninput="updateInfra(${i},'content',this.value)">${b.content}</textarea>
+
+        <button class="small-btn" onclick="deleteInfra(${i})">🗑️ हटाउनुहोस्</button>
+      </div>
+    `;
   });
-
-/* Load infra */
-const infra = JSON.parse(localStorage.getItem(INFRA_KEY)||"{}");
-infraText.value = infra.paragraph || "";
-if(infra.checklist){
-  road.checked = !!infra.checklist.road;
-  electricity.checked = !!infra.checklist.electricity;
-  water.checked = !!infra.checklist.water;
-  market.checked = !!infra.checklist.market;
-  internet.checked = !!infra.checklist.internet;
 }
+
+renderInfra();
 </script>
 
 </body>
