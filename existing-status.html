@@ -3,21 +3,20 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>व्यवसाय स्थिति | FarmerBase BP Engine</title>
+<title>स्थिति अवलोकन | FarmerBase BP Engine</title>
 
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
-/* ===== NAVIGATION (MANDATORY) ===== */
+/* ===== NAV ===== */
 .nav-bar{
   max-width:var(--w);
   margin:8px auto;
   padding:8px 14px;
   display:flex;
   justify-content:space-between;
-  gap:10px;
 }
 .nav-btn{
   text-decoration:none;
@@ -36,232 +35,115 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .top-nav{position:sticky;top:0;background:#f6f7f9;z-index:9}
 .bottom-nav{position:sticky;bottom:0;background:#f6f7f9;z-index:9}
 
-/* ===== LAYOUT ===== */
+/* ===== Layout ===== */
 .main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
 .card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{
   margin:0;padding:10px 12px;
-  background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px
+  background:#f3f5f7;border-bottom:1px solid var(--b);
+  font-size:14px
 }
 .card .body{padding:12px;font-size:13px}
 
-.btn{
-  margin:6px 4px 6px 0;
-  padding:6px 10px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  background:#fafafa;
-  cursor:pointer;
+.status-row{
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #eee;
 }
-.btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.btn.danger{background:#fdecea;border-color:#e53935;color:#b71c1c}
-.small{font-size:12px}
+.status-ok{color:#2e7d32;font-weight:600}
+.status-warn{color:#e65100;font-weight:600}
 
-input,textarea{
-  width:100%;
-  padding:6px;
-  margin:4px 0;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:13px;
+.note{
+  font-size:12px;
+  color:#555;
+  margin-top:8px;
 }
-textarea{resize:vertical}
-
-/* ===== CONTENT BLOCKS ===== */
-.topic-box{border-left:3px solid var(--g);padding-left:10px;margin-top:14px}
-.bullet{display:flex;gap:6px;margin:4px 0}
-.check-q{margin-top:10px;padding:8px;border-left:3px solid #1b5e20}
-.opt{display:flex;gap:6px;margin:4px 0}
-.opt-text{flex:1}
 </style>
 </head>
 
 <body>
 
-<!-- 🔼 TOP NAV (always visible when user is at top) -->
+<!-- 🔼 TOP NAV -->
 <div class="nav-bar top-nav">
   <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
-  <a href="production.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
+  <a href="business-detail.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
 </div>
 
 <div class="main">
 
-<!-- BUSINESS HEADER -->
+<!-- BUSINESS SUMMARY -->
 <div class="card">
-  <h3 id="bizTitle">व्यवसाय</h3>
-  <div class="body" id="bizMeta"></div>
-</div>
-
-<!-- TOPIC / CONTENT / CHECKLIST -->
-<div class="card">
-  <h3>🧠 विषय / विवरण / प्रश्न–उत्तर</h3>
+  <h3>🏢 व्यवसाय स्थिति</h3>
   <div class="body">
-    <button class="btn primary" onclick="addTopic()">➕ नयाँ Topic थप्नुहोस्</button>
-    <div id="topicList"></div>
+    <div class="status-row">
+      <span>व्यवसायको नाम</span>
+      <strong id="bizName">—</strong>
+    </div>
+    <div class="status-row">
+      <span>संस्थागत परिचय</span>
+      <strong id="introStatus">—</strong>
+    </div>
+    <div class="status-row">
+      <span>दर्ता / कानुनी विवरण</span>
+      <strong id="regStatus">—</strong>
+    </div>
+    <div class="status-row">
+      <span>सम्पर्क विवरण</span>
+      <strong id="contactStatus">—</strong>
+    </div>
+
+    <div class="note">
+      ℹ️ यो पेजले केवल स्थिति देखाउँछ।  
+      विवरण लेख्न <b>“व्यवसाय विवरण”</b> पेजमा जानुहोस्।
+    </div>
   </div>
 </div>
 
 </div>
 
-<!-- 🔽 BOTTOM NAV (always visible when user is at bottom) -->
+<!-- 🔽 BOTTOM NAV -->
 <div class="nav-bar bottom-nav">
   <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
-  <a href="production.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
+  <a href="business-detail.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
 </div>
 
 <script>
 /* ======================
-   BUSINESS LOAD
+   LOAD SHORT-INFO STATUS
 ====================== */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID = B.activeId;
-const INFO = JSON.parse(localStorage.getItem("fb_business_info_"+BID)||"{}");
+const BID = B.activeId || "b1";
+const KEY = "fb_short_info_" + BID;
+const data = JSON.parse(localStorage.getItem(KEY)||"{}");
 
-document.getElementById("bizTitle").textContent =
-  INFO.name || "नाम नभएको व्यवसाय";
-document.getElementById("bizMeta").textContent =
-  `मुद्रा: ${INFO.pref?.cur||"NPR"} | भाषा: ${INFO.pref?.lang||"np"}`;
+/* Name */
+document.getElementById("bizName").textContent =
+  data.name || "भरिएको छैन";
 
-/* ======================
-   DATA STORE
-====================== */
-const KEY = "fb_topics_" + BID;
-let topics = JSON.parse(localStorage.getItem(KEY) || "[]");
+/* Intro */
+document.getElementById("introStatus").textContent =
+  data.intro ? "पूरा" : "अधूरो";
+document.getElementById("introStatus").className =
+  data.intro ? "status-ok" : "status-warn";
 
-function save(){
-  localStorage.setItem(KEY, JSON.stringify(topics));
-  render();
-}
+/* Registration */
+const regOk = data.registration &&
+  (data.registration.office || data.registration.number || data.registration.pan);
 
-/* ======================
-   CRUD FUNCTIONS
-====================== */
-function addTopic(){
-  topics.push({
-    id:"t"+Date.now(),
-    title:"",
-    content:"",
-    bullets:[],
-    qa:[]
-  });
-  save();
-}
+document.getElementById("regStatus").textContent =
+  regOk ? "पूरा" : "अधूरो";
+document.getElementById("regStatus").className =
+  regOk ? "status-ok" : "status-warn";
 
-function deleteTopic(id){
-  if(!confirm("यो Topic हटाउने?")) return;
-  topics = topics.filter(t=>t.id!==id);
-  save();
-}
+/* Contact */
+const contactOk = data.contact &&
+  (data.contact.owner || data.contact.phone);
 
-function updateTopic(id,key,val){
-  topics.find(t=>t.id===id)[key]=val;
-  save();
-}
-
-/* Bullets */
-function addBullet(id){
-  topics.find(t=>t.id===id).bullets.push("");
-  save();
-}
-function updateBullet(id,i,val){
-  topics.find(t=>t.id===id).bullets[i]=val;
-  save();
-}
-function deleteBullet(id,i){
-  topics.find(t=>t.id===id).bullets.splice(i,1);
-  save();
-}
-
-/* Checklist */
-function addQuestion(id){
-  topics.find(t=>t.id===id).qa.push({
-    q:"",
-    options:[{text:"",checked:false}]
-  });
-  save();
-}
-function addOption(id,qi){
-  topics.find(t=>t.id===id).qa[qi].options.push({text:"",checked:false});
-  save();
-}
-function updateQ(id,qi,val){
-  topics.find(t=>t.id===id).qa[qi].q=val;
-  save();
-}
-function updateOpt(id,qi,oi,val){
-  topics.find(t=>t.id===id).qa[qi].options[oi].text=val;
-  save();
-}
-function toggleOpt(id,qi,oi,val){
-  topics.find(t=>t.id===id).qa[qi].options[oi].checked=val;
-  save();
-}
-
-/* ======================
-   RENDER (FIXED)
-====================== */
-function render(){
-  const wrap=document.getElementById("topicList");
-  wrap.innerHTML="";
-
-  topics.forEach(t=>{
-    const box=document.createElement("div");
-    box.className="topic-box";
-
-    box.innerHTML=`
-      <label>Topic शीर्षक</label>
-      <input value="${t.title}" oninput="updateTopic('${t.id}','title',this.value)">
-
-      <label>विवरण (Paragraph)</label>
-      <textarea rows="4" oninput="updateTopic('${t.id}','content',this.value)">${t.content}</textarea>
-
-      <label>बुँदा</label>
-      ${t.bullets.map((b,i)=>`
-        <div class="bullet">
-          <input value="${b}" oninput="updateBullet('${t.id}',${i},this.value)">
-          <button class="btn danger small" onclick="deleteBullet('${t.id}',${i})">✖</button>
-        </div>
-      `).join("")}
-      <button class="btn small" onclick="addBullet('${t.id}')">➕ बुँदा थप्नुहोस्</button>
-
-      <hr>
-      <button class="btn" onclick="addQuestion('${t.id}')">➕ प्रश्न थप्नुहोस्</button>
-      <button class="btn danger" onclick="deleteTopic('${t.id}')">🗑️ Topic हटाउनुहोस्</button>
-    `;
-
-    t.qa.forEach((q,qi)=>{
-      const qd=document.createElement("div");
-      qd.className="check-q";
-      qd.innerHTML=`
-        <label>❓ प्रश्न</label>
-        <input value="${q.q}" oninput="updateQ('${t.id}',${qi},this.value)">
-      `;
-
-      q.options.forEach((o,oi)=>{
-        qd.innerHTML+=`
-          <div class="opt">
-            <input type="checkbox" ${o.checked?"checked":""}
-              onchange="toggleOpt('${t.id}',${qi},${oi},this.checked)">
-            <input class="opt-text" value="${o.text}"
-              oninput="updateOpt('${t.id}',${qi},${oi},this.value)">
-          </div>
-        `;
-      });
-
-      qd.innerHTML+=`
-        <button class="btn small" onclick="addOption('${t.id}',${qi})">
-          ➕ उत्तर थप्नुहोस्
-        </button>
-      `;
-
-      box.appendChild(qd);
-    });
-
-    wrap.appendChild(box);
-  });
-}
-
-render();
+document.getElementById("contactStatus").textContent =
+  contactOk ? "पूरा" : "अधूरो";
+document.getElementById("contactStatus").className =
+  contactOk ? "status-ok" : "status-warn";
 </script>
 
 </body>
