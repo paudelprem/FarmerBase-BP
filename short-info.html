@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Short Info | FarmerBase BP Engine</title>
+<title>संक्षिप्त विवरण | FarmerBase BP Engine</title>
 
 <style>
-/* ===== Base ===== */
 *{box-sizing:border-box}
 body{
   margin:0;
@@ -20,7 +19,7 @@ body{
   --b:#e0e0e0;
 }
 
-/* ===== Header (Slim) ===== */
+/* Header */
 header{
   position:sticky; top:0; z-index:10;
   background:#fff;
@@ -39,7 +38,7 @@ header{
   font-size:13px; color:#333;
 }
 
-/* ===== Page ===== */
+/* Page */
 .main{
   max-width:var(--w);
   margin:18px auto 24px;
@@ -60,8 +59,12 @@ header{
 }
 .card .body{ padding:12px }
 
-/* ===== Form ===== */
-.row{display:grid; gap:10px; grid-template-columns:repeat(12,1fr); margin-bottom:10px}
+/* Form */
+.row{
+  display:grid; gap:10px;
+  grid-template-columns:repeat(12,1fr);
+  margin-bottom:10px
+}
 .col-12{grid-column:span 12}
 .col-6{grid-column:span 6}
 .col-4{grid-column:span 4}
@@ -78,30 +81,56 @@ input, select{
 }
 small{font-size:11px; color:#777}
 
-/* ===== Toggles ===== */
+/* Toggle */
 .toggle{
-  display:inline-flex; border:1px solid #ccc; border-radius:20px; overflow:hidden;
+  display:inline-flex;
+  border:1px solid #ccc;
+  border-radius:20px;
+  overflow:hidden;
 }
 .toggle button{
-  border:0; padding:6px 10px; font-size:12px; cursor:pointer; background:#fff;
+  border:0;
+  padding:6px 10px;
+  font-size:12px;
+  cursor:pointer;
+  background:#fff;
 }
-.toggle button.active{background:#e8f5e9; color:#1b5e20}
+.toggle button.active{
+  background:#e8f5e9;
+  color:#1b5e20;
+}
 
-/* ===== Footer Nav ===== */
+/* Footer */
 .footer-nav{
-  display:flex; justify-content:space-between; align-items:center;
-  padding:10px 14px; border-top:1px solid var(--b); background:#fff;
-  position:sticky; bottom:0;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:10px 14px;
+  border-top:1px solid var(--b);
+  background:#fff;
+  position:sticky;
+  bottom:0;
 }
 .status{font-size:12px; color:#2e7d32}
 .btn{
-  padding:8px 12px; border-radius:6px; font-size:13px; cursor:pointer;
-  border:1px solid #ccc; background:#fafafa;
+  padding:8px 12px;
+  border-radius:6px;
+  font-size:13px;
+  cursor:pointer;
+  border:1px solid #ccc;
+  background:#fafafa;
 }
-.btn.primary{background:#1b5e20; color:#fff; border-color:#1b5e20}
-.btn[disabled]{opacity:.5; cursor:not-allowed}
+.btn.primary{
+  background:#1b5e20;
+  color:#fff;
+  border-color:#1b5e20
+}
+.btn[disabled]{
+  opacity:.5;
+  cursor:not-allowed
+}
 
-/* ===== Responsive ===== */
+/* Responsive */
 @media (max-width:720px){
   .col-6,.col-4,.col-3{grid-column:span 12}
 }
@@ -113,7 +142,7 @@ small{font-size:11px; color:#777}
 <header>
   <div class="h-wrap">
     <div class="brand">FarmerBase BP Engine</div>
-    <div class="biz-name" id="bizNamePreview">Business Name</div>
+    <div class="biz-name" id="bizNamePreview">व्यवसायको नाम</div>
   </div>
 </header>
 
@@ -121,24 +150,24 @@ small{font-size:11px; color:#777}
 
   <!-- Business Basic -->
   <section class="card">
-    <h3>📌 Business Basic Information</h3>
+    <h3>📌 व्यवसायको आधारभूत जानकारी</h3>
     <div class="body">
       <div class="row">
         <div class="col-6">
-          <label>Business Name *</label>
-          <input id="businessName" placeholder="e.g., My Agro Farm" />
+          <label>व्यवसायको नाम *</label>
+          <input id="businessName" placeholder="उदाहरण: मेरो कृषि फार्म" />
         </div>
         <div class="col-6">
-          <label>Business Type</label>
+          <label>व्यवसायको प्रकार</label>
           <select id="businessType">
-            <option>Agriculture</option>
-            <option>Livestock</option>
-            <option>Trade</option>
-            <option>Service</option>
+            <option>कृषि</option>
+            <option>पशुपालन</option>
+            <option>व्यापार</option>
+            <option>सेवा</option>
           </select>
         </div>
         <div class="col-6">
-          <label>Start Date</label>
+          <label>व्यवसाय सुरु मिति</label>
           <input id="startDate" type="date" />
         </div>
       </div>
@@ -147,31 +176,31 @@ small{font-size:11px; color:#777}
 
   <!-- Address -->
   <section class="card">
-    <h3>📍 Address Details</h3>
+    <h3>📍 ठेगाना विवरण</h3>
     <div class="body">
       <div class="row">
         <div class="col-3">
-          <label>Province</label>
+          <label>प्रदेश</label>
           <select id="province"></select>
         </div>
         <div class="col-3">
-          <label>District</label>
+          <label>जिल्ला</label>
           <select id="district"></select>
         </div>
         <div class="col-3">
-          <label>Municipality / Rural Municipality</label>
+          <label>न.पा./गा.पा.</label>
           <input id="municipality" />
         </div>
         <div class="col-3">
-          <label>Ward No</label>
+          <label>वडा नं.</label>
           <input id="ward" />
         </div>
         <div class="col-6">
-          <label>Locality / Tole</label>
+          <label>टोल / बस्ती</label>
           <input id="locality" />
         </div>
         <div class="col-6">
-          <label>Google Map Link</label>
+          <label>गुगल म्याप लिङ्क</label>
           <input id="mapLink" placeholder="https://maps.google.com/..." />
         </div>
       </div>
@@ -180,23 +209,23 @@ small{font-size:11px; color:#777}
 
   <!-- Ownership -->
   <section class="card">
-    <h3>👤 Ownership & Contact</h3>
+    <h3>👤 स्वामित्व तथा सम्पर्क</h3>
     <div class="body">
       <div class="row">
         <div class="col-6">
-          <label>Proprietor Name</label>
+          <label>प्रोपाइटरको नाम</label>
           <input id="propName" />
         </div>
         <div class="col-6">
-          <label>Phone</label>
+          <label>सम्पर्क नम्बर</label>
           <input id="propPhone" />
         </div>
         <div class="col-6">
-          <label>Contact Person</label>
+          <label>सम्पर्क व्यक्ति</label>
           <input id="contactName" />
         </div>
         <div class="col-6">
-          <label>Contact Phone</label>
+          <label>सम्पर्क व्यक्ति नम्बर</label>
           <input id="contactPhone" />
         </div>
       </div>
@@ -205,19 +234,19 @@ small{font-size:11px; color:#777}
 
   <!-- Registration -->
   <section class="card">
-    <h3>🏢 Registration (Optional)</h3>
+    <h3>🏢 दर्ता विवरण (ऐच्छिक)</h3>
     <div class="body">
       <div class="row">
         <div class="col-6">
-          <label>Registration Authority</label>
+          <label>दर्ता निकाय</label>
           <input id="regAuthority" />
         </div>
         <div class="col-6">
-          <label>Registration No</label>
+          <label>दर्ता नं.</label>
           <input id="regNo" />
         </div>
         <div class="col-6">
-          <label>PAN No</label>
+          <label>प्यान नं.</label>
           <input id="panNo" />
         </div>
       </div>
@@ -226,43 +255,43 @@ small{font-size:11px; color:#777}
 
   <!-- Preferences -->
   <section class="card">
-    <h3>⚙️ Preferences</h3>
+    <h3>⚙️ प्राथमिकता सेटिङ</h3>
     <div class="body">
       <div class="row">
         <div class="col-4">
-          <label>Language</label><br/>
+          <label>भाषा</label><br/>
           <div class="toggle" id="langToggle">
-            <button class="active" data-v="np">NP</button>
-            <button data-v="en">EN</button>
+            <button class="active" data-v="np">नेपाली</button>
+            <button data-v="en">English</button>
           </div>
         </div>
         <div class="col-4">
-          <label>Currency</label><br/>
+          <label>मुद्रा</label><br/>
           <div class="toggle" id="curToggle">
-            <button class="active" data-v="NPR">NPR</button>
+            <button class="active" data-v="NPR">ने.रु.</button>
             <button data-v="USD">USD</button>
           </div>
         </div>
         <div class="col-4">
-          <label>Date System</label><br/>
+          <label>मिति प्रणाली</label><br/>
           <div class="toggle" id="dateToggle">
-            <button class="active" data-v="BS">BS</button>
-            <button data-v="AD">AD</button>
+            <button class="active" data-v="BS">वि.सं.</button>
+            <button data-v="AD">ई.सं.</button>
           </div>
         </div>
       </div>
-      <small>Preferences apply engine-wide.</small>
+      <small>यी सेटिङहरू सम्पूर्ण प्रणालीमा लागू हुनेछन्।</small>
     </div>
   </section>
 
 </main>
 
-<!-- Footer Nav -->
+<!-- Footer -->
 <div class="footer-nav">
-  <div class="status" id="saveStatus">Last saved: —</div>
+  <div class="status" id="saveStatus">अन्तिम सेभ: —</div>
   <div>
-    <button class="btn" onclick="location.href='index.html'">⬅ Back</button>
-    <button class="btn primary" id="continueBtn" disabled>Continue ➜</button>
+    <button class="btn" onclick="location.href='index.html'">⬅ पछाडि</button>
+    <button class="btn primary" id="continueBtn" disabled>अगाडि बढ्नुहोस् ➜</button>
   </div>
 </div>
 
