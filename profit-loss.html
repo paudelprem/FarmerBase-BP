@@ -34,8 +34,13 @@ th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:right}
 th{text-align:center;background:#f3f5f7}
 td:first-child,th:first-child{text-align:left}
 
-input{padding:4px;font-size:12px;width:80px}
+input{padding:4px;font-size:12px;width:90px}
+.btn{font-size:12px;padding:4px 10px;margin:4px;cursor:pointer}
+.btn.primary{color:#1b5e20;font-weight:600}
+.btn.danger{color:#b71c1c}
+
 .small{font-size:11px;color:#555}
+.warn{color:#b71c1c;font-size:12px;margin-top:6px}
 
 @media print{.nav-bar{display:none}}
 </style>
@@ -70,23 +75,44 @@ input{padding:4px;font-size:12px;width:80px}
   <div class="body" id="roiBox"></div>
 </div>
 
-<!-- GROWTH SETTINGS -->
+<!-- PROFIT DISTRIBUTION -->
 <div class="card">
-  <h3>⚙️ ५ वर्षे प्रक्षेपण – बृद्धि दर सेटिङ</h3>
+  <h3>🔄 लाभांश / नाफा वितरण</h3>
   <div class="body">
 
+    <button class="btn primary" id="addDistRow">➕ वितरण शीर्षक थप्नुहोस्</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>शीर्षक</th>
+          <th>%</th>
+          <th>रकम (रु)</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="distTable"></tbody>
+    </table>
+
+    <div id="distWarn" class="warn"></div>
+    <div class="small">ℹ️ शुद्ध नाफाको प्रतिशत अनुसार वितरण हुन्छ।</div>
+  </div>
+</div>
+
+<!-- GROWTH SETTINGS -->
+<div class="card">
+  <h3>⚙️ ५ वर्षे प्रक्षेपण – बृद्धि दर</h3>
+  <div class="body">
     <label>
       <input type="radio" name="gmode" value="same" checked
         onchange="growth.mode='same';saveGrowth()">
       सबै वर्षमा एउटै बृद्धि दर
     </label>
-
     <label>
       <input type="radio" name="gmode" value="yearly"
         onchange="growth.mode='yearly';saveGrowth()">
       हरेक वर्ष फरक बृद्धि दर
     </label>
-
     <div id="growthInputs" style="margin-top:10px"></div>
   </div>
 </div>
@@ -160,7 +186,7 @@ const netProfit   = grossProfit - totalInterest;
 const ROI = totalExpense ? (netProfit/totalExpense*100) : 0;
 const payback = netProfit>0 ? (totalExpense/netProfit) : 0;
 
-/* ========= RENDER SUMMARY ========= */
+/* ========= SUMMARY ========= */
 plSummary.innerHTML = `
 <table>
 <tr><td>कुल आम्दानी</td><td>रु ${totalIncome.toLocaleString()}</td></tr>
@@ -175,82 +201,110 @@ roiBox.innerHTML = `
 <div>Payback Period: <b>${payback.toFixed(2)} वर्ष</b></div>
 `;
 
-/* ========= GROWTH SETTINGS ========= */
-const GKEY = "fb_growth_"+BID;
-let growth = JSON.parse(localStorage.getItem(GKEY)||"null");
+/* ========= PROFIT DISTRIBUTION ========= */
+const DKEY = "fb_profit_distribution_"+BID;
+let dist = JSON.parse(localStorage.getItem(DKEY)||"null");
+if(!dist){
+  dist = [
+    {title:"पुनः लगानी",pct:50},
+    {title:"सामुदायिक / वातावरण विकास",pct:20},
+    {title:"कामदार क्षमता विकास",pct:10},
+    {title:"अन्य",pct:20}
+  ];
+}
+
+function saveDist(){
+  localStorage.setItem(DKEY, JSON.stringify(dist));
+  renderDist();
+}
+
+function renderDist(){
+  distTable.innerHTML="";
+  let pctSum=0;
+  dist.forEach((r,i)=>{
+    const amt = netProfit*((+r.pct||0)/100);
+    pctSum+=(+r.pct||0);
+    distTable.innerHTML+=`
+      <tr>
+        <td><input value="${r.title}"
+          oninput="dist[${i}].title=this.value;saveDist()"></td>
+        <td><input type="number" value="${r.pct}"
+          oninput="dist[${i}].pct=this.value;saveDist()"></td>
+        <td>रु ${amt.toLocaleString()}</td>
+        <td><button class="btn danger"
+          onclick="dist.splice(${i},1);saveDist()">🗑️</button></td>
+      </tr>`;
+  });
+  distWarn.textContent =
+    pctSum===100 ? "" : "⚠️ वितरणको कुल प्रतिशत 100% हुनुपर्छ";
+}
+document.getElementById("addDistRow")
+  .addEventListener("click",()=>{
+    dist.push({title:"",pct:0});
+    saveDist();
+  });
+renderDist();
+
+/* ========= GROWTH ========= */
+const GKEY="fb_growth_"+BID;
+let growth=JSON.parse(localStorage.getItem(GKEY)||"null");
 if(!growth){
-  growth = {
-    mode:"same",
-    income:[5,5,5,5,5],
-    expense:[3,3,3,3,3]
-  };
+  growth={mode:"same",income:[5,5,5,5,5],expense:[3,3,3,3,3]};
 }
 
 function saveGrowth(){
-  localStorage.setItem(GKEY, JSON.stringify(growth));
-  renderGrowthInputs();
-  renderProjection();
+  localStorage.setItem(GKEY,JSON.stringify(growth));
+  renderGrowthInputs();renderProjection();
 }
 
 function renderGrowthInputs(){
   let html="";
   if(growth.mode==="same"){
-    html = `
+    html=`
       <label>आम्दानी बृद्धि %</label>
       <input type="number" value="${growth.income[0]}"
         oninput="growth.income=[this.value,this.value,this.value,this.value,this.value];saveGrowth()">
-
       <label style="margin-left:10px">खर्च बृद्धि %</label>
       <input type="number" value="${growth.expense[0]}"
-        oninput="growth.expense=[this.value,this.value,this.value,this.value,this.value];saveGrowth()">
-    `;
+        oninput="growth.expense=[this.value,this.value,this.value,this.value,this.value];saveGrowth()">`;
   }else{
-    html = `<table>
-      <tr><th>वर्ष</th><th>आम्दानी %</th><th>खर्च %</th></tr>`;
+    html=`<table><tr><th>वर्ष</th><th>आम्दानी %</th><th>खर्च %</th></tr>`;
     for(let i=0;i<5;i++){
-      html += `
-        <tr>
-          <td>वर्ष ${i+1}</td>
-          <td><input type="number" value="${growth.income[i]}"
-            oninput="growth.income[${i}]=this.value;saveGrowth()"></td>
-          <td><input type="number" value="${growth.expense[i]}"
-            oninput="growth.expense[${i}]=this.value;saveGrowth()"></td>
-        </tr>
-      `;
+      html+=`
+      <tr>
+        <td>वर्ष ${i+1}</td>
+        <td><input type="number" value="${growth.income[i]}"
+          oninput="growth.income[${i}]=this.value;saveGrowth()"></td>
+        <td><input type="number" value="${growth.expense[i]}"
+          oninput="growth.expense[${i}]=this.value;saveGrowth()"></td>
+      </tr>`;
     }
-    html += `</table>`;
+    html+=`</table>`;
   }
-  growthInputs.innerHTML = html;
+  growthInputs.innerHTML=html;
 }
 
-/* ========= 5 YEAR PROJECTION ========= */
 function renderProjection(){
   yearTable.innerHTML="";
-  let cum=0;
-  let inc=totalIncome;
-  let expc=totalExpense;
-
+  let cum=0,inc=totalIncome,ex=totalExpense;
   for(let y=0;y<5;y++){
     if(y>0){
-      inc *= (1 + (+growth.income[y]/100));
-      expc *= (1 + (+growth.expense[y]/100));
+      inc*=(1+(+growth.income[y]/100));
+      ex*=(1+(+growth.expense[y]/100));
     }
-    const profit = inc - expc;
-    cum += profit;
-
-    yearTable.innerHTML += `
+    const profit=inc-ex;
+    cum+=profit;
+    yearTable.innerHTML+=`
       <tr>
         <td>वर्ष ${y+1}</td>
         <td>रु ${inc.toLocaleString()}</td>
-        <td>रु ${expc.toLocaleString()}</td>
+        <td>रु ${ex.toLocaleString()}</td>
         <td>रु ${profit.toLocaleString()}</td>
         <td>रु ${cum.toLocaleString()}</td>
-      </tr>
-    `;
+      </tr>`;
   }
 }
 
-/* INIT */
 renderGrowthInputs();
 renderProjection();
 </script>
