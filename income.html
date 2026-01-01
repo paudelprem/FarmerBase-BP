@@ -1,1 +1,293 @@
-hi
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>आम्दानी विवरण | FarmerBase BP Engine</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
+:root{--w:980px;--g:#1b5e20;--b:#ddd}
+
+/* NAV */
+.nav-bar{
+  max-width:var(--w);
+  margin:8px auto;
+  padding:8px 14px;
+  display:flex;
+  justify-content:space-between;
+  background:#f6f7f9
+}
+.nav-btn{
+  text-decoration:none;
+  font-size:13px;
+  padding:6px 14px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  background:#fafafa;
+  color:#222
+}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.top-nav{position:sticky;top:0;z-index:100}
+.bottom-nav{position:sticky;bottom:0;z-index:100}
+
+/* Layout */
+.main{
+  max-width:var(--w);
+  margin:10px auto 20px;
+  padding:0 14px;
+  position:relative;
+  z-index:1
+}
+.card{
+  background:#fff;
+  border:1px solid var(--b);
+  border-radius:8px;
+  margin-bottom:16px
+}
+.card h3{
+  margin:0;
+  padding:10px 12px;
+  background:#f3f5f7;
+  border-bottom:1px solid var(--b);
+  font-size:14px
+}
+.card .body{padding:12px;font-size:13px}
+
+input,select{
+  width:100%;
+  padding:6px;
+  margin:4px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:13px
+}
+input[readonly]{background:#f9f9f9;border-color:#eee}
+
+/* Buttons */
+.btn{
+  font-size:12px;
+  padding:4px 10px;
+  margin:4px 4px 0 0;
+  cursor:pointer
+}
+.btn.primary{color:#1b5e20;font-weight:600}
+.btn.danger{color:#b71c1c}
+
+/* Blocks */
+.income-block{
+  border-left:3px solid var(--g);
+  padding-left:10px;
+  margin-top:12px
+}
+
+/* Table */
+table{width:100%;border-collapse:collapse;margin-top:6px}
+th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:left}
+th{background:#f3f5f7}
+.small{font-size:11px;color:#555}
+.total{font-weight:600;margin-top:6px}
+</style>
+</head>
+
+<body>
+
+<!-- 🔼 TOP NAV -->
+<div class="nav-bar top-nav">
+  <a href="expenses.html" class="nav-btn">⬅️ खर्च विवरण</a>
+  <a href="profit-loss.html" class="nav-btn primary">➡️ नाफा / घाटा</a>
+</div>
+
+<div class="main">
+
+<!-- INCOME ENTRY -->
+<div class="card">
+  <h3>💰 आम्दानी विवरण</h3>
+  <div class="body">
+    <button class="btn primary" onclick="addIncome()">➕ नयाँ आम्दानी थप्नुहोस्</button>
+    <div id="incomeList"></div>
+  </div>
+</div>
+
+<!-- INCOME SUMMARY -->
+<div class="card">
+  <h3>📊 आम्दानीको विधागत समरी (% Share)</h3>
+  <div class="body" id="incomeTypeSummary"></div>
+</div>
+
+</div>
+
+<!-- 🔽 BOTTOM NAV -->
+<div class="nav-bar bottom-nav">
+  <a href="expenses.html" class="nav-btn">⬅️ खर्च विवरण</a>
+  <a href="profit-loss.html" class="nav-btn primary">➡️ नाफा / घाटा</a>
+</div>
+
+<script>
+/* ======================
+   CONTEXT
+====================== */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+
+/* ======================
+   LOAD PRODUCTION (for mapping)
+====================== */
+const prodItems = JSON.parse(
+  localStorage.getItem("fb_production_items_"+BID) || "[]"
+);
+
+/* product -> type map */
+const productTypeMap = {};
+prodItems.forEach(p=>{
+  if(p.name) productTypeMap[p.name] = p.type || "अन्य";
+});
+
+/* ======================
+   DATA STORE
+====================== */
+const KEY = "fb_income_" + BID;
+let incomes = JSON.parse(localStorage.getItem(KEY) || "[]");
+
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(incomes));
+  render();
+}
+
+/* ======================
+   CRUD
+====================== */
+function addIncome(){
+  incomes.push({
+    product:"",
+    qty:"",
+    rate:"",
+    edit:true,
+    backup:{}
+  });
+  save();
+}
+function editIncome(i){
+  incomes[i].backup = {...incomes[i]};
+  incomes[i].edit = true;
+  render();
+}
+function saveIncome(i){
+  incomes[i].edit = false;
+  save();
+}
+function cancelIncome(i){
+  incomes[i] = {...incomes[i].backup, edit:false};
+  save();
+}
+function deleteIncome(i){
+  if(!confirm("यो आम्दानी हटाउने?")) return;
+  incomes.splice(i,1);
+  save();
+}
+
+/* ======================
+   RENDER
+====================== */
+function render(){
+  const wrap = document.getElementById("incomeList");
+  wrap.innerHTML = "";
+
+  incomes.forEach((it,i)=>{
+    const amount = (Number(it.qty)||0) * (Number(it.rate)||0);
+
+    wrap.innerHTML += `
+      <div class="income-block">
+
+        <label>कुन उत्पादन?</label>
+        <select ${it.edit?"":"disabled"}
+          onchange="incomes[${i}].product=this.value">
+          <option value="">— छान्नुहोस् —</option>
+          ${prodItems.map(p=>`
+            <option value="${p.name}" ${p.name===it.product?"selected":""}>
+              ${p.name}
+            </option>
+          `).join("")}
+        </select>
+
+        <label>परिमाण</label>
+        <input type="number" ${it.edit?"":"readonly"}
+          value="${it.qty}"
+          oninput="incomes[${i}].qty=this.value">
+
+        <label>दर</label>
+        <input type="number" ${it.edit?"":"readonly"}
+          value="${it.rate}"
+          oninput="incomes[${i}].rate=this.value">
+
+        <div class="total">कुल आम्दानी: रु ${amount.toLocaleString()}</div>
+
+        ${it.edit ? `
+          <button class="btn primary" onclick="saveIncome(${i})">💾 Save</button>
+          <button class="btn" onclick="cancelIncome(${i})">↩️ Cancel</button>
+        ` : `
+          <button class="btn primary" onclick="editIncome(${i})">✏️ सच्याउनुहोस्</button>
+        `}
+        <button class="btn danger" onclick="deleteIncome(${i})">🗑️ हटाउनुहोस्</button>
+
+      </div>
+    `;
+  });
+
+  renderIncomeTypeSummary();
+}
+
+/* ======================
+   TYPE-WISE SUMMARY (% SHARE)
+====================== */
+function renderIncomeTypeSummary(){
+  const wrap = document.getElementById("incomeTypeSummary");
+  wrap.innerHTML = "";
+
+  if(incomes.length === 0){
+    wrap.innerHTML = `<div class="small">आम्दानी विवरण हालिएको छैन।</div>`;
+    return;
+  }
+
+  const groups = {};
+  let grandTotal = 0;
+
+  incomes.forEach(it=>{
+    const amount = (Number(it.qty)||0) * (Number(it.rate)||0);
+    const type = productTypeMap[it.product] || "अन्य";
+
+    if(!groups[type]) groups[type] = { total:0 };
+    groups[type].total += amount;
+    grandTotal += amount;
+  });
+
+  wrap.innerHTML += `
+    <div style="margin-bottom:6px;font-weight:600">
+      कुल आम्दानी: रु ${grandTotal.toLocaleString()}
+    </div>
+  `;
+
+  Object.keys(groups).forEach(type=>{
+    const total = groups[type].total;
+    const percent = grandTotal
+      ? ((total / grandTotal) * 100).toFixed(2)
+      : "0.00";
+
+    wrap.innerHTML += `
+      <div style="margin-top:10px">
+        <b>${type}</b><br>
+        <span class="small">
+          उप–जम्मा: रु ${total.toLocaleString()}
+          &nbsp; | &nbsp; हिस्सा: ${percent}%
+        </span>
+      </div>
+    `;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
