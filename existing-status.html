@@ -7,35 +7,79 @@
 
 <style>
 *{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f6f7f9;
+  color:#222
+}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
-/* NAV */
+/* ===== NAV ===== */
 .nav-bar{
-  max-width:var(--w);margin:8px auto;padding:8px 14px;
-  display:flex;justify-content:space-between
+  max-width:var(--w);
+  margin:8px auto;
+  padding:8px 14px;
+  display:flex;
+  justify-content:space-between;
+  background:#f6f7f9;
 }
 .nav-btn{
-  text-decoration:none;font-size:13px;padding:6px 14px;
-  border-radius:20px;border:1px solid #ccc;
-  background:#fafafa;color:#222
+  text-decoration:none;
+  font-size:13px;
+  padding:6px 14px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  background:#fafafa;
+  color:#222;
 }
-.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.top-nav{position:sticky;top:0;background:#f6f7f9;z-index:9}
-.bottom-nav{position:sticky;bottom:0;background:#f6f7f9;z-index:9}
+.nav-btn.primary{
+  background:var(--g);
+  color:#fff;
+  border-color:var(--g);
+}
+.top-nav{
+  position:sticky;
+  top:0;
+  z-index:100;
+}
+.bottom-nav{
+  position:sticky;
+  bottom:0;
+  z-index:100;
+}
 
-/* Layout */
-.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
-.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
-.card h3{
-  margin:0;padding:10px 12px;background:#f3f5f7;
-  border-bottom:1px solid var(--b);font-size:14px
+/* ===== Layout ===== */
+.main{
+  max-width:var(--w);
+  margin:10px auto 20px;
+  padding:0 14px;
+  position:relative;
+  z-index:1;
 }
-.card .body{padding:12px;font-size:13px}
+.card{
+  background:#fff;
+  border:1px solid var(--b);
+  border-radius:8px;
+  margin-bottom:16px;
+}
+.card h3{
+  margin:0;
+  padding:10px 12px;
+  background:#f3f5f7;
+  border-bottom:1px solid var(--b);
+  font-size:14px;
+}
+.card .body{
+  padding:12px;
+  font-size:13px;
+}
 
 .status-row{
-  display:flex;justify-content:space-between;
-  padding:6px 0;border-bottom:1px dashed #eee
+  display:flex;
+  justify-content:space-between;
+  padding:6px 0;
+  border-bottom:1px dashed #eee;
 }
 .label{color:#555}
 .value{font-weight:600}
@@ -44,19 +88,29 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .status-warn{color:#e65100}
 
 input,textarea{
-  width:100%;padding:6px;margin:4px 0;
-  border:1px solid #ccc;border-radius:6px;font-size:13px
+  width:100%;
+  padding:6px;
+  margin:4px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:13px;
 }
 
-/* Infra blocks */
+/* ===== Infra ===== */
 .infra-block{
   border-left:3px solid var(--g);
   padding-left:10px;
-  margin-bottom:14px
+  margin-top:12px;
 }
-.infra-head{font-weight:600;margin-top:6px}
+.infra-title{
+  font-weight:600;
+  margin-top:6px;
+}
 .small-btn{
-  font-size:12px;padding:4px 8px;margin-top:6px
+  font-size:12px;
+  padding:4px 10px;
+  margin-top:6px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -71,7 +125,7 @@ input,textarea{
 
 <div class="main">
 
-<!-- 1️⃣ SHORT-INFO SUMMARY -->
+<!-- BUSINESS SUMMARY -->
 <div class="card">
   <h3>🏢 व्यवसायको आधारभूत विवरण</h3>
   <div class="body">
@@ -109,12 +163,15 @@ input,textarea{
   </div>
 </div>
 
-<!-- 2️⃣ INFRASTRUCTURE -->
+<!-- INFRASTRUCTURE -->
 <div class="card">
   <h3>🔌 व्यवसायसँग सम्बन्धित पूर्वाधार अवस्था</h3>
   <div class="body">
-    <button id="addInfraBtn" class="small-btn">➕ नयाँ शीर्षक थप्नुहोस्</button>
+
+    <button class="small-btn" onclick="addInfra()">➕ नयाँ शीर्षक थप्नुहोस्</button>
+
     <div id="infraList"></div>
+
   </div>
 </div>
 
@@ -130,35 +187,38 @@ input,textarea{
 /* ======================
    CONTEXT
 ====================== */
-const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const B = JSON.parse(localStorage.getItem("fb_businesses") || "{}");
 const BID = B.activeId || "b1";
 
 /* ======================
-   LOAD SHORT-INFO
+   LOAD SHORT INFO
 ====================== */
-const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+const info = JSON.parse(localStorage.getItem("fb_short_info_" + BID) || "{}");
 
-bizName.textContent = info.name || "भरिएको छैन";
-ownerName.textContent = info.contact?.owner || "—";
-phone.textContent = info.contact?.phone || "—";
+document.getElementById("bizName").textContent = info.name || "भरिएको छैन";
+document.getElementById("ownerName").textContent = info.contact?.owner || "—";
+document.getElementById("phone").textContent = info.contact?.phone || "—";
 
-address.textContent = [
+document.getElementById("address").textContent = [
   info.address?.province,
   info.address?.district,
   info.address?.municipality,
-  info.address?.ward && "वडा " + info.address.ward
+  info.address?.ward ? "वडा " + info.address.ward : ""
 ].filter(Boolean).join(", ") || "—";
 
-introStatus.textContent = info.intro ? "पूरा" : "अधूरो";
-introStatus.className = info.intro ? "value status-ok" : "value status-warn";
+const introOk = !!info.intro;
+document.getElementById("introStatus").textContent = introOk ? "पूरा" : "अधूरो";
+document.getElementById("introStatus").className =
+  "value " + (introOk ? "status-ok" : "status-warn");
 
 const regOk = info.registration &&
  (info.registration.office || info.registration.number || info.registration.pan);
-regStatus.textContent = regOk ? "पूरा" : "अधूरो";
-regStatus.className = regOk ? "value status-ok" : "value status-warn";
+document.getElementById("regStatus").textContent = regOk ? "पूरा" : "अधूरो";
+document.getElementById("regStatus").className =
+  "value " + (regOk ? "status-ok" : "status-warn");
 
 /* ======================
-   INFRASTRUCTURE (TEXT-FIRST)
+   INFRASTRUCTURE LOGIC
 ====================== */
 const INFRA_KEY = "fb_infrastructure_" + BID;
 let infra = JSON.parse(localStorage.getItem(INFRA_KEY) || "[]");
@@ -174,7 +234,7 @@ function addInfra(){
 }
 
 function updateInfra(i,key,val){
-  infra[i][key]=val;
+  infra[i][key] = val;
   saveInfra();
 }
 
@@ -184,22 +244,20 @@ function deleteInfra(i){
   saveInfra();
 }
 
-/* FIXED CLICK HANDLER */
-document.getElementById("addInfraBtn")
-  .addEventListener("click", addInfra);
-
 function renderInfra(){
-  const wrap=document.getElementById("infraList");
-  wrap.innerHTML="";
+  const wrap = document.getElementById("infraList");
+  wrap.innerHTML = "";
+
   infra.forEach((b,i)=>{
-    const div=document.createElement("div");
-    div.className="infra-block";
-    div.innerHTML=`
-      <div class="infra-head">शीर्षक</div>
+    const div = document.createElement("div");
+    div.className = "infra-block";
+
+    div.innerHTML = `
+      <div class="infra-title">शीर्षक</div>
       <input value="${b.title}"
         oninput="updateInfra(${i},'title',this.value)">
 
-      <div class="infra-head">कुरा (विवरण)</div>
+      <div class="infra-title">कुरा (विवरण)</div>
       <textarea rows="3"
         oninput="updateInfra(${i},'content',this.value)">${b.content}</textarea>
 
