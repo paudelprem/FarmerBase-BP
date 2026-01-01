@@ -76,7 +76,7 @@ th{background:#f3f5f7}
 <div class="card">
   <h3>💸 चालु खर्च</h3>
   <div class="body">
-    <button class="btn primary" onclick="addExpense('current')">➕ चालु खर्च थप्नुहोस्</button>
+    <button class="btn primary" id="addCurrentBtn">➕ चालु खर्च थप्नुहोस्</button>
     <div id="currentList"></div>
   </div>
 </div>
@@ -85,7 +85,7 @@ th{background:#f3f5f7}
 <div class="card">
   <h3>🏗️ स्थिर (पुँजीगत) खर्च</h3>
   <div class="body">
-    <button class="btn primary" onclick="addExpense('fixed')">➕ स्थिर खर्च थप्नुहोस्</button>
+    <button class="btn primary" id="addFixedBtn">➕ स्थिर खर्च थप्नुहोस्</button>
     <div id="fixedList"></div>
   </div>
 </div>
@@ -125,9 +125,7 @@ const BID=B.activeId||"b1";
 const KEY="fb_expenses_"+BID;
 
 let data=JSON.parse(localStorage.getItem(KEY)||"null");
-if(!data){
-  data={current:[],fixed:[]};
-}
+if(!data){ data={current:[],fixed:[]}; }
 
 /* ======================
    SAVE
@@ -146,27 +144,32 @@ function addExpense(type){
     unit:"",
     qty:"",
     rate:"",
-    note:"",
     edit:true,
     backup:{}
   });
   save();
 }
 
+/* SAFE BUTTON BIND */
+document.addEventListener("DOMContentLoaded",()=>{
+  addCurrentBtn.addEventListener("click",()=>addExpense("current"));
+  addFixedBtn.addEventListener("click",()=>addExpense("fixed"));
+});
+
 /* ======================
    CRUD
 ====================== */
-function edit(type,i){
+function editRow(type,i){
   data[type][i].backup={...data[type][i]};
   data[type][i].edit=true;render();
 }
 function saveRow(type,i){
   data[type][i].edit=false;save();
 }
-function cancel(type,i){
+function cancelRow(type,i){
   data[type][i]={...data[type][i].backup,edit:false};save();
 }
-function del(type,i){
+function delRow(type,i){
   if(!confirm("यो खर्च हटाउने?"))return;
   data[type].splice(i,1);save();
 }
@@ -183,7 +186,11 @@ function render(){
 function renderList(type,wrap){
   wrap.innerHTML="";
   data[type].forEach((e,i)=>{
-    const amt=(+e.qty||0)*(+e.rate||0);
+    const qty=(+e.qty||0);
+    const rate=(+e.rate||0);
+    const amt=qty*rate;
+    const perUnit=qty?(amt/qty):0;
+
     wrap.innerHTML+=`
       <div class="block">
         <label>खर्च शीर्षक</label>
@@ -206,19 +213,20 @@ function renderList(type,wrap){
           oninput="data.${type}[${i}].rate=this.value"
           onblur="save()">
 
-        <div class="small">कुल: रु ${amt.toLocaleString()}</div>
+        <div class="small"><b>इकाईगत लागत:</b> रु ${perUnit.toLocaleString()}</div>
+        <div class="small">कुल खर्च: रु ${amt.toLocaleString()}</div>
 
         ${e.edit?`
           <button class="btn primary" onclick="saveRow('${type}',${i})">💾 Save</button>
-          <button class="btn" onclick="cancel('${type}',${i})">↩️ Cancel</button>
-        `:`<button class="btn primary" onclick="edit('${type}',${i})">✏️ सच्याउनुहोस्</button>`}
-        <button class="btn danger" onclick="del('${type}',${i})">🗑️ हटाउनुहोस्</button>
+          <button class="btn" onclick="cancelRow('${type}',${i})">↩️ Cancel</button>
+        `:`<button class="btn primary" onclick="editRow('${type}',${i})">✏️ सच्याउनुहोस्</button>`}
+        <button class="btn danger" onclick="delRow('${type}',${i})">🗑️ हटाउनुहोस्</button>
       </div>`;
   });
 }
 
 /* ======================
-   SUMMARY
+   SUMMARY (TYPE-WISE)
 ====================== */
 function renderSummary(){
   const all=[...data.current,...data.fixed];
@@ -227,20 +235,35 @@ function renderSummary(){
   }
   let total=0,groups={};
   all.forEach(e=>{
-    const amt=(+e.qty||0)*(+e.rate||0);
-    total+=amt;
+    const qty=(+e.qty||0);
+    const amt=qty*(+e.rate||0);
     const t=e.title||"अन्य";
-    if(!groups[t])groups[t]=0;
-    groups[t]+=amt;
+    total+=amt;
+    if(!groups[t])groups[t]={amt:0,qty:0};
+    groups[t].amt+=amt;
+    groups[t].qty+=qty;
   });
 
   summary.innerHTML=`
     <div class="small">कुल खर्च: रु ${total.toLocaleString()}</div>
     <table>
-      <tr><th>शीर्षक</th><th>रकम</th><th>% हिस्सा</th></tr>
+      <tr>
+        <th>शीर्षक</th>
+        <th>इकाईगत औसत लागत</th>
+        <th>कुल रकम</th>
+        <th>% हिस्सा</th>
+      </tr>
       ${Object.keys(groups).map(t=>{
-        const pct=((groups[t]/total)*100).toFixed(2);
-        return `<tr><td>${t}</td><td>${groups[t].toLocaleString()}</td><td>${pct}%</td></tr>`;
+        const g=groups[t];
+        const per=g.qty?(g.amt/g.qty):0;
+        const pct=((g.amt/total)*100).toFixed(2);
+        return `
+          <tr>
+            <td>${t}</td>
+            <td>${per.toLocaleString()}</td>
+            <td>${g.amt.toLocaleString()}</td>
+            <td>${pct}%</td>
+          </tr>`;
       }).join("")}
     </table>`;
 }
