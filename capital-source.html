@@ -20,36 +20,34 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .nav-bar{max-width:var(--w);margin:8px auto;padding:0 14px;display:flex;justify-content:space-between}
 .nav-btn{text-decoration:none;font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid #ccc;background:#fafafa;color:#222}
 .nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.top-nav{position:sticky;top:56px;z-index:90}
-.bottom-nav{position:sticky;bottom:0;z-index:90}
-.top-nav,.bottom-nav{pointer-events:auto}
+.top-nav{position:sticky;top:56px}
+.bottom-nav{position:sticky;bottom:0}
 
 /* MAIN */
-.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px;position:relative;z-index:2}
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
 .card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{margin:0;padding:10px 12px;background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px}
 .card .body{padding:12px;font-size:13px}
 
-label{display:block;margin-top:6px;font-size:12px;color:#444}
-input{
-  width:100%;padding:6px;margin-top:4px;
-  border:1px solid #ccc;border-radius:6px;font-size:13px
+input,textarea{
+  width:100%;padding:6px;border:1px solid #ccc;border-radius:6px;font-size:13px
 }
+textarea{resize:vertical}
 
-.btn{font-size:12px;padding:4px 10px;margin:6px 4px 0 0;cursor:pointer}
+.btn{font-size:12px;padding:4px 10px;margin:4px;cursor:pointer}
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
 
-.block{border-left:3px solid var(--g);padding-left:10px;margin-top:12px}
 .small{font-size:11px;color:#555}
 
 /* TABLE */
-table{width:100%;border-collapse:collapse;margin-top:8px}
-th,td{border:1px solid #ddd;padding:6px;font-size:12px}
+table{width:100%;border-collapse:collapse;margin-top:6px}
+th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:center}
 th{background:#f3f5f7}
 
-/* PRINT */
-@media print{.nav-bar{display:none}body{background:#fff}}
+.warn{color:#b71c1c;font-size:12px;margin-top:6px}
+
+@media print{.nav-bar{display:none}}
 </style>
 </head>
 
@@ -63,7 +61,6 @@ th{background:#f3f5f7}
   </div>
 </div>
 
-<!-- TOP NAV -->
 <div class="nav-bar top-nav">
   <a href="expenses.html" class="nav-btn">⬅️ खर्च</a>
   <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
@@ -71,150 +68,130 @@ th{background:#f3f5f7}
 
 <div class="main">
 
-<!-- CAPITAL SOURCE -->
+<!-- CAPITAL SUMMARY -->
 <div class="card">
-  <h3>🏦 पुँजीको स्रोत</h3>
+  <h3>📌 कुल पुँजी विवरण (Auto)</h3>
+  <div class="body" id="capitalSummary"></div>
+</div>
+
+<!-- CAPITAL SOURCE TABLE -->
+<div class="card">
+  <h3>🏦 पुँजीको स्रोत वितरण</h3>
   <div class="body">
-    <button class="btn primary" id="addSourceBtn">➕ नयाँ स्रोत थप्नुहोस्</button>
-    <div id="sourceList"></div>
+    <button class="btn primary" id="addRow">➕ स्रोत थप्नुहोस्</button>
+
+    <table>
+      <thead>
+        <tr>
+          <th>स्रोत</th>
+          <th>%</th>
+          <th>रकम</th>
+          <th>ऋण?</th>
+          <th>ब्याज %</th>
+          <th>वार्षिक ब्याज</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody id="sourceTable"></tbody>
+    </table>
+
+    <div id="percentWarn" class="warn"></div>
   </div>
 </div>
 
-<!-- SUMMARY -->
+<!-- NARRATION -->
 <div class="card">
-  <h3>📊 पुँजी संरचना सारांश</h3>
-  <div class="body" id="summary"></div>
+  <h3>📝 पुँजी व्यवस्थापन विवरण</h3>
+  <div class="body">
+    <textarea id="note" rows="4"
+      placeholder="उदाहरण: यो परियोजना स्वलगानी, बैंक ऋण तथा अनुदानको मिश्रित पुँजी संरचनामा सञ्चालन गरिनेछ..."></textarea>
+  </div>
 </div>
 
 </div>
 
-<!-- BOTTOM NAV -->
 <div class="nav-bar bottom-nav">
   <a href="expenses.html" class="nav-btn">⬅️ खर्च</a>
   <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
 </div>
 
 <script>
-/* ======================
-   IDENTITY
-====================== */
-function getIdentity(){
-  const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-  const BID=B.activeId||"b1";
-  return JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
-}
-const info=getIdentity();
-pageTitle.textContent=info.projectName||"परियोजनाको नाम";
-pageSub.textContent=info.businessName||"व्यवसाय / संस्थाको नाम";
-
-/* ======================
-   TOTAL EXPENSE
-====================== */
-function getTotalExpense(){
-  const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-  const BID=B.activeId||"b1";
-  const e=JSON.parse(localStorage.getItem("fb_expenses_"+BID)||"{}");
-  let sum=0;
-  [...(e.current||[]),...(e.fixed||[])].forEach(x=>{
-    sum+=(+x.qty||0)*(+x.rate||0);
-  });
-  return sum;
-}
-const TOTAL = getTotalExpense();
-
-/* ======================
-   STORAGE
-====================== */
+/* ========= IDENTITY ========= */
 const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID=B.activeId||"b1";
-const KEY="fb_capital_source_"+BID;
+const info=JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+pageTitle.textContent=info.projectName||"परियोजनाको नाम";
+pageSub.textContent=info.businessName||"व्यवसाय";
 
-let sources=JSON.parse(localStorage.getItem(KEY)||"null");
-if(!sources){
-  sources=[
-    {name:"स्वलगानी",percent:40,interest:0,isLoan:false},
-    {name:"अनुदान",percent:30,interest:0,isLoan:false},
-    {name:"बैंक ऋण",percent:30,interest:12,isLoan:true}
-  ];
+/* ========= EXPENSE TOTAL ========= */
+const e=JSON.parse(localStorage.getItem("fb_expenses_"+BID)||"{}");
+let current=0,fixed=0;
+(e.current||[]).forEach(x=>current+=(+x.qty||0)*(+x.rate||0));
+(e.fixed||[]).forEach(x=>fixed+=(+x.qty||0)*(+x.rate||0));
+const TOTAL=current+fixed;
+
+/* ========= STORAGE ========= */
+const KEY="fb_capital_source_"+BID;
+let data=JSON.parse(localStorage.getItem(KEY)||"null");
+if(!data){
+  data={rows:[
+    {name:"स्वलगानी",pct:40,loan:false,rate:0},
+    {name:"बैंक ऋण",pct:40,loan:true,rate:12},
+    {name:"अनुदान",pct:20,loan:false,rate:0}
+  ],note:""};
 }
 
-/* ======================
-   SAVE
-====================== */
 function save(){
-  localStorage.setItem(KEY,JSON.stringify(sources));
+  localStorage.setItem(KEY,JSON.stringify(data));
   render();
 }
 
-/* ======================
-   ADD
-====================== */
-addSourceBtn.addEventListener("click",()=>{
-  sources.push({
-    name:"",
-    percent:0,
-    interest:0,
-    isLoan:false
-  });
-  save();
-});
-
-/* ======================
-   RENDER
-====================== */
-function render(){
-  sourceList.innerHTML="";
-  let pctSum=0,totalInterest=0;
-
-  sources.forEach((s,i)=>{
-    const amt = TOTAL * ((+s.percent||0)/100);
-    const interestAmt = s.isLoan ? amt*((+s.interest||0)/100) : 0;
-    pctSum += (+s.percent||0);
-    totalInterest += interestAmt;
-
-    sourceList.innerHTML+=`
-      <div class="block">
-        <label>स्रोतको नाम</label>
-        <input value="${s.name}"
-          oninput="sources[${i}].name=this.value"
-          onblur="save()">
-
-        <label>% वितरण</label>
-        <input type="number" value="${s.percent}"
-          oninput="sources[${i}].percent=this.value"
-          onblur="save()">
-
-        <label>ब्याजदर (%)</label>
-        <input type="number" value="${s.interest}"
-          ${s.isLoan?"":"readonly"}
-          oninput="sources[${i}].interest=this.value"
-          onblur="save()">
-
-        <label>
-          <input type="checkbox"
-            ${s.isLoan?"checked":""}
-            onchange="sources[${i}].isLoan=this.checked;save()">
-          ऋण हो ?
-        </label>
-
-        <div class="small">
-          रकम: रु ${amt.toLocaleString()}<br>
-          वार्षिक ब्याज: रु ${interestAmt.toLocaleString()}
-        </div>
-
-        <button class="btn danger" onclick="sources.splice(${i},1);save()">
-          🗑️ हटाउनुहोस्
-        </button>
-      </div>`;
-  });
-
-  summary.innerHTML=`
-    <div class="small">कुल खर्च: रु ${TOTAL.toLocaleString()}</div>
-    <div class="small">कुल % वितरण: ${pctSum}%</div>
-    <div class="small"><b>वार्षिक कुल ब्याज:</b> रु ${totalInterest.toLocaleString()}</div>
-    ${pctSum!==100?'<div style="color:#b71c1c;font-size:12px">⚠️ % वितरण 100% हुनुपर्छ</div>':""}
+/* ========= RENDER SUMMARY ========= */
+function renderSummary(){
+  capitalSummary.innerHTML=`
+    <div>कुल पुँजी: <b>रु ${TOTAL.toLocaleString()}</b></div>
+    <div>चालु खर्च: रु ${current.toLocaleString()}</div>
+    <div>स्थिर खर्च: रु ${fixed.toLocaleString()}</div>
   `;
 }
+
+/* ========= RENDER TABLE ========= */
+function render(){
+  renderSummary();
+  sourceTable.innerHTML="";
+  let pctSum=0;
+
+  data.rows.forEach((r,i)=>{
+    const amt=TOTAL*((+r.pct||0)/100);
+    const int=r.loan?amt*((+r.rate||0)/100):0;
+    pctSum+=(+r.pct||0);
+
+    sourceTable.innerHTML+=`
+      <tr>
+        <td><input value="${r.name}" oninput="data.rows[${i}].name=this.value;save()"></td>
+        <td><input type="number" value="${r.pct}" oninput="data.rows[${i}].pct=this.value;save()"></td>
+        <td>रु ${amt.toLocaleString()}</td>
+        <td><input type="checkbox" ${r.loan?"checked":""}
+              onchange="data.rows[${i}].loan=this.checked;save()"></td>
+        <td><input type="number" value="${r.rate}" ${r.loan?"":"readonly"}
+              oninput="data.rows[${i}].rate=this.value;save()"></td>
+        <td>रु ${int.toLocaleString()}</td>
+        <td><button class="btn danger" onclick="data.rows.splice(${i},1);save()">🗑️</button></td>
+      </tr>
+    `;
+  });
+
+  percentWarn.textContent =
+    pctSum===100 ? "" : "⚠️ स्रोत वितरणको कुल प्रतिशत 100% हुनुपर्छ";
+}
+
+addRow.onclick=()=>{
+  data.rows.push({name:"",pct:0,loan:false,rate:0});
+  save();
+};
+
+note.value=data.note||"";
+note.onblur=()=>{data.note=note.value;save();};
 
 render();
 </script>
