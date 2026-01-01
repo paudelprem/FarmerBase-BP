@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create Letter | FarmerBase BP Engine</title>
+
+<style>
+body{margin:0;font-family:system-ui;background:#f4f6f8}
+.wrap{max-width:900px;margin:auto;background:#fff;padding:20px}
+h1,h2{margin:0;color:#1b5e20}
+hr{border:none;border-top:1px solid #ddd;margin:16px 0}
+
+label{font-size:13px;font-weight:600}
+input,textarea{
+  width:100%;padding:8px;font-size:13px;
+  border:1px solid #ccc;border-radius:6px
+}
+textarea{resize:vertical;min-height:120px}
+
+.box{border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:16px}
+.box h3{margin:0 0 8px;font-size:14px;color:#333}
+
+.btn{
+  padding:6px 14px;border-radius:20px;
+  border:1px solid #ccc;background:#1b5e20;
+  color:#fff;cursor:pointer;font-size:13px;margin-right:6px
+}
+.btn.light{background:#eee;color:#222}
+
+.small{font-size:12px;color:#555}
+.file{margin:6px 0}
+
+.footer{font-size:12px;color:#444;margin-top:30px}
+@media print{.btn{display:none}}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+
+<!-- ACTIONS -->
+<button class="btn light" onclick="location.href='index.html'">⬅️ Home</button>
+<button class="btn" onclick="window.print()">🖨️ Print / PDF</button>
+
+<!-- HEADER -->
+<h1 id="orgName">संस्थाको नाम</h1>
+<div class="small" id="projectName"></div>
+
+<hr>
+
+<!-- OFFICE -->
+<div class="box">
+  <h3>🏢 कार्यालयको नाम</h3>
+  <textarea id="office" placeholder="कार्यालयको पूरा नाम लेख्नुहोस्"></textarea>
+</div>
+
+<!-- SUBJECT -->
+<div class="box">
+  <h3>📌 विषय</h3>
+  <input id="subject" placeholder="विषय लेख्नुहोस्">
+</div>
+
+<!-- BODY -->
+<div class="box">
+  <h3>📝 निवेदनको व्यहोरा</h3>
+  <textarea id="body" placeholder="निवेदनको व्यहोरा यहाँ लेख्नुहोस्"></textarea>
+</div>
+
+<!-- ATTACHMENTS -->
+<div class="box">
+  <h3>📎 संलग्न कागजपत्र</h3>
+
+  <div id="files"></div>
+
+  <button class="btn light" onclick="addFile()">➕ कागजपत्र थप्नुहोस्</button>
+</div>
+
+<!-- FOOTER -->
+<div class="footer" id="footerInfo"></div>
+
+</div>
+
+<script>
+/* ========= LOAD SHORT INFO ========= */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+
+/* ========= HEADER ========= */
+orgName.textContent = info.businessName || "संस्थाको नाम";
+projectName.textContent = info.projectName || "";
+
+/* ========= FOOTER ========= */
+footerInfo.innerHTML = `
+<b>${info.businessName||""}</b><br>
+दर्ता नं: ${info.regNo||"-"} |
+PAN नं: ${info.pan||"-"}<br>
+ठेगाना: ${info.address||""}
+`;
+
+/* ========= STORAGE ========= */
+const KEY = "fb_letters_"+BID;
+let data = JSON.parse(localStorage.getItem(KEY)||"null");
+if(!data){
+  data={office:"",subject:"",body:"",files:[]};
+}
+
+/* ========= BIND ========= */
+office.value = data.office;
+subject.value = data.subject;
+body.value = data.body;
+
+office.onblur = ()=>{data.office=office.value;save()};
+subject.onblur = ()=>{data.subject=subject.value;save()};
+body.onblur = ()=>{data.body=body.value;save()};
+
+/* ========= FILES ========= */
+function addFile(){
+  data.files.push({name:"",url:""});
+  save();
+}
+
+function renderFiles(){
+  files.innerHTML="";
+  data.files.forEach((f,i)=>{
+    files.innerHTML+=`
+      <div class="file">
+        <input placeholder="कागजपत्रको नाम"
+          value="${f.name}"
+          onblur="data.files[${i}].name=this.value;save()">
+        <input placeholder="File URL (upload पछि)"
+          value="${f.url}"
+          onblur="data.files[${i}].url=this.value;save()">
+        <button class="btn light"
+          onclick="data.files.splice(${i},1);save()">❌</button>
+      </div>
+    `;
+  });
+}
+
+/* ========= SAVE ========= */
+function save(){
+  localStorage.setItem(KEY,JSON.stringify(data));
+  renderFiles();
+}
+
+renderFiles();
+</script>
+
+</body>
+</html>
