@@ -10,94 +10,55 @@
 body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
-/* ===== NAV ===== */
+/* NAV */
 .nav-bar{
-  max-width:var(--w);
-  margin:8px auto;
-  padding:8px 14px;
-  display:flex;
-  justify-content:space-between;
-  background:#f6f7f9
+  max-width:var(--w);margin:8px auto;padding:8px 14px;
+  display:flex;justify-content:space-between;background:#f6f7f9
 }
 .nav-btn{
-  text-decoration:none;
-  font-size:13px;
-  padding:6px 14px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  background:#fafafa;
-  color:#222
+  text-decoration:none;font-size:13px;padding:6px 14px;
+  border-radius:20px;border:1px solid #ccc;
+  background:#fafafa;color:#222
 }
-.nav-btn.primary{
-  background:var(--g);
-  color:#fff;
-  border-color:var(--g)
-}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
 .top-nav{position:sticky;top:0;z-index:100}
 .bottom-nav{position:sticky;bottom:0;z-index:100}
 
-/* ===== Layout ===== */
-.main{
-  max-width:var(--w);
-  margin:10px auto 20px;
-  padding:0 14px;
-  position:relative;
-  z-index:1
-}
-.card{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:8px;
-  margin-bottom:16px
-}
+/* Layout */
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px;position:relative;z-index:1}
+.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{
-  margin:0;
-  padding:10px 12px;
-  background:#f3f5f7;
-  border-bottom:1px solid var(--b);
-  font-size:14px
+  margin:0;padding:10px 12px;background:#f3f5f7;
+  border-bottom:1px solid var(--b);font-size:14px
 }
 .card .body{padding:12px;font-size:13px}
 
 input,select,textarea{
-  width:100%;
-  padding:6px;
-  margin:4px 0;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:13px
+  width:100%;padding:6px;margin:4px 0;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
 }
-input[readonly],textarea[readonly]{
-  background:#f9f9f9;border-color:#eee
-}
+input[readonly],textarea[readonly]{background:#f9f9f9;border-color:#eee}
 
-/* ===== Buttons ===== */
-.btn{
-  font-size:12px;
-  padding:4px 10px;
-  margin:4px 4px 0 0;
-  cursor:pointer
-}
+/* Buttons */
+.btn{font-size:12px;padding:4px 10px;margin:4px 4px 0 0;cursor:pointer}
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
 
-/* ===== Blocks ===== */
-.type-row{
-  display:flex;
-  gap:8px;
-  margin-bottom:6px
-}
-.item-block{
-  border-left:3px solid var(--g);
-  padding-left:10px;
-  margin-top:12px
-}
+/* Blocks */
+.type-row{display:flex;gap:8px;margin-bottom:6px}
+.item-block{border-left:3px solid var(--g);padding-left:10px;margin-top:12px}
+
+/* Table */
+table{width:100%;border-collapse:collapse;margin-top:6px}
+th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:left}
+th{background:#f3f5f7}
+.small{font-size:11px;color:#555}
 </style>
 </head>
 
 <body>
 
-<!-- 🔼 TOP NAV -->
+<!-- TOP NAV -->
 <div class="nav-bar top-nav">
   <a href="business-detail.html" class="nav-btn">⬅️ व्यवसाय विवरण</a>
   <a href="expenses.html" class="nav-btn primary">➡️ खर्च विवरण</a>
@@ -105,7 +66,7 @@ input[readonly],textarea[readonly]{
 
 <div class="main">
 
-<!-- PRODUCT TYPES -->
+<!-- TYPES -->
 <div class="card">
   <h3>🏷️ उत्पादनको प्रकार</h3>
   <div class="body">
@@ -114,7 +75,7 @@ input[readonly],textarea[readonly]{
   </div>
 </div>
 
-<!-- PRODUCTION ITEMS -->
+<!-- ITEMS -->
 <div class="card">
   <h3>📦 उत्पादन विवरण</h3>
   <div class="body">
@@ -123,28 +84,30 @@ input[readonly],textarea[readonly]{
   </div>
 </div>
 
+<!-- SUMMARY -->
+<div class="card">
+  <h3>📊 उत्पादन वस्तुहरूको विधागत समरी</h3>
+  <div class="body" id="groupedSummary"></div>
 </div>
 
-<!-- 🔽 BOTTOM NAV -->
+</div>
+
+<!-- BOTTOM NAV -->
 <div class="nav-bar bottom-nav">
   <a href="business-detail.html" class="nav-btn">⬅️ व्यवसाय विवरण</a>
   <a href="expenses.html" class="nav-btn primary">➡️ खर्च विवरण</a>
 </div>
 
 <script>
-/* ======================
-   CONTEXT
-====================== */
+/* CONTEXT */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
 
-/* ======================
-   DATA STORE
-====================== */
+/* STORAGE KEYS */
 const TYPE_KEY = "fb_production_types_" + BID;
 const ITEM_KEY = "fb_production_items_" + BID;
 
-/* ---- FIXED TYPE STRUCTURE ---- */
+/* TYPES (OBJECT STRUCTURE) */
 let types = JSON.parse(localStorage.getItem(TYPE_KEY) || "null");
 if(!types){
   types = [
@@ -153,91 +116,57 @@ if(!types){
   ];
 }
 
+/* ITEMS */
 let items = JSON.parse(localStorage.getItem(ITEM_KEY) || "[]");
 
+/* SAVE */
 function save(){
   localStorage.setItem(TYPE_KEY, JSON.stringify(types));
   localStorage.setItem(ITEM_KEY, JSON.stringify(items));
   render();
 }
 
-/* ======================
-   TYPES CRUD
-====================== */
-function addType(){
-  types.push({name:"", edit:true, backup:{}});
-  save();
-}
-function editType(i){
-  types[i].backup = {...types[i]};
-  types[i].edit = true;
-  render();
-}
-function saveType(i){
-  types[i].edit = false;
-  save();
-}
-function cancelType(i){
-  types[i] = {...types[i].backup, edit:false};
-  save();
-}
+/* ---------- TYPES CRUD ---------- */
+function addType(){ types.push({name:"",edit:true,backup:{}}); save(); }
+function editType(i){ types[i].backup={...types[i]}; types[i].edit=true; render(); }
+function saveType(i){ types[i].edit=false; save(); }
+function cancelType(i){ types[i]={...types[i].backup,edit:false}; save(); }
 function deleteType(i){
-  if(!confirm("यो प्रकार हटाउने?")) return;
-  types.splice(i,1);
-  save();
+  if(!confirm("यो प्रकार हटाउने?"))return;
+  types.splice(i,1); save();
 }
 
-/* ======================
-   ITEMS CRUD
-====================== */
+/* ---------- ITEMS CRUD ---------- */
 function addItem(){
   items.push({
-    type:"",
-    name:"",
-    unit:"",
-    qty:"",
-    note:"",
-    edit:true,
-    backup:{}
+    type:"",name:"",unit:"",qty:"",note:"",
+    edit:true,backup:{}
   });
   save();
 }
-function editItem(i){
-  items[i].backup = {...items[i]};
-  items[i].edit = true;
-  render();
-}
-function saveItem(i){
-  items[i].edit = false;
-  save();
-}
-function cancelItem(i){
-  items[i] = {...items[i].backup, edit:false};
-  save();
-}
+function editItem(i){ items[i].backup={...items[i]}; items[i].edit=true; render(); }
+function saveItem(i){ items[i].edit=false; save(); }
+function cancelItem(i){ items[i]={...items[i].backup,edit:false}; save(); }
 function deleteItem(i){
-  if(!confirm("यो उत्पादन हटाउने?")) return;
-  items.splice(i,1);
-  save();
+  if(!confirm("यो उत्पादन हटाउने?"))return;
+  items.splice(i,1); save();
 }
 
-/* ======================
-   RENDER
-====================== */
+/* ---------- RENDER ---------- */
 function render(){
 
-  /* TYPES */
-  const tWrap = document.getElementById("typeList");
-  tWrap.innerHTML = "";
+  /* Types */
+  const tWrap=document.getElementById("typeList");
+  tWrap.innerHTML="";
   types.forEach((t,i)=>{
-    tWrap.innerHTML += `
+    tWrap.innerHTML+=`
       <div class="type-row">
         <input ${t.edit?"":"readonly"} value="${t.name}"
           oninput="types[${i}].name=this.value">
-        ${t.edit ? `
+        ${t.edit?`
           <button class="btn primary" onclick="saveType(${i})">💾</button>
           <button class="btn" onclick="cancelType(${i})">↩️</button>
-        ` : `
+        `:`
           <button class="btn primary" onclick="editType(${i})">✏️</button>
         `}
         <button class="btn danger" onclick="deleteType(${i})">🗑️</button>
@@ -245,13 +174,12 @@ function render(){
     `;
   });
 
-  /* ITEMS */
-  const iWrap = document.getElementById("itemList");
-  iWrap.innerHTML = "";
+  /* Items */
+  const iWrap=document.getElementById("itemList");
+  iWrap.innerHTML="";
   items.forEach((it,i)=>{
-    iWrap.innerHTML += `
+    iWrap.innerHTML+=`
       <div class="item-block">
-
         <label>उत्पादनको प्रकार</label>
         <select ${it.edit?"":"disabled"}
           onchange="items[${i}].type=this.value">
@@ -263,30 +191,95 @@ function render(){
           `).join("")}
         </select>
 
-        <label>वस्तु वा सेवा</label>
+        <label>वस्तु / सेवा</label>
         <input ${it.edit?"":"readonly"} value="${it.name}"
           oninput="items[${i}].name=this.value">
 
-        <label>उत्पादन इकाई</label>
+        <label>इकाई</label>
         <input ${it.edit?"":"readonly"} value="${it.unit}"
           oninput="items[${i}].unit=this.value">
 
-        <label>उत्पादन परिमाण</label>
+        <label>परिमाण</label>
         <input ${it.edit?"":"readonly"} value="${it.qty}"
           oninput="items[${i}].qty=this.value">
 
-        <label>कैफियत (Narration)</label>
+        <label>कैफियत</label>
         <textarea rows="2" ${it.edit?"":"readonly"}
           oninput="items[${i}].note=this.value">${it.note||""}</textarea>
 
-        ${it.edit ? `
+        ${it.edit?`
           <button class="btn primary" onclick="saveItem(${i})">💾 Save</button>
           <button class="btn" onclick="cancelItem(${i})">↩️ Cancel</button>
-        ` : `
+        `:`
           <button class="btn primary" onclick="editItem(${i})">✏️ सच्याउनुहोस्</button>
         `}
         <button class="btn danger" onclick="deleteItem(${i})">🗑️ हटाउनुहोस्</button>
+      </div>
+    `;
+  });
 
+  renderGroupedSummary();
+}
+
+/* ---------- GROUPED SUMMARY (TOTAL + % SHARE) ---------- */
+function renderGroupedSummary(){
+  const wrap=document.getElementById("groupedSummary");
+  wrap.innerHTML="";
+
+  if(items.length===0){
+    wrap.innerHTML='<div class="small">उत्पादन विवरण हालिएको छैन।</div>';
+    return;
+  }
+
+  const groups={};
+  let grandTotal=0;
+
+  items.forEach(it=>{
+    const type=it.type||"अन्य";
+    const qty=Number(it.qty)||0;
+    if(!groups[type]) groups[type]={items:[],total:0};
+    groups[type].items.push(it);
+    groups[type].total+=qty;
+    grandTotal+=qty;
+  });
+
+  wrap.innerHTML+=`
+    <div style="margin-bottom:6px;font-weight:600">
+      कुल उत्पादन परिमाण: ${grandTotal}
+    </div>
+  `;
+
+  Object.keys(groups).forEach(type=>{
+    const g=groups[type];
+    const pct=grandTotal?((g.total/grandTotal)*100).toFixed(2):"0.00";
+
+    wrap.innerHTML+=`
+      <div style="margin-top:12px">
+        <h4 style="margin:4px 0">${type}</h4>
+        <div class="small">
+          उप–जम्मा: ${g.total} | हिस्सा: ${pct}%
+        </div>
+
+        <table>
+          <thead>
+            <tr>
+              <th>वस्तु / सेवा</th>
+              <th>इकाई</th>
+              <th>परिमाण</th>
+              <th>कैफियत</th>
+            </tr>
+          </thead>
+          <tbody>
+            ${g.items.map(it=>`
+              <tr>
+                <td>${it.name||"—"}</td>
+                <td>${it.unit||"—"}</td>
+                <td>${it.qty||"—"}</td>
+                <td>${it.note||""}</td>
+              </tr>
+            `).join("")}
+          </tbody>
+        </table>
       </div>
     `;
   });
