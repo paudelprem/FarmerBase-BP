@@ -31,23 +31,23 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .card .body{padding:12px;font-size:13px}
 
 label{display:block;margin-top:6px;font-size:12px;color:#444}
-input,select,textarea{
+input,textarea{
   width:100%;padding:6px;margin-top:4px;
   border:1px solid #ccc;border-radius:6px;font-size:13px
 }
 input[readonly],textarea[readonly]{background:#f9f9f9;border-color:#eee}
 
-.btn{font-size:12px;padding:4px 10px;margin:4px 4px 0 0;cursor:pointer}
+.btn{font-size:12px;padding:4px 10px;margin:6px 4px 0 0;cursor:pointer}
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
 
 .block{border-left:3px solid var(--g);padding-left:10px;margin-top:12px}
+.small{font-size:11px;color:#555}
 
 /* TABLE */
 table{width:100%;border-collapse:collapse;margin-top:8px}
 th,td{border:1px solid #ddd;padding:6px;font-size:12px}
 th{background:#f3f5f7}
-.small{font-size:11px;color:#555}
 
 /* PRINT */
 @media print{.nav-bar{display:none}body{background:#fff}}
@@ -67,12 +67,12 @@ th{background:#f3f5f7}
 <!-- TOP NAV -->
 <div class="nav-bar top-nav">
   <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
-  <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
+  <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
 </div>
 
 <div class="main">
 
-<!-- CURRENT EXPENSE -->
+<!-- CURRENT -->
 <div class="card">
   <h3>💸 चालु खर्च</h3>
   <div class="body">
@@ -81,7 +81,7 @@ th{background:#f3f5f7}
   </div>
 </div>
 
-<!-- FIXED EXPENSE -->
+<!-- FIXED -->
 <div class="card">
   <h3>🏗️ स्थिर (पुँजीगत) खर्च</h3>
   <div class="body">
@@ -92,7 +92,7 @@ th{background:#f3f5f7}
 
 <!-- SUMMARY -->
 <div class="card">
-  <h3>📊 खर्चको विधागत समरी</h3>
+  <h3>📊 खर्च समरी</h3>
   <div class="body" id="summary"></div>
 </div>
 
@@ -101,7 +101,7 @@ th{background:#f3f5f7}
 <!-- BOTTOM NAV -->
 <div class="nav-bar bottom-nav">
   <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
-  <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
+  <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
 </div>
 
 <script>
@@ -116,6 +116,16 @@ function getIdentity(){
 const info=getIdentity();
 pageTitle.textContent=info.projectName||"परियोजनाको नाम";
 pageSub.textContent=info.businessName||"व्यवसाय / संस्थाको नाम";
+
+/* ======================
+   PRODUCTS (FROM PRODUCTION)
+====================== */
+function getProducts(){
+  const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+  const BID=B.activeId||"b1";
+  return JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+}
+const PRODUCTS=getProducts();
 
 /* ======================
    STORAGE
@@ -144,17 +154,19 @@ function addExpense(type){
     unit:"",
     qty:"",
     rate:"",
+    applyAll:true,
+    products:[],
     edit:true,
     backup:{}
   });
   save();
 }
 
-/* SAFE BUTTON BIND */
-document.addEventListener("DOMContentLoaded",()=>{
-  addCurrentBtn.addEventListener("click",()=>addExpense("current"));
-  addFixedBtn.addEventListener("click",()=>addExpense("fixed"));
-});
+/* SAFE EVENT BIND */
+document.getElementById("addCurrentBtn")
+  .addEventListener("click",()=>addExpense("current"));
+document.getElementById("addFixedBtn")
+  .addEventListener("click",()=>addExpense("fixed"));
 
 /* ======================
    CRUD
@@ -189,10 +201,11 @@ function renderList(type,wrap){
     const qty=(+e.qty||0);
     const rate=(+e.rate||0);
     const amt=qty*rate;
-    const perUnit=qty?(amt/qty):0;
+    const per=qty?(amt/qty):0;
 
     wrap.innerHTML+=`
       <div class="block">
+
         <label>खर्च शीर्षक</label>
         <input ${e.edit?"":"readonly"} value="${e.title}"
           oninput="data.${type}[${i}].title=this.value"
@@ -213,59 +226,55 @@ function renderList(type,wrap){
           oninput="data.${type}[${i}].rate=this.value"
           onblur="save()">
 
-        <div class="small"><b>इकाईगत लागत:</b> रु ${perUnit.toLocaleString()}</div>
+        <div class="small"><b>इकाईगत लागत:</b> रु ${per.toLocaleString()}</div>
         <div class="small">कुल खर्च: रु ${amt.toLocaleString()}</div>
+
+        <label>
+          <input type="checkbox"
+            ${e.applyAll?"checked":""}
+            onchange="data.${type}[${i}].applyAll=this.checked;save()">
+          सबै उत्पादनमा लाग्ने
+        </label>
+
+        ${!e.applyAll && PRODUCTS.length?`
+          <div class="small"><b>उत्पादन छान्नुहोस्:</b></div>
+          ${PRODUCTS.map(p=>`
+            <label>
+              <input type="checkbox"
+                ${e.products.includes(p.name)?"checked":""}
+                onchange="
+                  const arr=data.${type}[${i}].products;
+                  this.checked?arr.push('${p.name}'):arr.splice(arr.indexOf('${p.name}'),1);
+                  save();
+                ">
+              ${p.name}
+            </label>
+          `).join("")}
+        `:""}
 
         ${e.edit?`
           <button class="btn primary" onclick="saveRow('${type}',${i})">💾 Save</button>
           <button class="btn" onclick="cancelRow('${type}',${i})">↩️ Cancel</button>
         `:`<button class="btn primary" onclick="editRow('${type}',${i})">✏️ सच्याउनुहोस्</button>`}
         <button class="btn danger" onclick="delRow('${type}',${i})">🗑️ हटाउनुहोस्</button>
+
       </div>`;
   });
 }
 
 /* ======================
-   SUMMARY (TYPE-WISE)
+   SUMMARY
 ====================== */
 function renderSummary(){
   const all=[...data.current,...data.fixed];
   if(all.length===0){
-    summary.innerHTML="<div class='small'>खर्च विवरण छैन।</div>";return;
+    summary.innerHTML="<div class='small'>खर्च छैन।</div>";return;
   }
-  let total=0,groups={};
+  let total=0;
   all.forEach(e=>{
-    const qty=(+e.qty||0);
-    const amt=qty*(+e.rate||0);
-    const t=e.title||"अन्य";
-    total+=amt;
-    if(!groups[t])groups[t]={amt:0,qty:0};
-    groups[t].amt+=amt;
-    groups[t].qty+=qty;
+    total+=(+e.qty||0)*(+e.rate||0);
   });
-
-  summary.innerHTML=`
-    <div class="small">कुल खर्च: रु ${total.toLocaleString()}</div>
-    <table>
-      <tr>
-        <th>शीर्षक</th>
-        <th>इकाईगत औसत लागत</th>
-        <th>कुल रकम</th>
-        <th>% हिस्सा</th>
-      </tr>
-      ${Object.keys(groups).map(t=>{
-        const g=groups[t];
-        const per=g.qty?(g.amt/g.qty):0;
-        const pct=((g.amt/total)*100).toFixed(2);
-        return `
-          <tr>
-            <td>${t}</td>
-            <td>${per.toLocaleString()}</td>
-            <td>${g.amt.toLocaleString()}</td>
-            <td>${pct}%</td>
-          </tr>`;
-      }).join("")}
-    </table>`;
+  summary.innerHTML=`<div class="small"><b>कुल खर्च:</b> रु ${total.toLocaleString()}</div>`;
 }
 
 render();
