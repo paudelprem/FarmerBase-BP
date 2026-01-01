@@ -37,8 +37,11 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
   display:flex;justify-content:space-between;
   padding:6px 0;border-bottom:1px dashed #eee
 }
-.status-ok{color:#2e7d32;font-weight:600}
-.status-warn{color:#e65100;font-weight:600}
+.label{color:#555}
+.value{font-weight:600}
+
+.status-ok{color:#2e7d32}
+.status-warn{color:#e65100}
 
 input,textarea{
   width:100%;padding:6px;margin:4px 0;
@@ -49,13 +52,11 @@ input,textarea{
 .infra-block{
   border-left:3px solid var(--g);
   padding-left:10px;
-  margin-bottom:12px
+  margin-bottom:14px
 }
-.infra-head{
-  font-weight:600;margin-bottom:4px
-}
+.infra-head{font-weight:600;margin-top:6px}
 .small-btn{
-  font-size:12px;padding:4px 8px;margin-right:4px
+  font-size:12px;padding:4px 8px;margin-top:6px
 }
 </style>
 </head>
@@ -70,34 +71,49 @@ input,textarea{
 
 <div class="main">
 
-<!-- 1️⃣ SHORT-INFO SUMMARY (READ ONLY) -->
+<!-- 1️⃣ SHORT-INFO SUMMARY -->
 <div class="card">
-  <h3>🏢 व्यवसायको आधारभूत स्थिति</h3>
+  <h3>🏢 व्यवसायको आधारभूत विवरण</h3>
   <div class="body">
+
     <div class="status-row">
-      <span>व्यवसायको नाम</span>
-      <strong id="bizName">—</strong>
+      <span class="label">व्यवसायको नाम</span>
+      <span class="value" id="bizName">—</span>
     </div>
+
     <div class="status-row">
-      <span>संस्थागत परिचय</span>
-      <strong id="introStatus">—</strong>
+      <span class="label">प्रोप्राइटर / सञ्चालक</span>
+      <span class="value" id="ownerName">—</span>
     </div>
+
     <div class="status-row">
-      <span>दर्ता / कानुनी विवरण</span>
-      <strong id="regStatus">—</strong>
+      <span class="label">सम्पर्क नम्बर</span>
+      <span class="value" id="phone">—</span>
     </div>
+
     <div class="status-row">
-      <span>सम्पर्क विवरण</span>
-      <strong id="contactStatus">—</strong>
+      <span class="label">ठेगाना</span>
+      <span class="value" id="address">—</span>
     </div>
+
+    <div class="status-row">
+      <span class="label">संस्थागत परिचय</span>
+      <span class="value" id="introStatus">—</span>
+    </div>
+
+    <div class="status-row">
+      <span class="label">दर्ता / कानुनी स्थिति</span>
+      <span class="value" id="regStatus">—</span>
+    </div>
+
   </div>
 </div>
 
-<!-- 2️⃣ INFRASTRUCTURE (REFINED) -->
+<!-- 2️⃣ INFRASTRUCTURE -->
 <div class="card">
   <h3>🔌 व्यवसायसँग सम्बन्धित पूर्वाधार अवस्था</h3>
   <div class="body">
-    <button class="small-btn" onclick="addInfra()">➕ नयाँ शीर्षक थप्नुहोस्</button>
+    <button id="addInfraBtn" class="small-btn">➕ नयाँ शीर्षक थप्नुहोस्</button>
     <div id="infraList"></div>
   </div>
 </div>
@@ -117,22 +133,29 @@ input,textarea{
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
 
-/* Short-info (read-only) */
+/* ======================
+   LOAD SHORT-INFO
+====================== */
 const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+
 bizName.textContent = info.name || "भरिएको छैन";
+ownerName.textContent = info.contact?.owner || "—";
+phone.textContent = info.contact?.phone || "—";
+
+address.textContent = [
+  info.address?.province,
+  info.address?.district,
+  info.address?.municipality,
+  info.address?.ward && "वडा " + info.address.ward
+].filter(Boolean).join(", ") || "—";
 
 introStatus.textContent = info.intro ? "पूरा" : "अधूरो";
-introStatus.className = info.intro ? "status-ok" : "status-warn";
+introStatus.className = info.intro ? "value status-ok" : "value status-warn";
 
 const regOk = info.registration &&
  (info.registration.office || info.registration.number || info.registration.pan);
 regStatus.textContent = regOk ? "पूरा" : "अधूरो";
-regStatus.className = regOk ? "status-ok" : "status-warn";
-
-const contactOk = info.contact &&
- (info.contact.owner || info.contact.phone);
-contactStatus.textContent = contactOk ? "पूरा" : "अधूरो";
-contactStatus.className = contactOk ? "status-ok" : "status-warn";
+regStatus.className = regOk ? "value status-ok" : "value status-warn";
 
 /* ======================
    INFRASTRUCTURE (TEXT-FIRST)
@@ -149,31 +172,40 @@ function addInfra(){
   infra.push({ title:"", content:"" });
   saveInfra();
 }
+
 function updateInfra(i,key,val){
-  infra[i][key]=val; saveInfra();
+  infra[i][key]=val;
+  saveInfra();
 }
+
 function deleteInfra(i){
   if(!confirm("यो शीर्षक हटाउने?")) return;
-  infra.splice(i,1); saveInfra();
+  infra.splice(i,1);
+  saveInfra();
 }
+
+/* FIXED CLICK HANDLER */
+document.getElementById("addInfraBtn")
+  .addEventListener("click", addInfra);
 
 function renderInfra(){
   const wrap=document.getElementById("infraList");
   wrap.innerHTML="";
   infra.forEach((b,i)=>{
-    wrap.innerHTML+=`
-      <div class="infra-block">
-        <div class="infra-head">शीर्षक</div>
-        <input value="${b.title}"
-          oninput="updateInfra(${i},'title',this.value)">
+    const div=document.createElement("div");
+    div.className="infra-block";
+    div.innerHTML=`
+      <div class="infra-head">शीर्षक</div>
+      <input value="${b.title}"
+        oninput="updateInfra(${i},'title',this.value)">
 
-        <div class="infra-head">कुरा (विवरण)</div>
-        <textarea rows="3"
-          oninput="updateInfra(${i},'content',this.value)">${b.content}</textarea>
+      <div class="infra-head">कुरा (विवरण)</div>
+      <textarea rows="3"
+        oninput="updateInfra(${i},'content',this.value)">${b.content}</textarea>
 
-        <button class="small-btn" onclick="deleteInfra(${i})">🗑️ हटाउनुहोस्</button>
-      </div>
+      <button class="small-btn" onclick="deleteInfra(${i})">🗑️ हटाउनुहोस्</button>
     `;
+    wrap.appendChild(div);
   });
 }
 
