@@ -10,10 +10,10 @@
 body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
-/* Navigation */
+/* ===== NAVIGATION (MANDATORY) ===== */
 .nav-bar{
   max-width:var(--w);
-  margin:10px auto;
+  margin:8px auto;
   padding:8px 14px;
   display:flex;
   justify-content:space-between;
@@ -22,7 +22,7 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .nav-btn{
   text-decoration:none;
   font-size:13px;
-  padding:6px 12px;
+  padding:6px 14px;
   border-radius:20px;
   border:1px solid #ccc;
   background:#fafafa;
@@ -36,7 +36,7 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .top-nav{position:sticky;top:0;background:#f6f7f9;z-index:9}
 .bottom-nav{position:sticky;bottom:0;background:#f6f7f9;z-index:9}
 
-/* Layout */
+/* ===== LAYOUT ===== */
 .main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
 .card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{
@@ -67,13 +67,9 @@ input,textarea{
 }
 textarea{resize:vertical}
 
-/* Topic */
-.topic-box{border-left:3px solid var(--g);padding-left:10px;margin-top:12px}
-
-/* Bullets */
+/* ===== CONTENT BLOCKS ===== */
+.topic-box{border-left:3px solid var(--g);padding-left:10px;margin-top:14px}
 .bullet{display:flex;gap:6px;margin:4px 0}
-
-/* Checklist */
 .check-q{margin-top:10px;padding:8px;border-left:3px solid #1b5e20}
 .opt{display:flex;gap:6px;margin:4px 0}
 .opt-text{flex:1}
@@ -82,7 +78,7 @@ textarea{resize:vertical}
 
 <body>
 
-<!-- TOP NAV -->
+<!-- 🔼 TOP NAV (always visible when user is at top) -->
 <div class="nav-bar top-nav">
   <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
   <a href="production.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
@@ -107,16 +103,16 @@ textarea{resize:vertical}
 
 </div>
 
-<!-- BOTTOM NAV -->
+<!-- 🔽 BOTTOM NAV (always visible when user is at bottom) -->
 <div class="nav-bar bottom-nav">
   <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
   <a href="production.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
 </div>
 
 <script>
-/* =========================
+/* ======================
    BUSINESS LOAD
-========================= */
+====================== */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId;
 const INFO = JSON.parse(localStorage.getItem("fb_business_info_"+BID)||"{}");
@@ -126,18 +122,20 @@ document.getElementById("bizTitle").textContent =
 document.getElementById("bizMeta").textContent =
   `मुद्रा: ${INFO.pref?.cur||"NPR"} | भाषा: ${INFO.pref?.lang||"np"}`;
 
-/* =========================
-   TOPIC DATA
-========================= */
+/* ======================
+   DATA STORE
+====================== */
 const KEY = "fb_topics_" + BID;
-let topics = JSON.parse(localStorage.getItem(KEY)||"[]");
+let topics = JSON.parse(localStorage.getItem(KEY) || "[]");
 
 function save(){
   localStorage.setItem(KEY, JSON.stringify(topics));
   render();
 }
 
-/* Topic CRUD */
+/* ======================
+   CRUD FUNCTIONS
+====================== */
 function addTopic(){
   topics.push({
     id:"t"+Date.now(),
@@ -148,40 +146,60 @@ function addTopic(){
   });
   save();
 }
+
 function deleteTopic(id){
-  if(!confirm("यो Topic हटाउने?"))return;
+  if(!confirm("यो Topic हटाउने?")) return;
   topics = topics.filter(t=>t.id!==id);
   save();
 }
 
-/* Bullet */
-function addBullet(tid){
-  topics.find(t=>t.id===tid).bullets.push("");
+function updateTopic(id,key,val){
+  topics.find(t=>t.id===id)[key]=val;
   save();
 }
-function updateBullet(tid,i,val){
-  topics.find(t=>t.id===tid).bullets[i]=val;
+
+/* Bullets */
+function addBullet(id){
+  topics.find(t=>t.id===id).bullets.push("");
   save();
 }
-function deleteBullet(tid,i){
-  topics.find(t=>t.id===tid).bullets.splice(i,1);
+function updateBullet(id,i,val){
+  topics.find(t=>t.id===id).bullets[i]=val;
+  save();
+}
+function deleteBullet(id,i){
+  topics.find(t=>t.id===id).bullets.splice(i,1);
   save();
 }
 
 /* Checklist */
-function addQuestion(tid){
-  topics.find(t=>t.id===tid).qa.push({
+function addQuestion(id){
+  topics.find(t=>t.id===id).qa.push({
     q:"",
     options:[{text:"",checked:false}]
   });
   save();
 }
-function addOption(tid,qi){
-  topics.find(t=>t.id===tid).qa[qi].options.push({text:"",checked:false});
+function addOption(id,qi){
+  topics.find(t=>t.id===id).qa[qi].options.push({text:"",checked:false});
+  save();
+}
+function updateQ(id,qi,val){
+  topics.find(t=>t.id===id).qa[qi].q=val;
+  save();
+}
+function updateOpt(id,qi,oi,val){
+  topics.find(t=>t.id===id).qa[qi].options[oi].text=val;
+  save();
+}
+function toggleOpt(id,qi,oi,val){
+  topics.find(t=>t.id===id).qa[qi].options[oi].checked=val;
   save();
 }
 
-/* Render */
+/* ======================
+   RENDER (FIXED)
+====================== */
 function render(){
   const wrap=document.getElementById("topicList");
   wrap.innerHTML="";
@@ -192,17 +210,18 @@ function render(){
 
     box.innerHTML=`
       <label>Topic शीर्षक</label>
-      <input value="${t.title}" oninput="t.title=this.value;save()">
+      <input value="${t.title}" oninput="updateTopic('${t.id}','title',this.value)">
 
       <label>विवरण (Paragraph)</label>
-      <textarea rows="4" oninput="t.content=this.value;save()">${t.content}</textarea>
+      <textarea rows="4" oninput="updateTopic('${t.id}','content',this.value)">${t.content}</textarea>
 
-      <label>बुँदा (Bullets)</label>
+      <label>बुँदा</label>
       ${t.bullets.map((b,i)=>`
         <div class="bullet">
           <input value="${b}" oninput="updateBullet('${t.id}',${i},this.value)">
           <button class="btn danger small" onclick="deleteBullet('${t.id}',${i})">✖</button>
-        </div>`).join("")}
+        </div>
+      `).join("")}
       <button class="btn small" onclick="addBullet('${t.id}')">➕ बुँदा थप्नुहोस्</button>
 
       <hr>
@@ -215,17 +234,18 @@ function render(){
       qd.className="check-q";
       qd.innerHTML=`
         <label>❓ प्रश्न</label>
-        <input value="${q.q}" oninput="q.q=this.value;save()">
+        <input value="${q.q}" oninput="updateQ('${t.id}',${qi},this.value)">
       `;
 
       q.options.forEach((o,oi)=>{
         qd.innerHTML+=`
           <div class="opt">
             <input type="checkbox" ${o.checked?"checked":""}
-              onchange="o.checked=this.checked;save()">
+              onchange="toggleOpt('${t.id}',${qi},${oi},this.checked)">
             <input class="opt-text" value="${o.text}"
-              oninput="o.text=this.value;save()">
-          </div>`;
+              oninput="updateOpt('${t.id}',${qi},${oi},this.value)">
+          </div>
+        `;
       });
 
       qd.innerHTML+=`
@@ -233,6 +253,7 @@ function render(){
           ➕ उत्तर थप्नुहोस्
         </button>
       `;
+
       box.appendChild(qd);
     });
 
