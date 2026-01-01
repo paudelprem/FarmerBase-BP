@@ -12,20 +12,20 @@ body{
   font-family:system-ui;
   background:#f6f7f9;
   color:#222;
+  min-height:100vh;
   display:flex;
-  align-items:center;
-  justify-content:center;
-  min-height:100vh
+  flex-direction:column;
+  justify-content:center
 }
-:root{--w:860px;--g:#1b5e20;--b:#ddd}
+:root{--w:980px;--g:#1b5e20;--b:#ddd}
 
 .wrapper{
-  width:100%;
   max-width:var(--w);
+  margin:auto;
+  padding:16px;
   display:grid;
   grid-template-columns:1fr 1fr;
-  gap:20px;
-  padding:16px
+  gap:20px
 }
 
 .card{
@@ -35,21 +35,11 @@ body{
   padding:18px
 }
 
-h1{
-  margin:0 0 6px;
-  font-size:18px
-}
-.sub{
-  font-size:12px;
-  color:#555;
-  margin-bottom:12px
-}
+/* LOGIN SIDE */
+h1{margin:0 0 6px;font-size:18px}
+.sub{font-size:12px;color:#555;margin-bottom:12px}
 
-label{
-  display:block;
-  margin-top:10px;
-  font-size:13px
-}
+label{display:block;margin-top:10px;font-size:13px}
 input{
   width:100%;
   padding:8px;
@@ -58,7 +48,6 @@ input{
   border-radius:6px;
   font-size:13px
 }
-
 .btn{
   width:100%;
   margin-top:16px;
@@ -70,28 +59,12 @@ input{
   color:#fff;
   cursor:pointer
 }
-
-.small{
-  font-size:11px;
-  color:#666;
-  margin-top:10px
-}
+.small{font-size:11px;color:#666;margin-top:10px}
 
 /* INFO SIDE */
-.info h2{
-  margin:0 0 8px;
-  font-size:17px
-}
-.info p{
-  font-size:13px;
-  line-height:1.6;
-  margin:6px 0
-}
-.info ul{
-  margin:6px 0 10px 18px;
-  padding:0;
-  font-size:13px
-}
+.info h2{margin:0 0 8px;font-size:17px}
+.info p{font-size:13px;line-height:1.6;margin:6px 0}
+.info ul{margin:6px 0 10px 18px;padding:0;font-size:13px}
 .info li{margin:4px 0}
 
 .steps{
@@ -103,11 +76,29 @@ input{
   font-size:13px
 }
 
+/* CONCEPT CREDIT */
+.credit{
+  max-width:var(--w);
+  margin:10px auto 20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  font-size:12px;
+  color:#555
+}
+.credit img{
+  width:48px;
+  height:48px;
+  border-radius:50%;
+  object-fit:cover;
+  border:1px solid #ccc
+}
+
 /* MOBILE */
 @media(max-width:760px){
-  .wrapper{
-    grid-template-columns:1fr
-  }
+  .wrapper{grid-template-columns:1fr}
+  .credit{flex-direction:column}
 }
 </style>
 </head>
@@ -116,7 +107,7 @@ input{
 
 <div class="wrapper">
 
-  <!-- LOGIN SIDE -->
+  <!-- LOGIN -->
   <div class="card">
     <h1>FarmerBase BP Engine</h1>
     <div class="sub">सुरू गर्न छोटो परिचय दिनुहोस्</div>
@@ -137,19 +128,20 @@ input{
     </div>
   </div>
 
-  <!-- INFO SIDE -->
+  <!-- INFO -->
   <div class="card info">
     <h2>किन FarmerBase BP Engine ?</h2>
 
     <p>
-      नेपालमा धेरै किसान तथा साना व्यवसायीहरूसँग व्यवसायिक योजना (Business Plan)
-      बनाउने ज्ञान, समय वा प्राविधिक पहुँच हुँदैन।
+      नेपालमा धेरै किसान तथा साना व्यवसायीहरूसँग
+      व्यवसायिक योजना बनाउने ज्ञान, समय वा
+      प्राविधिक पहुँच हुँदैन।
     </p>
 
     <p>
       बैंक, सहकारी, अनुदान वा साझेदारीका लागि
-      <b>गणनामा आधारित, यथार्थ र विश्वासयोग्य योजना</b> चाहिन्छ —
-      जुन हातैले बनाउन कठिन हुन्छ।
+      <b>गणनामा आधारित, यथार्थ र विश्वासयोग्य योजना</b>
+      चाहिन्छ — जुन हातैले बनाउन कठिन हुन्छ।
     </p>
 
     <p>
@@ -163,7 +155,7 @@ input{
     <p>
       FarmerBase BP Engine एउटा <b>Auto Business Planning System</b> हो,
       जहाँ उत्पादन, खर्च, आम्दानी, नाफा, ROI र
-      ५-वर्षे प्रक्षेपण सबै आपसमा जोडिएका (connected) हुन्छन्।
+      ५-वर्षे प्रक्षेपण सबै आपसमा जोडिएका हुन्छन्।
     </p>
 
     <ul>
@@ -173,85 +165,53 @@ input{
       <li>🌾 मिश्रित कृषि व्यवसाय</li>
     </ul>
 
-    <p>यी सबै व्यवसायका लागि एउटै सिस्टमले काम गर्छ।</p>
-
-    <h3 style="font-size:14px;margin-top:10px">
-      ⚙️ किसानले आफैं योजना बनाउन सक्ने आधार
-    </h3>
-
-    <ul>
-      <li>✔️ सबै गणना सिस्टमले आफैं गर्छ</li>
-      <li>✔️ किसानले केवल संख्या र दर मात्र राख्छ</li>
-      <li>✔️ भाषा सरल, नेपाली Unicode</li>
-      <li>✔️ Excel वा Accounting ज्ञान आवश्यक छैन</li>
-      <li>✔️ मोबाइल / कम्प्युटर दुवैमा चल्ने</li>
-    </ul>
-
     <div class="steps">
       <b>🖱️ २–४ क्लिकमै योजना कसरी बन्छ ?</b><br><br>
-      Step 1: उत्पादन चयन (के उत्पादन गर्ने ?)<br>
-      Step 2: खर्च विवरण (चालु / स्थिर खर्च)<br>
-      Step 3: नाफा प्रतिशत राख्ने<br>
-      Step 4: 👉 सिस्टमले आफैं बनाउँछ:
+      Step 1: उत्पादन चयन<br>
+      Step 2: खर्च विवरण (चालु / स्थिर)<br>
+      Step 3: नाफा प्रतिशत<br>
+      Step 4: 👉 सिस्टमले आफैं:
       <ul>
         <li>आम्दानी</li>
         <li>नाफा–नोक्सान</li>
-        <li>ह्रासकट्टी</li>
-        <li>ROI र Payback Period</li>
+        <li>ROI</li>
         <li>५-वर्षे प्रक्षेपण</li>
       </ul>
-      अन्त्यमा किसानले पाउँछ —
-      <b>Print / PDF-ready पूर्ण व्यवसायिक प्रस्ताव</b>
     </div>
-
-    <h3 style="font-size:14px;margin-top:10px">🏦 कसका लागि उपयोगी ?</h3>
-    <ul>
-      <li>👨‍🌾 किसान / कृषक समूह</li>
-      <li>🤝 सहकारी संस्था</li>
-      <li>🏛️ पालिका / अनुदान कार्यक्रम</li>
-      <li>🏦 बैंक तथा वित्तीय संस्था</li>
-    </ul>
-
-    <p>
-      <b>🎯 निष्कर्ष:</b><br>
-      FarmerBase BP Engine किसानलाई योजना बनाउने बोझबाट मुक्त गर्छ
-      र गणनामा आधारित, विश्वसनीय र यथार्थ योजना स्वतः तयार पार्छ।
-    </p>
   </div>
 
 </div>
 
+<!-- CONCEPT CREDIT -->
+<div class="credit">
+  <img src="https://scontent.fktm3-1.fna.fbcdn.net/v/t39.30808-6/241174928_10162407914859852_3099747735535518838_n.jpg" alt="Prem Prasad Paudel">
+  <div>
+    <b>Concept Development By :</b><br>
+    Prem Prasad Paudel
+  </div>
+</div>
+
 <script>
-/* BOOTSTRAP */
 function proceed(){
-  const businessName = document.getElementById("businessName").value.trim();
-  const projectName  = document.getElementById("projectName").value.trim();
-  const ownerName    = document.getElementById("ownerName").value.trim();
+  const businessName = businessName.value.trim();
+  const projectName  = projectName.value.trim();
+  const ownerName    = ownerName.value.trim();
 
   if(!businessName || !projectName){
     alert("कम्तीमा व्यवसाय र परियोजनाको नाम आवश्यक छ।");
     return;
   }
 
-  let B = JSON.parse(localStorage.getItem("fb_businesses") || "null");
-  if(!B){
-    B = { activeId:"b1", list:{} };
-  }
-  const BID = B.activeId;
-
-  const shortInfo = {
-    businessName,
-    projectName,
-    ownerName
-  };
+  let B = JSON.parse(localStorage.getItem("fb_businesses")||"null");
+  if(!B) B={activeId:"b1",list:{}};
 
   localStorage.setItem(
-    "fb_short_info_" + BID,
-    JSON.stringify(shortInfo)
+    "fb_short_info_"+B.activeId,
+    JSON.stringify({businessName,projectName,ownerName})
   );
-  localStorage.setItem("fb_businesses", JSON.stringify(B));
+  localStorage.setItem("fb_businesses",JSON.stringify(B));
 
-  location.href = "short-info.html";
+  location.href="short-info.html";
 }
 </script>
 
