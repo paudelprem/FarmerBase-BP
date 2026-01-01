@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Login | FarmerBase BP Engine</title>
+
+<style>
+*{box-sizing:border-box}
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#f6f7f9;
+  color:#222;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  min-height:100vh
+}
+:root{--w:420px;--g:#1b5e20;--b:#ddd}
+
+.card{
+  width:100%;
+  max-width:var(--w);
+  background:#fff;
+  border:1px solid var(--b);
+  border-radius:10px;
+  padding:18px
+}
+h1{
+  margin:0 0 6px;
+  font-size:18px;
+  text-align:center
+}
+.sub{
+  text-align:center;
+  font-size:12px;
+  color:#555;
+  margin-bottom:14px
+}
+
+label{
+  display:block;
+  margin-top:10px;
+  font-size:13px
+}
+input{
+  width:100%;
+  padding:8px;
+  margin-top:4px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:13px
+}
+
+.btn{
+  width:100%;
+  margin-top:16px;
+  padding:10px;
+  font-size:14px;
+  border:none;
+  border-radius:24px;
+  background:var(--g);
+  color:#fff;
+  cursor:pointer
+}
+.small{
+  text-align:center;
+  font-size:11px;
+  color:#666;
+  margin-top:10px
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>FarmerBase BP Engine</h1>
+  <div class="sub">सुरू गर्न छोटो परिचय दिनुहोस्</div>
+
+  <label>व्यवसाय / संस्थाको नाम</label>
+  <input id="businessName" placeholder="जस्तै: श्री लक्ष्मी कृषि फर्म">
+
+  <label>परियोजनाको नाम</label>
+  <input id="projectName" placeholder="जस्तै: ५० वटा बाख्रा पालन परियोजना">
+
+  <label>प्रोप्राइटर / सञ्चालकको नाम</label>
+  <input id="ownerName" placeholder="तपाईंको नाम">
+
+  <label>ठेगाना (संक्षिप्त)</label>
+  <input id="address" placeholder="पालिका / वडा">
+
+  <button class="btn" onclick="proceed()">सुरू गरौँ →</button>
+
+  <div class="small">
+    ⚠️ दर्ता, PAN, कानुनी विवरण अर्को चरणमा सोधिन्छ
+  </div>
+</div>
+
+<script>
+/* ======================
+   BOOTSTRAP BUSINESS
+====================== */
+function proceed(){
+  const businessName = document.getElementById("businessName").value.trim();
+  const projectName  = document.getElementById("projectName").value.trim();
+  const ownerName    = document.getElementById("ownerName").value.trim();
+  const address      = document.getElementById("address").value.trim();
+
+  if(!businessName || !projectName){
+    alert("कम्तीमा व्यवसाय र परियोजनाको नाम आवश्यक छ।");
+    return;
+  }
+
+  /* INIT business store */
+  let B = JSON.parse(localStorage.getItem("fb_businesses") || "null");
+  if(!B){
+    B = { activeId:"b1", list:{} };
+  }
+
+  const BID = B.activeId || "b1";
+
+  /* SAVE light identity to short-info bucket */
+  const shortInfo = {
+    businessName,
+    projectName,
+    ownerName,
+    address
+  };
+  localStorage.setItem(
+    "fb_short_info_" + BID,
+    JSON.stringify(shortInfo)
+  );
+
+  localStorage.setItem("fb_businesses", JSON.stringify(B));
+
+  /* GO NEXT */
+  location.href = "short-info.html";
+}
+</script>
+
+</body>
+</html>
