@@ -81,7 +81,7 @@ input[readonly],textarea[readonly]{
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
 
-/* ===== Type & Item blocks ===== */
+/* ===== Blocks ===== */
 .type-row{
   display:flex;
   gap:8px;
@@ -144,7 +144,15 @@ const BID = B.activeId || "b1";
 const TYPE_KEY = "fb_production_types_" + BID;
 const ITEM_KEY = "fb_production_items_" + BID;
 
-let types = JSON.parse(localStorage.getItem(TYPE_KEY) || '["कृषि","पशुपालन"]');
+/* ---- FIXED TYPE STRUCTURE ---- */
+let types = JSON.parse(localStorage.getItem(TYPE_KEY) || "null");
+if(!types){
+  types = [
+    {name:"कृषि", edit:false},
+    {name:"पशुपालन", edit:false}
+  ];
+}
+
 let items = JSON.parse(localStorage.getItem(ITEM_KEY) || "[]");
 
 function save(){
@@ -154,30 +162,33 @@ function save(){
 }
 
 /* ======================
-   TYPES (CRUD)
+   TYPES CRUD
 ====================== */
 function addType(){
-  types.push({name:"",edit:true,backup:{}});
+  types.push({name:"", edit:true, backup:{}});
   save();
 }
 function editType(i){
-  types[i].backup={...types[i]};
-  types[i].edit=true; render();
+  types[i].backup = {...types[i]};
+  types[i].edit = true;
+  render();
 }
 function saveType(i){
-  types[i].edit=false; save();
+  types[i].edit = false;
+  save();
 }
 function cancelType(i){
-  types[i]={...types[i].backup,edit:false};
+  types[i] = {...types[i].backup, edit:false};
   save();
 }
 function deleteType(i){
   if(!confirm("यो प्रकार हटाउने?")) return;
-  types.splice(i,1); save();
+  types.splice(i,1);
+  save();
 }
 
 /* ======================
-   ITEMS (CRUD)
+   ITEMS CRUD
 ====================== */
 function addItem(){
   items.push({
@@ -192,49 +203,53 @@ function addItem(){
   save();
 }
 function editItem(i){
-  items[i].backup={...items[i]};
-  items[i].edit=true; render();
+  items[i].backup = {...items[i]};
+  items[i].edit = true;
+  render();
 }
 function saveItem(i){
-  items[i].edit=false; save();
+  items[i].edit = false;
+  save();
 }
 function cancelItem(i){
-  items[i]={...items[i].backup,edit:false};
+  items[i] = {...items[i].backup, edit:false};
   save();
 }
 function deleteItem(i){
   if(!confirm("यो उत्पादन हटाउने?")) return;
-  items.splice(i,1); save();
+  items.splice(i,1);
+  save();
 }
 
 /* ======================
    RENDER
 ====================== */
 function render(){
-  /* Types */
-  const tWrap=document.getElementById("typeList");
-  tWrap.innerHTML="";
+
+  /* TYPES */
+  const tWrap = document.getElementById("typeList");
+  tWrap.innerHTML = "";
   types.forEach((t,i)=>{
-    tWrap.innerHTML+=`
+    tWrap.innerHTML += `
       <div class="type-row">
-        <input ${t.edit?"":"readonly"} value="${t.name||""}"
+        <input ${t.edit?"":"readonly"} value="${t.name}"
           oninput="types[${i}].name=this.value">
         ${t.edit ? `
-          <button class="btn primary" onclick="saveType(${i})">💾 Save</button>
-          <button class="btn" onclick="cancelType(${i})">↩️ Cancel</button>
+          <button class="btn primary" onclick="saveType(${i})">💾</button>
+          <button class="btn" onclick="cancelType(${i})">↩️</button>
         ` : `
-          <button class="btn primary" onclick="editType(${i})">✏️ सच्याउनुहोस्</button>
+          <button class="btn primary" onclick="editType(${i})">✏️</button>
         `}
         <button class="btn danger" onclick="deleteType(${i})">🗑️</button>
       </div>
     `;
   });
 
-  /* Items */
-  const iWrap=document.getElementById("itemList");
-  iWrap.innerHTML="";
+  /* ITEMS */
+  const iWrap = document.getElementById("itemList");
+  iWrap.innerHTML = "";
   items.forEach((it,i)=>{
-    iWrap.innerHTML+=`
+    iWrap.innerHTML += `
       <div class="item-block">
 
         <label>उत्पादनको प्रकार</label>
@@ -244,7 +259,8 @@ function render(){
           ${types.map(t=>`
             <option value="${t.name}" ${t.name===it.type?"selected":""}>
               ${t.name}
-            </option>`).join("")}
+            </option>
+          `).join("")}
         </select>
 
         <label>वस्तु वा सेवा</label>
@@ -261,7 +277,7 @@ function render(){
 
         <label>कैफियत (Narration)</label>
         <textarea rows="2" ${it.edit?"":"readonly"}
-          oninput="items[${i}].note=this.value)">${it.note||""}</textarea>
+          oninput="items[${i}].note=this.value">${it.note||""}</textarea>
 
         ${it.edit ? `
           <button class="btn primary" onclick="saveItem(${i})">💾 Save</button>
