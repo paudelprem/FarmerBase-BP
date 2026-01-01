@@ -36,11 +36,11 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 }
 .card .body{padding:12px;font-size:13px}
 
-input,select{
+input,select,textarea{
   width:100%;padding:6px;margin:4px 0;
   border:1px solid #ccc;border-radius:6px;font-size:13px
 }
-input[readonly]{background:#f9f9f9;border-color:#eee}
+textarea[readonly],input[readonly]{background:#f9f9f9;border-color:#eee}
 
 .btn{
   font-size:12px;padding:4px 10px;margin:4px 4px 0 0;cursor:pointer
@@ -48,11 +48,21 @@ input[readonly]{background:#f9f9f9;border-color:#eee}
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
 
-.expense-block{
+.subcat{
   border-left:3px solid var(--g);
-  padding-left:10px;margin-top:12px
+  padding-left:10px;
+  margin-top:14px
 }
-.total{font-weight:600;margin-top:4px}
+
+table{
+  width:100%;border-collapse:collapse;margin-top:6px
+}
+th,td{
+  border:1px solid #ddd;padding:6px;font-size:12px;text-align:left
+}
+th{background:#f3f5f7}
+.total{font-weight:600;margin-top:6px}
+.small{font-size:11px;color:#555}
 </style>
 </head>
 
@@ -66,12 +76,22 @@ input[readonly]{background:#f9f9f9;border-color:#eee}
 
 <div class="main">
 
+<!-- NARRATION -->
 <div class="card">
-  <h3>💸 खर्च विवरण (Projection)</h3>
+  <h3>📝 खर्च समग्र टिप्पणी (Narration)</h3>
   <div class="body">
-    <button class="btn primary" onclick="addExpense('चलु')">➕ चालु खर्च थप्नुहोस्</button>
-    <button class="btn primary" onclick="addExpense('स्थिर')">➕ स्थिर खर्च थप्नुहोस्</button>
-    <div id="expenseList"></div>
+    <textarea id="expenseNarration" rows="3"
+      placeholder="खर्चको समग्र अवस्था, अनुमानको आधार, विशेष टिप्पणी..."></textarea>
+  </div>
+</div>
+
+<!-- EXPENSES -->
+<div class="card">
+  <h3>💸 खर्च विवरण</h3>
+  <div class="body">
+    <button class="btn primary" onclick="addSub('चलु')">➕ चालु खर्च उपशीर्षक</button>
+    <button class="btn primary" onclick="addSub('स्थिर')">➕ स्थिर पुँजी उपशीर्षक</button>
+    <div id="expenseArea"></div>
   </div>
 </div>
 
@@ -88,90 +108,145 @@ input[readonly]{background:#f9f9f9;border-color:#eee}
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
 
-/* LOAD PRODUCTS */
-const products = JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+/* PRODUCTS (for mapping) */
+const products = JSON.parse(
+  localStorage.getItem("fb_production_items_"+BID) || "[]"
+);
 
 /* DATA */
-const KEY="fb_expenses_"+BID;
-let expenses = JSON.parse(localStorage.getItem(KEY)||"[]");
+const KEY="fb_expenses_v2_"+BID;
+let data = JSON.parse(localStorage.getItem(KEY) || "null");
+if(!data){
+  data = { narration:"", subs:[] };
+}
 
-function save(){localStorage.setItem(KEY,JSON.stringify(expenses));render();}
+/* SAVE */
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(data));
+  render();
+}
 
-function addExpense(type){
-  expenses.push({
+/* NARRATION */
+expenseNarration.value = data.narration || "";
+expenseNarration.oninput = ()=>{
+  data.narration = expenseNarration.value;
+  save();
+};
+
+/* SUBCATEGORY */
+function addSub(type){
+  data.subs.push({
     type,
-    category:"",
-    item:"",
-    unit:"",
-    budgetQty:"",
-    budgetRate:"",
-    product:"",
-    depreciationYears: type==="स्थिर"?5:null
+    title:"",
+    edit:true,
+    items:[]
   });
   save();
 }
-
-function deleteExpense(i){
-  if(!confirm("यो खर्च हटाउने?"))return;
-  expenses.splice(i,1);save();
+function editSub(i){ data.subs[i].edit=true; render(); }
+function saveSub(i){ data.subs[i].edit=false; save(); }
+function deleteSub(i){
+  if(!confirm("यो उपशीर्षक हटाउने?"))return;
+  data.subs.splice(i,1); save();
 }
 
+/* ITEMS */
+function addItem(si){
+  data.subs[si].items.push({
+    name:"",unit:"",qty:"",rate:"",
+    product:"",
+    years: data.subs[si].type==="स्थिर"?5:null
+  });
+  save();
+}
+function deleteItem(si,ii){
+  if(!confirm("यो विवरण हटाउने?"))return;
+  data.subs[si].items.splice(ii,1); save();
+}
+
+/* RENDER */
 function render(){
-  const wrap=document.getElementById("expenseList");
+  const wrap=document.getElementById("expenseArea");
   wrap.innerHTML="";
-  expenses.forEach((e,i)=>{
-    const total=(e.budgetQty*e.budgetRate)||0;
-    const yearlyDep = e.type==="स्थिर" && e.depreciationYears
-      ? (total/e.depreciationYears).toFixed(2)
-      : null;
 
-    wrap.innerHTML+=`
-      <div class="expense-block">
-        <b>${e.type} खर्च</b>
+  data.subs.forEach((s,si)=>{
+    let subTotal=0;
 
-        <label>उपशीर्षक</label>
-        <input value="${e.category}"
-          oninput="expenses[${i}].category=this.value;save()">
+    const div=document.createElement("div");
+    div.className="subcat";
 
-        <label>के सामान / सेवा</label>
-        <input value="${e.item}"
-          oninput="expenses[${i}].item=this.value;save()">
-
-        <label>युनिट</label>
-        <input value="${e.unit}"
-          oninput="expenses[${i}].unit=this.value;save()">
-
-        <label>संख्या</label>
-        <input type="number" value="${e.budgetQty}"
-          oninput="expenses[${i}].budgetQty=this.value;save()">
-
-        <label>दर</label>
-        <input type="number" value="${e.budgetRate}"
-          oninput="expenses[${i}].budgetRate=this.value;save()">
-
-        <label>कुन उत्पादनमा लाग्ने?</label>
-        <select onchange="expenses[${i}].product=this.value;save()">
-          <option value="">— छान्नुहोस् —</option>
-          ${products.map(p=>`
-            <option ${p.name===e.product?"selected":""}>${p.name}</option>
-          `).join("")}
-        </select>
-
-        ${e.type==="स्थिर"?`
-          <label>ह्रासकट्टी अवधि (वर्ष)</label>
-          <input type="number" value="${e.depreciationYears}"
-            oninput="expenses[${i}].depreciationYears=this.value;save()">
-          <div class="total">वार्षिक ह्रासकट्टी: रु ${yearlyDep}</div>
-        `:""}
-
-        <div class="total">कुल खर्च: रु ${total}</div>
-
-        <button class="btn danger" onclick="deleteExpense(${i})">🗑️ हटाउनुहोस्</button>
+    div.innerHTML=`
+      <b>${s.type} खर्च</b>
+      <div>
+        <input ${s.edit?"":"readonly"} value="${s.title}"
+          placeholder="उपशीर्षक नाम"
+          oninput="data.subs[${si}].title=this.value">
+        ${s.edit?`
+          <button class="btn primary" onclick="saveSub(${si})">💾</button>
+        `:`
+          <button class="btn primary" onclick="editSub(${si})">✏️</button>
+        `}
+        <button class="btn danger" onclick="deleteSub(${si})">🗑️</button>
       </div>
+
+      <table>
+        <thead>
+          <tr>
+            <th>सामान/सेवा</th>
+            <th>युनिट</th>
+            <th>संख्या</th>
+            <th>दर</th>
+            <th>कुल</th>
+            <th>उत्पादन</th>
+            ${s.type==="स्थिर"?'<th>ह्रास (वर्ष)</th><th>वार्षिक</th>':""}
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          ${s.items.map((it,ii)=>{
+            const total=(it.qty*it.rate)||0;
+            subTotal+=total;
+            const yearly = s.type==="स्थिर" && it.years
+              ? (total/it.years).toFixed(2) : "";
+            return `
+            <tr>
+              <td><input value="${it.name}"
+                oninput="data.subs[${si}].items[${ii}].name=this.value;save()"></td>
+              <td><input value="${it.unit}"
+                oninput="data.subs[${si}].items[${ii}].unit=this.value;save()"></td>
+              <td><input type="number" value="${it.qty}"
+                oninput="data.subs[${si}].items[${ii}].qty=this.value;save()"></td>
+              <td><input type="number" value="${it.rate}"
+                oninput="data.subs[${si}].items[${ii}].rate=this.value;save()"></td>
+              <td>${total}</td>
+              <td>
+                <select onchange="data.subs[${si}].items[${ii}].product=this.value;save()">
+                  <option value="">—</option>
+                  ${products.map(p=>`
+                    <option ${p.name===it.product?"selected":""}>${p.name}</option>
+                  `).join("")}
+                </select>
+              </td>
+              ${s.type==="स्थिर"?`
+                <td><input type="number" value="${it.years||""}"
+                  oninput="data.subs[${si}].items[${ii}].years=this.value;save()"></td>
+                <td>${yearly}</td>
+              `:""}
+              <td>
+                <button class="btn danger"
+                  onclick="deleteItem(${si},${ii})">✖</button>
+              </td>
+            </tr>`;
+          }).join("")}
+        </tbody>
+      </table>
+
+      <button class="btn primary" onclick="addItem(${si})">➕ विवरण थप्नुहोस्</button>
+      <div class="total">उपशीर्षक कुल: रु ${subTotal}</div>
     `;
+    wrap.appendChild(div);
   });
 }
-
 render();
 </script>
 
