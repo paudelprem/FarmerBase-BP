@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Auto Proposal | FarmerBase BP Engine</title>
+
+<style>
+body{font-family:system-ui;background:#f6f7f9;margin:0}
+.wrap{max-width:900px;margin:auto;background:#fff;padding:20px}
+h1,h2{color:#1b5e20}
+p{line-height:1.7;font-size:14px}
+.section{margin-bottom:22px}
+.btn{padding:6px 14px;border:1px solid #ccc;border-radius:20px;
+     background:#1b5e20;color:#fff;cursor:pointer;margin-right:6px}
+.small{font-size:12px;color:#555}
+@media print{.btn{display:none}}
+</style>
+</head>
+
+<body>
+
+<div class="wrap">
+  <button class="btn" onclick="setLang('np')">🇳🇵 नेपाली</button>
+  <button class="btn" onclick="setLang('en')">🇬🇧 English</button>
+  <button class="btn" onclick="window.print()">🖨️ Print / PDF</button>
+
+  <h1 id="title"></h1>
+  <div id="proposal"></div>
+</div>
+
+<script>
+/* ========= LOAD DATA ========= */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+const prod = JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+const exp  = JSON.parse(localStorage.getItem("fb_expenses_"+BID)||"{}");
+const cap  = JSON.parse(localStorage.getItem("fb_capital_source_"+BID)||"{}");
+const inc  = JSON.parse(localStorage.getItem("fb_income_"+BID)||"{}");
+const dist = JSON.parse(localStorage.getItem("fb_profit_distribution_"+BID)||"[]");
+
+/* ========= CALC ========= */
+let totalExp=0;
+[...(exp.current||[]),...(exp.fixed||[])].forEach(e=>{
+  totalExp+=(+e.qty||0)*(+e.rate||0);
+});
+let totalInc=0;
+prod.forEach(p=>{
+  totalInc+=(+inc[p.name]?.price||0)*(+p.qty||0);
+});
+let interest=0;
+(cap.rows||[]).forEach(r=>{
+  if(r.loan){
+    interest+=totalExp*((+r.pct||0)/100)*((+r.rate||0)/100);
+  }
+});
+const netProfit=totalInc-totalExp-interest;
+const ROI=totalExp?((netProfit/totalExp)*100).toFixed(2):0;
+
+/* ========= LANGUAGE ========= */
+let LANG="np";
+
+function setLang(l){
+  LANG=l;
+  render();
+}
+
+/* ========= RENDER ========= */
+function render(){
+  if(LANG==="np"){
+    title.textContent = `व्यवसायिक प्रस्ताव (${info.projectName||"परियोजना"})`;
+    proposal.innerHTML = `
+    <div class="section">
+      <h2>१. परिचय</h2>
+      <p>${info.businessName} द्वारा प्रस्तावित <b>${info.projectName}</b> परियोजना
+      आर्थिक रूपमा दिगो व्यवसाय विकासका लागि तयार गरिएको हो।</p>
+    </div>
+
+    <div class="section">
+      <h2>२. उद्देश्य</h2>
+      <p>आम्दानी वृद्धि, रोजगारी सिर्जना र दीर्घकालीन स्थायित्व हासिल गर्नु।</p>
+    </div>
+
+    <div class="section">
+      <h2>३. उत्पादन विवरण</h2>
+      <ul>${prod.map(p=>`<li>${p.name} – ${p.qty} ${p.unit}</li>`).join("")}</ul>
+    </div>
+
+    <div class="section">
+      <h2>४. खर्च संरचना</h2>
+      <p>कुल लागत रु ${totalExp.toLocaleString()} अनुमान गरिएको छ।</p>
+    </div>
+
+    <div class="section">
+      <h2>५. पुँजी संरचना</h2>
+      <ul>${(cap.rows||[]).map(r=>`<li>${r.name} – ${r.pct}%</li>`).join("")}</ul>
+    </div>
+
+    <div class="section">
+      <h2>६. आम्दानी र नाफा</h2>
+      <p>वार्षिक आम्दानी रु ${totalInc.toLocaleString()} र
+      शुद्ध नाफा रु ${netProfit.toLocaleString()} रहने अनुमान छ।</p>
+    </div>
+
+    <div class="section">
+      <h2>७. ROI</h2>
+      <p>परियोजनाको ROI ${ROI}% रहेको छ।</p>
+    </div>
+
+    <div class="section">
+      <h2>८. नाफा वितरण</h2>
+      <ul>${dist.map(d=>`<li>${d.title} – ${d.pct}%</li>`).join("")}</ul>
+    </div>
+
+    <div class="section">
+      <h2>९. निष्कर्ष</h2>
+      <p>परियोजना कार्यान्वयनका लागि उपयुक्त र सिफारिसयोग्य देखिन्छ।</p>
+    </div>`;
+  }
+
+  /* ---------- ENGLISH ---------- */
+  else{
+    title.textContent = `Business Proposal (${info.projectName||"Project"})`;
+    proposal.innerHTML = `
+    <div class="section">
+      <h2>1. Introduction</h2>
+      <p>The proposed <b>${info.projectName}</b> by ${info.businessName}
+      aims to establish a financially sustainable and market-oriented business.</p>
+    </div>
+
+    <div class="section">
+      <h2>2. Objectives</h2>
+      <p>The project focuses on income generation, employment creation,
+      and long-term economic sustainability.</p>
+    </div>
+
+    <div class="section">
+      <h2>3. Production Details</h2>
+      <ul>${prod.map(p=>`<li>${p.name} – ${p.qty} ${p.unit}</li>`).join("")}</ul>
+    </div>
+
+    <div class="section">
+      <h2>4. Cost Structure</h2>
+      <p>The total estimated project cost is NPR ${totalExp.toLocaleString()}.</p>
+    </div>
+
+    <div class="section">
+      <h2>5. Capital Structure</h2>
+      <ul>${(cap.rows||[]).map(r=>`<li>${r.name} – ${r.pct}%</li>`).join("")}</ul>
+    </div>
+
+    <div class="section">
+      <h2>6. Income & Profit Analysis</h2>
+      <p>The projected annual revenue is NPR ${totalInc.toLocaleString()},
+      with an estimated net profit of NPR ${netProfit.toLocaleString()}.</p>
+    </div>
+
+    <div class="section">
+      <h2>7. ROI</h2>
+      <p>The project yields an estimated Return on Investment (ROI) of ${ROI}%.</p>
+    </div>
+
+    <div class="section">
+      <h2>8. Profit Allocation</h2>
+      <ul>${dist.map(d=>`<li>${d.title} – ${d.pct}%</li>`).join("")}</ul>
+    </div>
+
+    <div class="section">
+      <h2>9. Conclusion</h2>
+      <p>Based on the above analysis, the project is financially viable
+      and recommended for implementation.</p>
+    </div>`;
+  }
+}
+
+/* INIT */
+render();
+</script>
+
+</body>
+</html>
