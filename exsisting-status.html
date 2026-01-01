@@ -6,32 +6,78 @@
 <title>व्यवसाय स्थिति | FarmerBase BP Engine</title>
 
 <style>
-body{margin:0;font-family:system-ui;background:#f6f7f9}
-.main{max-width:980px;margin:20px auto;padding:0 14px}
-.card{background:#fff;border:1px solid #ddd;border-radius:8px;margin-bottom:16px}
-.card h3{margin:0;padding:10px 12px;background:#f3f5f7;border-bottom:1px solid #ddd;font-size:14px}
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
+:root{--w:980px;--g:#1b5e20;--b:#ddd}
+
+/* ===== Navigation ===== */
+.nav-bar{
+  max-width:var(--w);
+  margin:10px auto;
+  padding:8px 14px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  gap:10px;
+}
+.nav-btn{
+  text-decoration:none;
+  font-size:13px;
+  padding:6px 12px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  background:#fafafa;
+  color:#222;
+}
+.nav-btn.primary{
+  background:var(--g);
+  color:#fff;
+  border-color:var(--g);
+}
+.top-nav{position:sticky;top:0;background:#f6f7f9;z-index:9}
+.bottom-nav{position:sticky;bottom:0;background:#f6f7f9;z-index:9}
+
+/* ===== Layout ===== */
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
+.card h3{
+  margin:0;padding:10px 12px;
+  background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px
+}
 .card .body{padding:12px;font-size:13px}
 
 .row{display:flex;justify-content:space-between;margin:6px 0}
 .btn{
- display:inline-block;margin:6px 0;padding:6px 10px;
- border:1px solid #ccc;border-radius:6px;
- background:#fafafa;color:#222;text-decoration:none;cursor:pointer
+  display:inline-block;margin:6px 0;padding:6px 10px;
+  border:1px solid #ccc;border-radius:6px;
+  background:#fafafa;color:#222;text-decoration:none;cursor:pointer
 }
-.btn.primary{background:#1b5e20;color:#fff;border-color:#1b5e20}
-.btn.danger{background:#fbe9e7;border-color:#f44336;color:#c62828}
+.btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.btn.danger{background:#fdecea;border-color:#e53935;color:#b71c1c}
+
 input,textarea{
- width:100%;padding:6px;margin:4px 0;
- border:1px solid #ccc;border-radius:6px;font-size:13px
+  width:100%;padding:6px;margin:4px 0;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
 }
 textarea{resize:vertical}
-.qa-box{border-left:3px solid #1b5e20;padding-left:8px;margin-top:8px}
-.answer{margin-left:12px}
+
+/* ===== Topic / Checklist ===== */
+.topic-box{border-left:3px solid var(--g);padding-left:10px;margin-top:10px}
+.check-q{margin-top:10px;padding:8px;border-left:3px solid #1b5e20}
+.q-title{font-weight:600;margin-bottom:4px}
+.opt{display:flex;align-items:center;gap:6px;margin:4px 0}
+.opt-text{flex:1}
 .small{font-size:12px;color:#555}
 </style>
 </head>
 
 <body>
+
+<!-- 🔼 TOP NAV -->
+<div class="nav-bar top-nav">
+  <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
+  <a href="production.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
+</div>
 
 <div class="main">
 
@@ -47,25 +93,26 @@ textarea{resize:vertical}
   <div class="body" id="statusList"></div>
 </div>
 
-<!-- TOPIC SECTION -->
+<!-- TOPIC / QA -->
 <div class="card">
-  <h3>🧠 विषय / प्रश्न–उत्तर</h3>
+  <h3>🧠 विषय / प्रश्न–उत्तर (Checklist)</h3>
   <div class="body">
-
     <button class="btn primary" onclick="addTopic()">➕ नयाँ Topic थप्नुहोस्</button>
-
     <div id="topicList"></div>
-
   </div>
 </div>
 
-<a class="btn" href="index.html">⬅ Home</a>
+</div>
 
+<!-- 🔽 BOTTOM NAV -->
+<div class="nav-bar bottom-nav">
+  <a href="short-info.html" class="nav-btn">⬅️ व्यवसाय जानकारी</a>
+  <a href="production.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
 </div>
 
 <script>
 /* =========================
-   BASIC BUSINESS LOAD
+   BUSINESS LOAD
 ========================= */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId;
@@ -73,110 +120,119 @@ const INFO = JSON.parse(localStorage.getItem("fb_business_info_"+BID)||"{}");
 
 document.getElementById("bizTitle").textContent = INFO.name || "नाम नभएको व्यवसाय";
 document.getElementById("bizMeta").innerHTML =
-  `आर्थिक वर्ष: ${new Date().getFullYear()} | मुद्रा: ${INFO.pref?.cur||"NPR"}`;
+  `मुद्रा: ${INFO.pref?.cur||"NPR"} | भाषा: ${INFO.pref?.lang||"np"}`;
 
-/* Status */
-const status = [
- ["व्यवसाय विवरण", INFO.name ? "पूरा" : "अधूरो"]
-];
 document.getElementById("statusList").innerHTML =
- status.map(s=>`<div class="row"><span>${s[0]}</span><b>${s[1]}</b></div>`).join("");
+  `<div class="row"><span>व्यवसाय विवरण</span><b>${INFO.name?"पूरा":"अधूरो"}</b></div>`;
 
 /* =========================
-   TOPIC + QA MODULE
+   TOPIC + CHECKLIST Q&A
 ========================= */
 const KEY = "fb_topics_" + BID;
 let topics = JSON.parse(localStorage.getItem(KEY)||"[]");
 
 function saveTopics(){
- localStorage.setItem(KEY, JSON.stringify(topics));
- renderTopics();
+  localStorage.setItem(KEY, JSON.stringify(topics));
+  renderTopics();
 }
 
 function addTopic(){
- topics.push({
-  id:"t"+Date.now(),
-  title:"",
-  content:"",
-  photo:"",
-  qa:[]
- });
- saveTopics();
+  topics.push({
+    id:"t"+Date.now(),
+    title:"",
+    content:"",
+    qa:[]
+  });
+  saveTopics();
 }
 
 function deleteTopic(id){
- if(!confirm("यो Topic हटाउने?")) return;
- topics = topics.filter(t=>t.id!==id);
- saveTopics();
+  if(!confirm("यो Topic हटाउने?")) return;
+  topics = topics.filter(t=>t.id!==id);
+  saveTopics();
 }
 
 function addQuestion(tid){
- const t = topics.find(x=>x.id===tid);
- t.qa.push({q:"",a:[""]});
- saveTopics();
+  const t = topics.find(x=>x.id===tid);
+  t.qa.push({
+    q:"",
+    options:[{text:"",checked:false}]
+  });
+  saveTopics();
 }
 
-function addAnswer(tid,qidx){
- const t = topics.find(x=>x.id===tid);
- t.qa[qidx].a.push("");
- saveTopics();
+function addOption(tid,qidx){
+  topics.find(x=>x.id===tid)
+        .qa[qidx].options.push({text:"",checked:false});
+  saveTopics();
+}
+
+function updateTopic(tid,key,val){
+  topics.find(x=>x.id===tid)[key]=val;
+  saveTopics();
+}
+function updateQ(tid,i,val){
+  topics.find(x=>x.id===tid).qa[i].q=val;
+  saveTopics();
+}
+function updateOpt(tid,i,oi,val){
+  topics.find(x=>x.id===tid).qa[i].options[oi].text=val;
+  saveTopics();
+}
+function toggleOpt(tid,i,oi,val){
+  topics.find(x=>x.id===tid).qa[i].options[oi].checked=val;
+  saveTopics();
 }
 
 function renderTopics(){
- const wrap = document.getElementById("topicList");
- wrap.innerHTML="";
+  const wrap=document.getElementById("topicList");
+  wrap.innerHTML="";
 
- topics.forEach(t=>{
-  const div = document.createElement("div");
-  div.className="qa-box";
+  topics.forEach(t=>{
+    const box=document.createElement("div");
+    box.className="topic-box";
+    box.innerHTML=`
+      <label>Topic शीर्षक</label>
+      <input value="${t.title}" oninput="updateTopic('${t.id}','title',this.value)">
 
-  div.innerHTML=`
-   <label>Topic शीर्षक</label>
-   <input value="${t.title}" oninput="updateTopic('${t.id}','title',this.value)">
+      <label>विवरण</label>
+      <textarea oninput="updateTopic('${t.id}','content',this.value)">${t.content}</textarea>
 
-   <label>विवरण</label>
-   <textarea oninput="updateTopic('${t.id}','content',this.value)">${t.content}</textarea>
+      <button class="btn" onclick="addQuestion('${t.id}')">➕ प्रश्न थप्नुहोस्</button>
+      <button class="btn danger" onclick="deleteTopic('${t.id}')">🗑️ Topic हटाउनुहोस्</button>
+    `;
 
-   <label>Photo URL (ऐच्छिक)</label>
-   <input value="${t.photo}" oninput="updateTopic('${t.id}','photo',this.value)">
+    t.qa.forEach((q,i)=>{
+      const qd=document.createElement("div");
+      qd.className="check-q";
+      qd.innerHTML=`
+        <div class="q-title">❓ प्रश्न</div>
+        <input value="${q.q}" oninput="updateQ('${t.id}',${i},this.value)">
+      `;
 
-   <button class="btn" onclick="addQuestion('${t.id}')">➕ प्रश्न थप्नुहोस्</button>
-   <button class="btn danger" onclick="deleteTopic('${t.id}')">🗑️ Topic हटाउनुहोस्</button>
-  `;
+      q.options.forEach((op,oi)=>{
+        qd.innerHTML+=`
+          <label class="opt">
+            <input type="checkbox" ${op.checked?"checked":""}
+              onchange="toggleOpt('${t.id}',${i},${oi},this.checked)">
+            <input class="opt-text" value="${op.text}"
+              oninput="updateOpt('${t.id}',${i},${oi},this.value)">
+          </label>
+        `;
+      });
 
-  t.qa.forEach((q,i)=>{
-   const qdiv=document.createElement("div");
-   qdiv.className="qa-box";
-   qdiv.innerHTML=`
-    <label>❓ प्रश्न</label>
-    <input value="${q.q}" oninput="updateQ('${t.id}',${i},this.value)">
-   `;
-   q.a.forEach((ans,ai)=>{
-    qdiv.innerHTML+=`
-     <div class="answer">
-       <input value="${ans}" oninput="updateA('${t.id}',${i},${ai},this.value)">
-     </div>`;
-   });
-   qdiv.innerHTML+=`<button class="btn small" onclick="addAnswer('${t.id}',${i})">➕ उत्तर थप्नुहोस्</button>`;
-   div.appendChild(qdiv);
+      qd.innerHTML+=`
+        <button class="btn small" onclick="addOption('${t.id}',${i})">
+          ➕ उत्तर थप्नुहोस्
+        </button>
+      `;
+      box.appendChild(qd);
+    });
+
+    wrap.appendChild(box);
   });
-
-  wrap.appendChild(div);
- });
 }
 
-function updateTopic(id,key,val){
- const t=topics.find(x=>x.id===id);
- t[key]=val; saveTopics();
-}
-function updateQ(id,i,val){
- topics.find(x=>x.id===id).qa[i].q=val; saveTopics();
-}
-function updateA(id,i,ai,val){
- topics.find(x=>x.id===id).qa[i].a[ai]=val; saveTopics();
-}
-
-/* INIT */
 renderTopics();
 </script>
 
