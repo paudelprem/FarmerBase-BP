@@ -11,34 +11,43 @@ body{
   margin:0;
   font-family:system-ui;
   background:#f6f7f9;
-  color:#222;
-  min-height:100vh;
-  display:flex;
-  flex-direction:column;
-  justify-content:center
+  color:#222
 }
-:root{--w:980px;--g:#1b5e20;--b:#ddd}
+:root{--g:#1b5e20;--b:#ddd;--w:1000px}
 
-.wrapper{
+/* LAYOUT */
+.wrap{
   max-width:var(--w);
-  margin:auto;
-  padding:16px;
+  margin:30px auto;
   display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:20px
+  grid-template-columns:1.2fr 1fr;
+  gap:20px;
+  padding:0 14px
+}
+@media(max-width:900px){
+  .wrap{grid-template-columns:1fr}
 }
 
-.card{
+/* LEFT */
+.left{
   background:#fff;
   border:1px solid var(--b);
   border-radius:10px;
-  padding:18px
+  padding:20px
 }
+.left h1{margin-top:0;font-size:20px;color:var(--g)}
+.left p{font-size:14px;line-height:1.6}
 
-/* LOGIN SIDE */
-h1{margin:0 0 6px;font-size:18px}
-.sub{font-size:12px;color:#555;margin-bottom:12px}
+/* RIGHT */
+.right{
+  background:#fff;
+  border:1px solid var(--b);
+  border-radius:10px;
+  padding:20px
+}
+.right h2{margin-top:0;font-size:18px}
 
+/* FORM */
 label{display:block;margin-top:10px;font-size:13px}
 input{
   width:100%;
@@ -46,96 +55,50 @@ input{
   margin-top:4px;
   border:1px solid #ccc;
   border-radius:6px;
-  font-size:13px
+  font-size:14px
 }
-.btn{
-  width:100%;
+button{
   margin-top:16px;
+  width:100%;
   padding:10px;
-  font-size:14px;
-  border:none;
-  border-radius:24px;
+  font-size:15px;
   background:var(--g);
   color:#fff;
+  border:none;
+  border-radius:30px;
   cursor:pointer
 }
-.small{font-size:11px;color:#666;margin-top:10px}
+button:hover{opacity:.95}
 
-/* INFO SIDE */
-.info h2{margin:0 0 8px;font-size:17px}
-.info p{font-size:13px;line-height:1.6;margin:6px 0}
-.info ul{margin:6px 0 10px 18px;padding:0;font-size:13px}
-.info li{margin:4px 0}
-
-.steps{
-  background:#f3f5f7;
-  border:1px solid #e0e0e0;
-  border-radius:8px;
-  padding:10px;
-  margin-top:10px;
-  font-size:13px
+/* FOOTER BLOCK */
+.dev{
+  margin-top:20px;
+  border-top:1px dashed #ccc;
+  padding-top:14px;
+  display:grid;
+  grid-template-columns:120px 1fr;
+  gap:14px;
+  align-items:center
 }
-
-/* CONCEPT CREDIT */
-.credit{
-  max-width:var(--w);
-  margin:10px auto 20px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:12px;
-  font-size:12px;
-  color:#555
+.dev img{
+  width:120px;
+  border-radius:8px
 }
-.credit img{
-  width:48px;
-  height:48px;
-  border-radius:50%;
-  object-fit:cover;
-  border:1px solid #ccc
-}
-
-/* MOBILE */
-@media(max-width:760px){
-  .wrapper{grid-template-columns:1fr}
-  .credit{flex-direction:column}
-}
+.dev small{font-size:12px;color:#444}
 </style>
 </head>
 
 <body>
 
-<div class="wrapper">
+<div class="wrap">
 
-  <!-- LOGIN -->
-  <div class="card">
-    <h1>FarmerBase BP Engine</h1>
-    <div class="sub">सुरू गर्न छोटो परिचय दिनुहोस्</div>
-
-    <label>व्यवसाय / संस्थाको नाम</label>
-    <input id="businessName" placeholder="जस्तै: श्री लक्ष्मी कृषि फर्म">
-
-    <label>परियोजनाको नाम</label>
-    <input id="projectName" placeholder="जस्तै: ५० वटा बाख्रा पालन परियोजना">
-
-    <label>प्रोप्राइटर / सञ्चालकको नाम</label>
-    <input id="ownerName" placeholder="तपाईंको नाम">
-
-    <button class="btn" onclick="proceed()">सुरू गरौँ →</button>
-
-    <div class="small">
-      ⚠️ दर्ता, PAN, कानुनी विवरण अर्को चरण (Short Info) मा सोधिन्छ
-    </div>
-  </div>
-
-  <!-- INFO -->
-  <div class="card info">
-    <h2>किन FarmerBase BP Engine ?</h2>
+  <!-- LEFT : CONCEPT -->
+  <div class="left">
+    <h1>किन FarmerBase BP Engine ?</h1>
 
     <p>
       नेपालमा धेरै किसान तथा साना व्यवसायीहरूसँग
-      व्यवसायिक योजना बनाउने ज्ञान, समय वा
-      प्राविधिक पहुँच हुँदैन।
+      <b>व्यवसायिक योजना</b> बनाउने समय, ज्ञान वा प्राविधिक पहुँच हुँदैन।
     </p>
 
     <p>
@@ -150,69 +113,90 @@ input{
       आफ्नो व्यवसायिक योजना बनाउन।
     </p>
 
-    <h3 style="font-size:14px;margin-top:10px">📌 FarmerBase BP Engine के हो ?</h3>
-
-    <p>
-      FarmerBase BP Engine एउटा <b>Auto Business Planning System</b> हो,
-      जहाँ उत्पादन, खर्च, आम्दानी, नाफा, ROI र
-      ५-वर्षे प्रक्षेपण सबै आपसमा जोडिएका हुन्छन्।
-    </p>
-
-    <ul>
-      <li>🐖 पशुपालन (बंगुर, बाख्रा आदि)</li>
-      <li>🥬 तरकारी खेती</li>
-      <li>🐄 दुग्धजन्य व्यवसाय</li>
-      <li>🌾 मिश्रित कृषि व्यवसाय</li>
+    <p><b>के–के स्वतः बन्छ?</b></p>
+    <ul style="font-size:14px">
+      <li>उत्पादन, खर्च, आम्दानी</li>
+      <li>नाफा–नोक्सान</li>
+      <li>ROI, Payback Period</li>
+      <li>५ वर्षे प्रक्षेपण</li>
     </ul>
 
-    <div class="steps">
-      <b>🖱️ २–४ क्लिकमै योजना कसरी बन्छ ?</b><br><br>
-      Step 1: उत्पादन चयन<br>
-      Step 2: खर्च विवरण (चालु / स्थिर)<br>
-      Step 3: नाफा प्रतिशत<br>
-      Step 4: 👉 सिस्टमले आफैं:
-      <ul>
-        <li>आम्दानी</li>
-        <li>नाफा–नोक्सान</li>
-        <li>ROI</li>
-        <li>५-वर्षे प्रक्षेपण</li>
-      </ul>
+    <!-- DEVELOPER -->
+    <div class="dev">
+      <img src="Screenshot 2026-01-01 203450.png" alt="Prem Prasad Paudel">
+      <small>
+        <b>Concept Development By:</b><br>
+        Prem Prasad Paudel<br>
+        ✉️ paudelprem@gmail.com<br>
+        📱 WhatsApp: 9843508470
+      </small>
     </div>
   </div>
 
-</div>
+  <!-- RIGHT : LOGIN -->
+  <div class="right">
+    <h2>व्यवसाय सुरू गरौँ</h2>
 
-<!-- CONCEPT CREDIT -->
-<div class="credit">
-  <img src="https://scontent.fktm3-1.fna.fbcdn.net/v/t39.30808-6/241174928_10162407914859852_3099747735535518838_n.jpg" alt="Prem Prasad Paudel">
-  <div>
-    <b>Concept Development By :</b><br>
-    Prem Prasad Paudel
+    <label>व्यवसाय / संस्थाको नाम</label>
+    <input id="businessName" placeholder="जस्तै: किसान कृषि फार्म">
+
+    <label>परियोजनाको नाम</label>
+    <input id="projectName" placeholder="जस्तै: तरकारी उत्पादन योजना">
+
+    <label>प्रोप्राइटर / सञ्चालकको नाम</label>
+    <input id="ownerName" placeholder="नाम">
+
+    <button id="startBtn">🚀 व्यवसाय सुरू गरौँ</button>
   </div>
+
 </div>
 
 <script>
-function proceed(){
-  const businessName = businessName.value.trim();
-  const projectName  = projectName.value.trim();
-  const ownerName    = ownerName.value.trim();
+/* =========================
+   LOGIN CORE (ROOT FIX)
+========================= */
+document.getElementById("startBtn").addEventListener("click", ()=>{
 
-  if(!businessName || !projectName){
-    alert("कम्तीमा व्यवसाय र परियोजनाको नाम आवश्यक छ।");
+  const bName = businessName.value.trim();
+  const pName = projectName.value.trim();
+  const oName = ownerName.value.trim();
+
+  if(!bName || !pName){
+    alert("कृपया व्यवसाय र परियोजनाको नाम लेख्नुहोस्");
     return;
   }
 
-  let B = JSON.parse(localStorage.getItem("fb_businesses")||"null");
-  if(!B) B={activeId:"b1",list:{}};
+  // CREATE BUSINESS CONTEXT
+  let B = JSON.parse(localStorage.getItem("fb_businesses") || "null");
+  if(!B){
+    B = { activeId:null, list:{} };
+  }
 
+  const id = "b_" + Date.now();
+
+  B.activeId = id;
+  B.list[id] = {
+    businessName:bName,
+    projectName:pName,
+    ownerName:oName,
+    created:new Date().toISOString()
+  };
+
+  localStorage.setItem("fb_businesses", JSON.stringify(B));
+
+  // PREFILL SHORT INFO
   localStorage.setItem(
-    "fb_short_info_"+B.activeId,
-    JSON.stringify({businessName,projectName,ownerName})
+    "fb_short_info_" + id,
+    JSON.stringify({
+      businessName:bName,
+      projectName:pName,
+      ownerName:oName
+    })
   );
-  localStorage.setItem("fb_businesses",JSON.stringify(B));
 
-  location.href="short-info.html";
-}
+  // GO NEXT
+  window.location.href = "short-info.html";
+});
 </script>
 
 </body>
