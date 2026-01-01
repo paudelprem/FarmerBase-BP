@@ -3,100 +3,56 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>व्यवसाय / परियोजना विवरण | FarmerBase BP Engine</title>
+<title>Short Info | FarmerBase BP Engine</title>
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui;
-  background:#f6f7f9;
-  color:#222
-}
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
 /* HEADER */
 .header{
-  position:sticky;
-  top:0;
-  z-index:100;
-  background:#fff;
-  border-bottom:1px solid var(--b)
+  position:sticky;top:0;z-index:100;
+  background:#fff;border-bottom:1px solid var(--b)
 }
 .header-inner{
-  max-width:var(--w);
-  margin:auto;
-  padding:10px 14px;
+  max-width:var(--w);margin:auto;padding:10px 14px
 }
-.header h1{
-  margin:0;
-  font-size:16px;
-}
-.header .sub{
-  font-size:12px;
-  color:#555
-}
+.header h1{margin:0;font-size:16px}
+.header .sub{font-size:12px;color:#555}
 
 /* NAV */
 .nav-bar{
-  max-width:var(--w);
-  margin:8px auto;
-  padding:0 14px;
-  display:flex;
-  justify-content:space-between
+  max-width:var(--w);margin:8px auto;padding:0 14px;
+  display:flex;justify-content:space-between
 }
 .nav-btn{
-  text-decoration:none;
-  font-size:13px;
-  padding:6px 14px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  background:#fafafa;
-  color:#222
+  text-decoration:none;font-size:13px;padding:6px 14px;
+  border-radius:20px;border:1px solid #ccc;
+  background:#fafafa;color:#222
 }
-.nav-btn.primary{
-  background:var(--g);
-  color:#fff;
-  border-color:var(--g)
-}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
 
 /* MAIN */
-.main{
-  max-width:var(--w);
-  margin:10px auto 20px;
-  padding:0 14px;
-  position:relative;
-  z-index:2
-}
-.card{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:8px;
-  margin-bottom:16px
-}
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px;position:relative;z-index:2}
+.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{
-  margin:0;
-  padding:10px 12px;
-  background:#f3f5f7;
-  border-bottom:1px solid var(--b);
-  font-size:14px
+  margin:0;padding:10px 12px;background:#f3f5f7;
+  border-bottom:1px solid var(--b);font-size:14px
 }
-.card .body{
-  padding:12px;
-  font-size:13px
-}
+.card .body{padding:12px;font-size:13px}
 
 label{display:block;margin-top:8px}
 input,textarea{
-  width:100%;
-  padding:6px;
-  margin-top:4px;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:13px
+  width:100%;padding:6px;margin-top:4px;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
 }
-
+textarea{resize:vertical}
 .small{font-size:11px;color:#555}
+
+/* MAP */
+.map-wrap{margin-top:8px;border:1px solid #ddd;border-radius:8px;overflow:hidden}
+.map-wrap iframe{width:100%;height:260px;border:0}
 
 /* PRINT */
 @media print{
@@ -108,39 +64,85 @@ input,textarea{
 
 <body>
 
-<!-- HEADER (AUTO INJECT) -->
+<!-- HEADER -->
 <div class="header">
   <div class="header-inner">
-    <h1 id="headerBusiness">व्यवसायको नाम</h1>
-    <div class="sub" id="headerProject">परियोजनाको नाम</div>
+    <h1 id="pageTitle">परियोजनाको नाम</h1>
+    <div class="sub" id="pageSub">व्यवसाय / संस्थाको नाम</div>
   </div>
 </div>
 
 <!-- TOP NAV -->
 <div class="nav-bar">
   <span></span>
-  <a href="existing-status.html" class="nav-btn primary">
-    ➡️ अगाडि जानुहोस्
-  </a>
+  <a href="existing-status.html" class="nav-btn primary">➡️ अगाडि</a>
 </div>
 
 <div class="main">
 
-<!-- BASIC INFO -->
+<!-- PROJECT & BUSINESS -->
 <div class="card">
-  <h3>🏢 व्यवसाय / परियोजना परिचय</h3>
+  <h3>🏢 व्यवसाय र परियोजना</h3>
   <div class="body">
 
     <label>व्यवसाय / संस्थाको नाम</label>
-    <input id="businessName" placeholder="उदाहरण: श्री लक्ष्मी कृषि फर्म">
+    <input id="businessName">
 
     <label>परियोजनाको नाम</label>
-    <input id="projectName"
-      placeholder="उदाहरण: ५० वटा बाख्रा पालन परियोजना">
+    <input id="projectName">
 
-    <label>संक्षिप्त परिचय</label>
-    <textarea id="intro" rows="3"
-      placeholder="व्यवसाय र परियोजनाको छोटो परिचय..."></textarea>
+    <label>परियोजनाको संक्षिप्त परिचय</label>
+    <textarea id="projectIntro" rows="3"></textarea>
+
+  </div>
+</div>
+
+<!-- OWNER & REGISTRATION -->
+<div class="card">
+  <h3>📄 दर्ता तथा सञ्चालक विवरण</h3>
+  <div class="body">
+
+    <label>प्रोप्राइटर / सञ्चालकको नाम</label>
+    <input id="ownerName">
+
+    <label>सम्पर्क नम्बर</label>
+    <input id="ownerPhone" placeholder="९८xxxxxxxx">
+
+    <label>दर्ता मिति</label>
+    <input type="date" id="regDate">
+
+    <label>दर्ता नं</label>
+    <input id="regNo">
+
+    <label>दर्ता निकाय</label>
+    <input id="regOffice" placeholder="जस्तै: गाउँपालिका / नगरपालिका">
+
+    <label>PAN / VAT नं</label>
+    <input id="panNo">
+
+  </div>
+</div>
+
+<!-- ADDRESS & MAP -->
+<div class="card">
+  <h3>📍 ठेगाना तथा Google नक्सा</h3>
+  <div class="body">
+
+    <label>ठेगाना (पूरा)</label>
+    <textarea id="address" rows="2"
+      placeholder="प्रदेश, जिल्ला, पालिका, वडा, टोल"></textarea>
+
+    <label>Google Map लिंक (Paste गर्नुहोस्)</label>
+    <input id="mapLink"
+      placeholder="https://www.google.com/maps/place/...">
+
+    <div class="map-wrap" id="mapWrap" style="display:none">
+      <iframe id="mapFrame" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+    </div>
+
+    <div class="small">
+      ℹ️ Google Maps मा स्थान खोजेर “Share → Copy link” गरी यहाँ paste गर्नुहोस्।
+    </div>
 
   </div>
 </div>
@@ -150,20 +152,15 @@ input,textarea{
 <!-- BOTTOM NAV -->
 <div class="nav-bar">
   <span></span>
-  <a href="existing-status.html" class="nav-btn primary">
-    ➡️ existing-status
-  </a>
+  <a href="existing-status.html" class="nav-btn primary">➡️ existing-status</a>
 </div>
 
 <script>
 /* ======================
    CONTEXT
 ====================== */
-let B = JSON.parse(localStorage.getItem("fb_businesses") || "null");
-if(!B){
-  B = { activeId:"b1", list:{} };
-  localStorage.setItem("fb_businesses", JSON.stringify(B));
-}
+let B = JSON.parse(localStorage.getItem("fb_businesses")||"null");
+if(!B){ B={activeId:"b1",list:{}}; localStorage.setItem("fb_businesses",JSON.stringify(B)); }
 const BID = B.activeId;
 
 /* ======================
@@ -175,59 +172,91 @@ if(!data){
   data = {
     businessName:"",
     projectName:"",
-    intro:""
+    projectIntro:"",
+    ownerName:"",
+    ownerPhone:"",
+    regDate:"",
+    regNo:"",
+    regOffice:"",
+    panNo:"",
+    address:"",
+    mapLink:""
   };
 }
 
 /* ======================
    ELEMENTS
 ====================== */
-const businessName = document.getElementById("businessName");
-const projectName  = document.getElementById("projectName");
-const intro        = document.getElementById("intro");
+const els = {
+  businessName: document.getElementById("businessName"),
+  projectName: document.getElementById("projectName"),
+  projectIntro: document.getElementById("projectIntro"),
+  ownerName: document.getElementById("ownerName"),
+  ownerPhone: document.getElementById("ownerPhone"),
+  regDate: document.getElementById("regDate"),
+  regNo: document.getElementById("regNo"),
+  regOffice: document.getElementById("regOffice"),
+  panNo: document.getElementById("panNo"),
+  address: document.getElementById("address"),
+  mapLink: document.getElementById("mapLink")
+};
 
-const headerBusiness = document.getElementById("headerBusiness");
-const headerProject  = document.getElementById("headerProject");
+const pageTitle = document.getElementById("pageTitle");
+const pageSub   = document.getElementById("pageSub");
+const mapWrap   = document.getElementById("mapWrap");
+const mapFrame  = document.getElementById("mapFrame");
 
 /* ======================
    LOAD
 ====================== */
-businessName.value = data.businessName || "";
-projectName.value  = data.projectName  || "";
-intro.value        = data.intro        || "";
-
+Object.keys(els).forEach(k=>{ els[k].value = data[k] || ""; });
 updateHeader();
+updateMap();
 
 /* ======================
-   SAVE (AUTO)
+   SAVE (ON BLUR)
 ====================== */
 function save(){
-  data.businessName = businessName.value;
-  data.projectName  = projectName.value;
-  data.intro        = intro.value;
-
+  Object.keys(els).forEach(k=> data[k] = els[k].value);
   localStorage.setItem(KEY, JSON.stringify(data));
   updateHeader();
 }
-
-[businessName, projectName, intro].forEach(el=>{
-  el.addEventListener("input", save);
+Object.values(els).forEach(el=>{
+  el.addEventListener("blur", save);
 });
 
 /* ======================
    HEADER AUTO INJECT
 ====================== */
 function updateHeader(){
-  headerBusiness.textContent =
-    data.businessName || "व्यवसायको नाम";
-  headerProject.textContent =
-    data.projectName || "परियोजनाको नाम";
-
-  /* Print title auto inject */
+  pageTitle.textContent = data.projectName || "परियोजनाको नाम";
+  pageSub.textContent   = data.businessName || "व्यवसाय / संस्थाको नाम";
   document.title =
-    (data.businessName || "Business") +
-    (data.projectName ? " | " + data.projectName : "");
+    (data.projectName || "") +
+    (data.businessName ? " | " + data.businessName : "");
 }
+
+/* ======================
+   MAP EMBED
+====================== */
+function updateMap(){
+  if(!data.mapLink){ mapWrap.style.display="none"; return; }
+
+  let src = "";
+  if(data.mapLink.includes("embed")){
+    src = data.mapLink;
+  }else{
+    // convert share link to embed search
+    src = "https://www.google.com/maps?q=" +
+          encodeURIComponent(data.mapLink) +
+          "&output=embed";
+  }
+  mapFrame.src = src;
+  mapWrap.style.display="block";
+}
+els.mapLink.addEventListener("blur", ()=>{
+  save(); updateMap();
+});
 </script>
 
 </body>
