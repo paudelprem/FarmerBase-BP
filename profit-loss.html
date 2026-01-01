@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Profit & Loss | FarmerBase BP Engine</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
+:root{--w:980px;--g:#1b5e20;--b:#ddd}
+
+/* HEADER */
+.header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--b)}
+.header-inner{max-width:var(--w);margin:auto;padding:10px 14px}
+.header h1{margin:0;font-size:16px}
+.header .sub{font-size:12px;color:#555}
+
+/* NAV */
+.nav-bar{max-width:var(--w);margin:8px auto;padding:0 14px;display:flex;justify-content:space-between}
+.nav-btn{text-decoration:none;font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid #ccc;background:#fafafa;color:#222}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.top-nav{position:sticky;top:56px}
+.bottom-nav{position:sticky;bottom:0}
+
+/* MAIN */
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
+.card h3{margin:0;padding:10px 12px;background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px}
+.card .body{padding:12px;font-size:13px}
+
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:right}
+th{text-align:center;background:#f3f5f7}
+td:first-child,th:first-child{text-align:left}
+
+input{padding:4px;font-size:12px;width:80px}
+.small{font-size:11px;color:#555}
+
+@media print{.nav-bar{display:none}}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-inner">
+    <h1 id="pageTitle">परियोजनाको नाम</h1>
+    <div class="sub" id="pageSub">व्यवसाय / संस्थाको नाम</div>
+  </div>
+</div>
+
+<div class="nav-bar top-nav">
+  <a href="income.html" class="nav-btn">⬅️ आम्दानी</a>
+  <a href="index.html" class="nav-btn primary">🏠 Home</a>
+</div>
+
+<div class="main">
+
+<!-- PROFIT LOSS SUMMARY -->
+<div class="card">
+  <h3>📑 वार्षिक नाफा–नोक्सान विवरण</h3>
+  <div class="body" id="plSummary"></div>
+</div>
+
+<!-- ROI -->
+<div class="card">
+  <h3>📈 ROI र Payback Period</h3>
+  <div class="body" id="roiBox"></div>
+</div>
+
+<!-- GROWTH SETTINGS -->
+<div class="card">
+  <h3>⚙️ ५ वर्षे प्रक्षेपण – बृद्धि दर सेटिङ</h3>
+  <div class="body">
+
+    <label>
+      <input type="radio" name="gmode" value="same" checked
+        onchange="growth.mode='same';saveGrowth()">
+      सबै वर्षमा एउटै बृद्धि दर
+    </label>
+
+    <label>
+      <input type="radio" name="gmode" value="yearly"
+        onchange="growth.mode='yearly';saveGrowth()">
+      हरेक वर्ष फरक बृद्धि दर
+    </label>
+
+    <div id="growthInputs" style="margin-top:10px"></div>
+  </div>
+</div>
+
+<!-- 5 YEAR PROJECTION -->
+<div class="card">
+  <h3>📊 ५ वर्षे आम्दानी–खर्च प्रक्षेपण</h3>
+  <div class="body">
+    <table>
+      <thead>
+        <tr>
+          <th>वर्ष</th>
+          <th>आम्दानी</th>
+          <th>खर्च</th>
+          <th>नाफा</th>
+          <th>संचित नाफा</th>
+        </tr>
+      </thead>
+      <tbody id="yearTable"></tbody>
+    </table>
+  </div>
+</div>
+
+</div>
+
+<div class="nav-bar bottom-nav">
+  <a href="income.html" class="nav-btn">⬅️ आम्दानी</a>
+  <a href="index.html" class="nav-btn primary">🏠 Home</a>
+</div>
+
+<script>
+/* ========= IDENTITY ========= */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+pageTitle.textContent = info.projectName || "परियोजनाको नाम";
+pageSub.textContent   = info.businessName || "व्यवसाय";
+
+/* ========= EXPENSE ========= */
+const exp = JSON.parse(localStorage.getItem("fb_expenses_"+BID)||"{}");
+let totalExpense = 0;
+[...(exp.current||[]),...(exp.fixed||[])].forEach(e=>{
+  totalExpense += (+e.qty||0)*(+e.rate||0);
+});
+
+/* ========= CAPITAL (INTEREST) ========= */
+const cap = JSON.parse(localStorage.getItem("fb_capital_source_"+BID)||"{}");
+let totalInterest = 0;
+(cap.rows||[]).forEach(r=>{
+  if(r.loan){
+    const amt = totalExpense*((+r.pct||0)/100);
+    totalInterest += amt*((+r.rate||0)/100);
+  }
+});
+
+/* ========= INCOME ========= */
+const income = JSON.parse(localStorage.getItem("fb_income_"+BID)||"{}");
+const prod = JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+
+let totalIncome = 0;
+prod.forEach(p=>{
+  const d = income[p.name] || {};
+  totalIncome += (+d.price||0) * (+p.qty||0);
+});
+
+/* ========= PROFIT ========= */
+const grossProfit = totalIncome - totalExpense;
+const netProfit   = grossProfit - totalInterest;
+
+/* ========= ROI & PAYBACK ========= */
+const ROI = totalExpense ? (netProfit/totalExpense*100) : 0;
+const payback = netProfit>0 ? (totalExpense/netProfit) : 0;
+
+/* ========= RENDER SUMMARY ========= */
+plSummary.innerHTML = `
+<table>
+<tr><td>कुल आम्दानी</td><td>रु ${totalIncome.toLocaleString()}</td></tr>
+<tr><td>कुल खर्च</td><td>रु ${totalExpense.toLocaleString()}</td></tr>
+<tr><td>कुल ब्याज</td><td>रु ${totalInterest.toLocaleString()}</td></tr>
+<tr><th>शुद्ध नाफा</th><th>रु ${netProfit.toLocaleString()}</th></tr>
+</table>
+`;
+
+roiBox.innerHTML = `
+<div>ROI: <b>${ROI.toFixed(2)} %</b></div>
+<div>Payback Period: <b>${payback.toFixed(2)} वर्ष</b></div>
+`;
+
+/* ========= GROWTH SETTINGS ========= */
+const GKEY = "fb_growth_"+BID;
+let growth = JSON.parse(localStorage.getItem(GKEY)||"null");
+if(!growth){
+  growth = {
+    mode:"same",
+    income:[5,5,5,5,5],
+    expense:[3,3,3,3,3]
+  };
+}
+
+function saveGrowth(){
+  localStorage.setItem(GKEY, JSON.stringify(growth));
+  renderGrowthInputs();
+  renderProjection();
+}
+
+function renderGrowthInputs(){
+  let html="";
+  if(growth.mode==="same"){
+    html = `
+      <label>आम्दानी बृद्धि %</label>
+      <input type="number" value="${growth.income[0]}"
+        oninput="growth.income=[this.value,this.value,this.value,this.value,this.value];saveGrowth()">
+
+      <label style="margin-left:10px">खर्च बृद्धि %</label>
+      <input type="number" value="${growth.expense[0]}"
+        oninput="growth.expense=[this.value,this.value,this.value,this.value,this.value];saveGrowth()">
+    `;
+  }else{
+    html = `<table>
+      <tr><th>वर्ष</th><th>आम्दानी %</th><th>खर्च %</th></tr>`;
+    for(let i=0;i<5;i++){
+      html += `
+        <tr>
+          <td>वर्ष ${i+1}</td>
+          <td><input type="number" value="${growth.income[i]}"
+            oninput="growth.income[${i}]=this.value;saveGrowth()"></td>
+          <td><input type="number" value="${growth.expense[i]}"
+            oninput="growth.expense[${i}]=this.value;saveGrowth()"></td>
+        </tr>
+      `;
+    }
+    html += `</table>`;
+  }
+  growthInputs.innerHTML = html;
+}
+
+/* ========= 5 YEAR PROJECTION ========= */
+function renderProjection(){
+  yearTable.innerHTML="";
+  let cum=0;
+  let inc=totalIncome;
+  let expc=totalExpense;
+
+  for(let y=0;y<5;y++){
+    if(y>0){
+      inc *= (1 + (+growth.income[y]/100));
+      expc *= (1 + (+growth.expense[y]/100));
+    }
+    const profit = inc - expc;
+    cum += profit;
+
+    yearTable.innerHTML += `
+      <tr>
+        <td>वर्ष ${y+1}</td>
+        <td>रु ${inc.toLocaleString()}</td>
+        <td>रु ${expc.toLocaleString()}</td>
+        <td>रु ${profit.toLocaleString()}</td>
+        <td>रु ${cum.toLocaleString()}</td>
+      </tr>
+    `;
+  }
+}
+
+/* INIT */
+renderGrowthInputs();
+renderProjection();
+</script>
+
+</body>
+</html>
