@@ -20,9 +20,8 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .nav-bar{max-width:var(--w);margin:8px auto;padding:0 14px;display:flex;justify-content:space-between}
 .nav-btn{text-decoration:none;font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid #ccc;background:#fafafa;color:#222}
 .nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.top-nav{position:sticky;top:56px;z-index:90}
-.bottom-nav{position:sticky;bottom:0;z-index:90}
-.top-nav,.bottom-nav{pointer-events:auto}
+.top-nav{position:sticky;top:56px}
+.bottom-nav{position:sticky;bottom:0}
 
 /* MAIN */
 .main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
@@ -30,21 +29,17 @@ body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 .card h3{margin:0;padding:10px 12px;background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px}
 .card .body{padding:12px;font-size:13px}
 
-label{display:block;margin-top:6px;font-size:12px}
-input{width:100%;padding:6px;margin-top:4px;border:1px solid #ccc;border-radius:6px}
-input[readonly]{background:#f9f9f9}
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:center}
+th{background:#f3f5f7}
 
-.btn{font-size:12px;padding:4px 10px;margin:6px 4px 0 0;cursor:pointer}
+input,select{width:100%;padding:4px;font-size:12px}
+.small{font-size:11px;color:#555}
+.btn{font-size:12px;padding:4px 10px;margin:4px;cursor:pointer}
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
-
-.block{border-left:3px solid var(--g);padding-left:10px;margin-top:10px}
-.small{font-size:11px;color:#555}
-
-/* COLLAPSE */
-.collapsed .edit-area{display:none}
-.collapsed .summary{display:block}
-.summary{display:none}
+.collapsed{background:#fafafa}
+.warn{color:#b71c1c;font-size:12px;margin-top:6px}
 
 @media print{.nav-bar{display:none}}
 </style>
@@ -60,7 +55,6 @@ input[readonly]{background:#f9f9f9}
   </div>
 </div>
 
-<!-- NAV -->
 <div class="nav-bar top-nav">
   <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
   <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
@@ -68,171 +62,142 @@ input[readonly]{background:#f9f9f9}
 
 <div class="main">
 
-<!-- CURRENT -->
 <div class="card">
-  <h3>💸 चालु खर्च</h3>
+  <h3>🔄 चालु खर्च (Current Expenses)</h3>
   <div class="body">
-    <button class="btn primary" id="addCurrent">➕ नयाँ खर्च</button>
-    <div id="currentList"></div>
+    <button class="btn primary" onclick="addRow('current')">➕ चालु खर्च थप्नुहोस्</button>
+    <table>
+      <thead>
+        <tr>
+          <th>विवरण</th><th>इकाई</th><th>परिमाण</th><th>दर</th>
+          <th>केमा लाग्ने?</th><th>लागत</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="currentTable"></tbody>
+    </table>
   </div>
 </div>
 
-<!-- FIXED -->
 <div class="card">
-  <h3>🏗️ स्थिर (पुँजीगत) खर्च</h3>
+  <h3>🏗️ स्थिर खर्च / सम्पत्ति (Fixed Assets)</h3>
   <div class="body">
-    <button class="btn primary" id="addFixed">➕ नयाँ खर्च</button>
-    <div id="fixedList"></div>
+    <button class="btn primary" onclick="addRow('fixed')">➕ स्थिर खर्च थप्नुहोस्</button>
+    <table>
+      <thead>
+        <tr>
+          <th>सम्पत्ति</th><th>इकाई</th><th>परिमाण</th><th>दर</th>
+          <th>ह्रास %</th><th>वार्षिक ह्रास</th>
+          <th>केमा लाग्ने?</th><th>लागत</th><th></th>
+        </tr>
+      </thead>
+      <tbody id="fixedTable"></tbody>
+    </table>
   </div>
 </div>
 
 </div>
 
-<!-- NAV BOTTOM -->
 <div class="nav-bar bottom-nav">
   <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
   <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
 </div>
 
 <script>
-/* ================= IDENTITY ================= */
-const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID = B.activeId || "b1";
-const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
-pageTitle.textContent = info.projectName || "परियोजनाको नाम";
-pageSub.textContent   = info.businessName || "व्यवसाय";
+/* ========= IDENTITY ========= */
+const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID=B.activeId||"b1";
+const info=JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
+pageTitle.textContent=info.projectName||"परियोजनाको नाम";
+pageSub.textContent=info.businessName||"व्यवसाय";
 
-/* ================= PRODUCTS ================= */
-const PRODUCTS = JSON.parse(
-  localStorage.getItem("fb_production_items_"+BID) || "[]"
-);
+/* ========= PRODUCTION ========= */
+const PRODUCTS=JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
 
-/* ================= STORAGE ================= */
-const KEY = "fb_expenses_"+BID;
-let data = JSON.parse(localStorage.getItem(KEY)||"null");
-if(!data) data = { current:[], fixed:[] };
+/* ========= STORAGE ========= */
+const KEY="fb_expenses_"+BID;
+let data=JSON.parse(localStorage.getItem(KEY)||"null");
+if(!data){
+  data={current:[],fixed:[]};
+}
 
+/* ========= SAVE ========= */
 function save(){
-  localStorage.setItem(KEY, JSON.stringify(data));
+  localStorage.setItem(KEY,JSON.stringify(data));
   render();
 }
 
-/* ================= ADD (PREPEND) ================= */
-function add(type){
-  data[type].unshift({
-    title:"",
-    unit:"",
-    qty:"",
-    rate:"",
-    applyType:"selected", // all | selected
+/* ========= ADD ROW ========= */
+function addRow(type){
+  const row={
+    name:"",unit:"",qty:1,rate:0,
+    depRate:10,
+    applyType:"selected",
     products:[],
-    edit:true
-  });
+    collapsed:false
+  };
+  data[type].unshift(row);
   save();
 }
 
-addCurrent.onclick = ()=>add("current");
-addFixed.onclick   = ()=>add("fixed");
+/* ========= RENDER ========= */
+function render(){
+  renderTable("current",currentTable,false);
+  renderTable("fixed",fixedTable,true);
+}
 
-/* ================= RENDER ================= */
-function renderList(type, wrap){
-  wrap.innerHTML="";
+/* ========= TABLE RENDER ========= */
+function renderTable(type,el,hasDep){
+  el.innerHTML="";
   data[type].forEach((e,i)=>{
-    const qty = (+e.qty||0);
-    const rate = (+e.rate||0);
-    const amt = qty * rate;
-    const per = qty ? amt/qty : 0;
+    const cost=(+e.qty||0)*(+e.rate||0);
+    const dep=hasDep?cost*((+e.depRate||0)/100):0;
 
-    wrap.innerHTML += `
-    <div class="block ${!e.edit?'collapsed':''}">
-      <div class="summary">
-        <b>${e.title || "(शीर्षक)"}</b><br>
-        <span class="small">
-          इकाईगत: रु ${per.toLocaleString()} |
-          कुल: रु ${amt.toLocaleString()}
-        </span>
-      </div>
+    el.innerHTML+=`
+    <tr class="${e.collapsed?'collapsed':''}">
+      <td><input value="${e.name}" onblur="data.${type}[${i}].name=this.value;save()"></td>
+      <td><input value="${e.unit}" onblur="data.${type}[${i}].unit=this.value;save()"></td>
+      <td><input type="number" value="${e.qty}" onblur="data.${type}[${i}].qty=this.value;save()"></td>
+      <td><input type="number" value="${e.rate}" onblur="data.${type}[${i}].rate=this.value;save()"></td>
 
-      <div class="edit-area">
-        <label>खर्च शीर्षक</label>
-        <input value="${e.title}"
-          oninput="data.${type}[${i}].title=this.value">
+      ${hasDep?`
+      <td><input type="number" value="${e.depRate}" onblur="data.${type}[${i}].depRate=this.value;save()"></td>
+      <td>रु ${dep.toLocaleString()}</td>`:""}
 
-        <label>इकाई</label>
-        <input value="${e.unit}"
-          oninput="data.${type}[${i}].unit=this.value">
+      <td>
+        <select onchange="data.${type}[${i}].applyType=this.value;save()">
+          <option value="all" ${e.applyType==="all"?"selected":""}>सबै उत्पादन</option>
+          <option value="selected" ${e.applyType==="selected"?"selected":""}>छानिएका</option>
+        </select>
+        ${e.applyType==="selected"?`
+          <div class="small">
+            ${PRODUCTS.map(p=>`
+              <label>
+                <input type="checkbox"
+                  ${e.products.includes(p.name)?"checked":""}
+                  onchange="
+                    const a=data.${type}[${i}].products;
+                    this.checked?a.push('${p.name}'):a.splice(a.indexOf('${p.name}'),1);
+                    save();
+                  ">
+                ${p.name}
+              </label>
+            `).join("")}
+          </div>`:""}
+      </td>
 
-        <label>परिमाण</label>
-        <input type="number" value="${e.qty}"
-          oninput="data.${type}[${i}].qty=this.value">
+      <td>रु ${cost.toLocaleString()}</td>
 
-        <label>दर</label>
-        <input type="number" value="${e.rate}"
-          oninput="data.${type}[${i}].rate=this.value">
-
-        <label><b>खर्चको प्रकृति</b></label>
-        <label>
-          <input type="radio" name="ap_${type}_${i}"
-            ${e.applyType==="all"?"checked":""}
-            onchange="data.${type}[${i}].applyType='all';save()">
-          सबै उत्पादनमा लाग्ने
-        </label>
-        <label>
-          <input type="radio" name="ap_${type}_${i}"
-            ${e.applyType==="selected"?"checked":""}
-            onchange="data.${type}[${i}].applyType='selected';save()">
-          केही उत्पादनमा मात्र लाग्ने
-        </label>
-
-        ${
-          e.applyType==="selected"
-          ? (
-            PRODUCTS.length===0
-            ? `<div class="small" style="color:#b71c1c">
-                ⚠️ उत्पादन सूची खाली छ (पहिले production भर्नुहोस्)
-              </div>`
-            : `
-              <div class="small"><b>केमा लगानी?</b></div>
-              ${PRODUCTS.map(p=>`
-                <label>
-                  <input type="checkbox"
-                    ${e.products.includes(p.name)?"checked":""}
-                    onchange="
-                      const arr=data.${type}[${i}].products;
-                      this.checked
-                        ? arr.push('${p.name}')
-                        : arr.splice(arr.indexOf('${p.name}'),1);
-                      save();
-                    ">
-                  ${p.name}
-                </label>
-              `).join("")}
-            `
-          )
-          : ""
-        }
-      </div>
-
-      ${
-        e.edit
-        ? `<button class="btn primary"
-             onclick="data.${type}[${i}].edit=false;save()">💾 Save</button>`
-        : `<button class="btn primary"
-             onclick="data.${type}[${i}].edit=true;save()">✏️ Edit</button>`
-      }
-      <button class="btn danger"
-        onclick="data.${type}.splice(${i},1);save()">🗑️ हटाउनुहोस्</button>
-    </div>
-    `;
+      <td>
+        <button class="btn" onclick="data.${type}[${i}].collapsed=!data.${type}[${i}].collapsed;save()">▾</button>
+        <button class="btn danger" onclick="data.${type}.splice(${i},1);save()">🗑️</button>
+      </td>
+    </tr>`;
   });
 }
 
-function render(){
-  renderList("current", currentList);
-  renderList("fixed", fixedList);
-}
 render();
 </script>
 
 </body>
 </html>
+
