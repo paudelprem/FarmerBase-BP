@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>खर्च विवरण | FarmerBase BP Engine</title>
+
+<style>
+*{box-sizing:border-box}
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
+:root{--w:980px;--g:#1b5e20;--b:#ddd}
+
+/* NAV */
+.nav-bar{
+  max-width:var(--w);margin:8px auto;padding:8px 14px;
+  display:flex;justify-content:space-between;background:#f6f7f9
+}
+.nav-btn{
+  text-decoration:none;font-size:13px;padding:6px 14px;
+  border-radius:20px;border:1px solid #ccc;
+  background:#fafafa;color:#222
+}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.top-nav{position:sticky;top:0;z-index:100}
+.bottom-nav{position:sticky;bottom:0;z-index:100}
+
+/* Layout */
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
+.card{
+  background:#fff;border:1px solid var(--b);
+  border-radius:8px;margin-bottom:16px
+}
+.card h3{
+  margin:0;padding:10px 12px;background:#f3f5f7;
+  border-bottom:1px solid var(--b);font-size:14px
+}
+.card .body{padding:12px;font-size:13px}
+
+input,select{
+  width:100%;padding:6px;margin:4px 0;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
+}
+input[readonly]{background:#f9f9f9;border-color:#eee}
+
+.btn{
+  font-size:12px;padding:4px 10px;margin:4px 4px 0 0;cursor:pointer
+}
+.btn.primary{color:#1b5e20;font-weight:600}
+.btn.danger{color:#b71c1c}
+
+.expense-block{
+  border-left:3px solid var(--g);
+  padding-left:10px;margin-top:12px
+}
+.total{font-weight:600;margin-top:4px}
+</style>
+</head>
+
+<body>
+
+<!-- TOP NAV -->
+<div class="nav-bar top-nav">
+  <a href="production.html" class="nav-btn">⬅️ उत्पादन विवरण</a>
+  <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
+</div>
+
+<div class="main">
+
+<div class="card">
+  <h3>💸 खर्च विवरण (Projection)</h3>
+  <div class="body">
+    <button class="btn primary" onclick="addExpense('चलु')">➕ चालु खर्च थप्नुहोस्</button>
+    <button class="btn primary" onclick="addExpense('स्थिर')">➕ स्थिर खर्च थप्नुहोस्</button>
+    <div id="expenseList"></div>
+  </div>
+</div>
+
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="nav-bar bottom-nav">
+  <a href="production.html" class="nav-btn">⬅️ उत्पादन विवरण</a>
+  <a href="income.html" class="nav-btn primary">➡️ आम्दानी</a>
+</div>
+
+<script>
+/* CONTEXT */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+
+/* LOAD PRODUCTS */
+const products = JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+
+/* DATA */
+const KEY="fb_expenses_"+BID;
+let expenses = JSON.parse(localStorage.getItem(KEY)||"[]");
+
+function save(){localStorage.setItem(KEY,JSON.stringify(expenses));render();}
+
+function addExpense(type){
+  expenses.push({
+    type,
+    category:"",
+    item:"",
+    unit:"",
+    budgetQty:"",
+    budgetRate:"",
+    product:"",
+    depreciationYears: type==="स्थिर"?5:null
+  });
+  save();
+}
+
+function deleteExpense(i){
+  if(!confirm("यो खर्च हटाउने?"))return;
+  expenses.splice(i,1);save();
+}
+
+function render(){
+  const wrap=document.getElementById("expenseList");
+  wrap.innerHTML="";
+  expenses.forEach((e,i)=>{
+    const total=(e.budgetQty*e.budgetRate)||0;
+    const yearlyDep = e.type==="स्थिर" && e.depreciationYears
+      ? (total/e.depreciationYears).toFixed(2)
+      : null;
+
+    wrap.innerHTML+=`
+      <div class="expense-block">
+        <b>${e.type} खर्च</b>
+
+        <label>उपशीर्षक</label>
+        <input value="${e.category}"
+          oninput="expenses[${i}].category=this.value;save()">
+
+        <label>के सामान / सेवा</label>
+        <input value="${e.item}"
+          oninput="expenses[${i}].item=this.value;save()">
+
+        <label>युनिट</label>
+        <input value="${e.unit}"
+          oninput="expenses[${i}].unit=this.value;save()">
+
+        <label>संख्या</label>
+        <input type="number" value="${e.budgetQty}"
+          oninput="expenses[${i}].budgetQty=this.value;save()">
+
+        <label>दर</label>
+        <input type="number" value="${e.budgetRate}"
+          oninput="expenses[${i}].budgetRate=this.value;save()">
+
+        <label>कुन उत्पादनमा लाग्ने?</label>
+        <select onchange="expenses[${i}].product=this.value;save()">
+          <option value="">— छान्नुहोस् —</option>
+          ${products.map(p=>`
+            <option ${p.name===e.product?"selected":""}>${p.name}</option>
+          `).join("")}
+        </select>
+
+        ${e.type==="स्थिर"?`
+          <label>ह्रासकट्टी अवधि (वर्ष)</label>
+          <input type="number" value="${e.depreciationYears}"
+            oninput="expenses[${i}].depreciationYears=this.value;save()">
+          <div class="total">वार्षिक ह्रासकट्टी: रु ${yearlyDep}</div>
+        `:""}
+
+        <div class="total">कुल खर्च: रु ${total}</div>
+
+        <button class="btn danger" onclick="deleteExpense(${i})">🗑️ हटाउनुहोस्</button>
+      </div>
+    `;
+  });
+}
+
+render();
+</script>
+
+</body>
+</html>
