@@ -3,28 +3,23 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Letters | FarmerBase BP Engine</title>
+<title>Create Letter | FarmerBase BP Engine</title>
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:#f4f6f8;color:#222}
-:root{--w:900px;--g:#1b5e20;--b:#ddd}
+body{margin:0;font-family:system-ui;background:#f4f6f8}
+.wrap{max-width:900px;margin:auto;background:#fff;padding:20px}
+h1,h2{margin:0;color:#1b5e20}
+hr{border:none;border-top:1px solid #ddd;margin:16px 0}
 
-/* HEADER */
-.header{background:#fff;border-bottom:1px solid var(--b)}
-.header-inner{max-width:var(--w);margin:auto;padding:14px}
-.header h1{margin:0;font-size:20px}
-.header p{margin:6px 0 0;color:#555;font-size:13px}
-
-/* MAIN */
-.main{max-width:var(--w);margin:auto;padding:20px}
-
-/* CARD */
-.card{
-  background:#fff;border:1px solid var(--b);
-  border-radius:10px;padding:16px;margin-bottom:20px
+label{font-size:13px;font-weight:600}
+input,textarea{
+  width:100%;padding:8px;font-size:13px;
+  border:1px solid #ccc;border-radius:6px
 }
-.card h2{margin-top:0;font-size:18px;color:var(--g)}
+textarea{resize:vertical;min-height:120px}
+
+.box{border:1px solid #ddd;border-radius:8px;padding:12px;margin-bottom:16px}
+.box h3{margin:0 0 8px;font-size:14px;color:#333}
 
 .btn{
   padding:6px 14px;border-radius:20px;
@@ -32,45 +27,62 @@ body{margin:0;font-family:system-ui;background:#f4f6f8;color:#222}
   color:#fff;cursor:pointer;font-size:13px;margin-right:6px
 }
 .btn.light{background:#eee;color:#222}
-.btn.danger{background:#b71c1c;border-color:#b71c1c}
-
-table{width:100%;border-collapse:collapse;margin-top:10px}
-th,td{border:1px solid #ddd;padding:8px;font-size:13px;text-align:left}
-th{background:#f3f5f7}
+.btn.danger{background:#b71c1c}
 
 .small{font-size:12px;color:#555}
+
+.footer{font-size:12px;color:#444;margin-top:30px}
+@media print{.btn{display:none}}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-  <div class="header-inner">
-    <h1>📄 निवेदनहरू (Letters)</h1>
-    <p>बनाइएका सबै निवेदनहरूको सूची</p>
+<div class="wrap">
+
+<!-- ACTIONS -->
+<button class="btn light" onclick="location.href='letters.html'">⬅️ सबै निवेदन</button>
+<button class="btn" onclick="window.print()">🖨️ Print / PDF</button>
+
+<!-- HEADER -->
+<h1 id="orgName">संस्थाको नाम</h1>
+<div class="small" id="projectName"></div>
+
+<hr>
+
+<!-- OFFICE -->
+<div class="box">
+  <h3>🏢 कार्यालयको नाम</h3>
+  <textarea id="office" placeholder="कार्यालयको पूरा नाम लेख्नुहोस्"></textarea>
+</div>
+
+<!-- SUBJECT -->
+<div class="box">
+  <h3>📌 विषय</h3>
+  <input id="subject" placeholder="विषय लेख्नुहोस्">
+</div>
+
+<!-- BODY -->
+<div class="box">
+  <h3>📝 निवेदनको व्यहोरा</h3>
+  <textarea id="body" placeholder="निवेदनको व्यहोरा यहाँ लेख्नुहोस्"></textarea>
+</div>
+
+<!-- ATTACHMENT LIST -->
+<div class="box">
+  <h3>📎 संलग्न कागजपत्रको सूचि</h3>
+
+  <div id="docs"></div>
+
+  <button class="btn light" onclick="addDoc()">➕ बुँदा थप्नुहोस्</button>
+
+  <div class="small">
+    (उदाहरण: व्यवसाय दर्ता प्रमाणपत्रको प्रतिलिपि)
   </div>
 </div>
 
-<div class="main">
-
-<div class="card">
-  <button class="btn" onclick="createNew()">➕ नयाँ निवेदन बनाउनुहोस्</button>
-  <button class="btn light" onclick="location.href='index.html'">⬅️ Home</button>
-
-  <table>
-    <thead>
-      <tr>
-        <th>कार्यालय</th>
-        <th>विषय</th>
-        <th>अन्तिम सच्याइएको</th>
-        <th>कार्य</th>
-      </tr>
-    </thead>
-    <tbody id="list"></tbody>
-  </table>
-
-  <div id="empty" class="small" style="margin-top:10px"></div>
-</div>
+<!-- FOOTER -->
+<div class="footer" id="footerInfo"></div>
 
 </div>
 
@@ -78,65 +90,69 @@ th{background:#f3f5f7}
 /* ========= BUSINESS ========= */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
 const BID = B.activeId || "b1";
+const info = JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
 
-/* ========= STORAGE ========= */
-const KEY = "fb_letters_list_"+BID;
-let letters = JSON.parse(localStorage.getItem(KEY)||"[]");
+/* ========= ACTIVE LETTER ========= */
+const activeId = localStorage.getItem("fb_active_letter_"+BID);
+const LIST_KEY = "fb_letters_list_"+BID;
+let list = JSON.parse(localStorage.getItem(LIST_KEY)||"[]");
+let letter = list.find(l=>l.id==activeId);
 
-/* ========= RENDER ========= */
-function render(){
-  list.innerHTML="";
-  if(letters.length===0){
-    empty.textContent="हालसम्म कुनै निवेदन बनाइएको छैन।";
-    return;
-  }
-  empty.textContent="";
+if(!letter){
+  letter={id:activeId,office:"",subject:"",body:"",docs:[],updated:new Date().toISOString()};
+  list.unshift(letter);
+}
 
-  letters.forEach((l,i)=>{
-    list.innerHTML+=`
-      <tr>
-        <td>${l.office||"-"}</td>
-        <td>${l.subject||"-"}</td>
-        <td>${new Date(l.updated).toLocaleString()}</td>
-        <td>
-          <button class="btn light" onclick="openLetter(${i})">खोल्नुहोस्</button>
-          <button class="btn danger" onclick="removeLetter(${i})">Delete</button>
-        </td>
-      </tr>
+/* ========= HEADER ========= */
+orgName.textContent = info.businessName || "संस्थाको नाम";
+projectName.textContent = info.projectName || "";
+
+/* ========= FOOTER ========= */
+footerInfo.innerHTML = `
+<b>${info.businessName||""}</b><br>
+दर्ता नं: ${info.regNo||"-"} |
+PAN नं: ${info.pan||"-"}<br>
+ठेगाना: ${info.address||""}
+`;
+
+/* ========= BIND ========= */
+office.value = letter.office || "";
+subject.value = letter.subject || "";
+body.value = letter.body || "";
+
+office.onblur = ()=>{letter.office=office.value;save()};
+subject.onblur = ()=>{letter.subject=subject.value;save()};
+body.onblur = ()=>{letter.body=body.value;save()};
+
+/* ========= DOC LIST ========= */
+function addDoc(){
+  letter.docs.push("");
+  save();
+}
+
+function renderDocs(){
+  docs.innerHTML="";
+  letter.docs.forEach((d,i)=>{
+    docs.innerHTML+=`
+      <div style="display:flex;gap:6px;margin-bottom:6px">
+        <input placeholder="संलग्न कागजपत्र"
+          value="${d}"
+          onblur="letter.docs[${i}]=this.value;save()">
+        <button class="btn danger"
+          onclick="letter.docs.splice(${i},1);save()">✖</button>
+      </div>
     `;
   });
 }
 
-/* ========= CREATE ========= */
-function createNew(){
-  const id = Date.now();
-  letters.unshift({
-    id,
-    office:"",
-    subject:"",
-    updated:new Date().toISOString()
-  });
-  localStorage.setItem(KEY,JSON.stringify(letters));
-  localStorage.setItem("fb_active_letter_"+BID,id);
-  location.href="create-letter.html";
+/* ========= SAVE ========= */
+function save(){
+  letter.updated = new Date().toISOString();
+  localStorage.setItem(LIST_KEY,JSON.stringify(list));
+  renderDocs();
 }
 
-/* ========= OPEN ========= */
-function openLetter(i){
-  localStorage.setItem("fb_active_letter_"+BID,letters[i].id);
-  location.href="create-letter.html";
-}
-
-/* ========= DELETE ========= */
-function removeLetter(i){
-  if(confirm("यो निवेदन delete गर्ने हो ?")){
-    letters.splice(i,1);
-    localStorage.setItem(KEY,JSON.stringify(letters));
-    render();
-  }
-}
-
-render();
+renderDocs();
 </script>
 
 </body>
