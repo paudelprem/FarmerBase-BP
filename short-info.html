@@ -3,273 +3,251 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>संक्षिप्त विवरण | FarmerBase BP Engine</title>
+<title>संक्षिप्त परिचय | FarmerBase BP Engine</title>
 
 <style>
 *{box-sizing:border-box}
-body{
-  margin:0;
-  font-family:system-ui,-apple-system,Segoe UI,Roboto;
-  background:#f6f7f9;
+body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
+:root{--w:980px;--g:#1b5e20;--b:#ddd}
+
+/* ===== NAV ===== */
+.nav-bar{
+  max-width:var(--w);
+  margin:8px auto;
+  padding:8px 14px;
+  display:flex;
+  justify-content:space-between;
+}
+.nav-btn{
+  text-decoration:none;
+  font-size:13px;
+  padding:6px 14px;
+  border-radius:20px;
+  border:1px solid #ccc;
+  background:#fafafa;
   color:#222;
 }
-:root{
-  --w:980px;
-  --g:#1b5e20;
-  --b:#e0e0e0;
+.nav-btn.primary{
+  background:var(--g);
+  color:#fff;
+  border-color:var(--g);
 }
+.top-nav{position:sticky;top:0;background:#f6f7f9;z-index:9}
+.bottom-nav{position:sticky;bottom:0;background:#f6f7f9;z-index:9}
 
-/* Header */
-header{
-  position:sticky; top:0; z-index:10;
-  background:#fff;
-  border-bottom:1px solid var(--b);
-}
-.h-wrap{
-  max-width:var(--w);
-  margin:auto;
-  padding:10px 14px;
-  display:flex; align-items:center; justify-content:space-between;
-}
-.brand{font-weight:700;color:var(--g);font-size:14px}
-.biz-name select{
-  font-size:12px;padding:4px 6px;border-radius:6px;border:1px solid #ccc;
-}
-
-/* Page */
-.main{
-  max-width:var(--w);
-  margin:18px auto 24px;
-  padding:0 14px;
-}
-.card{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:8px;
-  margin-bottom:16px;
-}
+/* ===== Layout ===== */
+.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
+.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
 .card h3{
   margin:0;padding:10px 12px;
-  font-size:14px;
-  background:#f3f5f7;
-  border-bottom:1px solid var(--b);
+  background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px
 }
-.card .body{padding:12px}
+.card .body{padding:12px;font-size:13px}
 
-/* Form */
-.row{
-  display:grid;gap:10px;
-  grid-template-columns:repeat(12,1fr);
-  margin-bottom:10px
-}
-.col-6{grid-column:span 6}
-.col-4{grid-column:span 4}
+.row{display:grid;grid-template-columns:repeat(12,1fr);gap:8px}
 .col-3{grid-column:span 3}
-label{font-size:12px;color:#444}
-input,select{
-  width:100%;padding:8px 9px;
-  font-size:13px;border:1px solid #ccc;
-  border-radius:6px;background:#fff;
-}
+.col-4{grid-column:span 4}
+.col-6{grid-column:span 6}
+.col-12{grid-column:span 12}
 
-/* Toggle */
-.toggle{display:inline-flex;border:1px solid #ccc;border-radius:20px;overflow:hidden}
-.toggle button{
-  border:0;padding:6px 10px;font-size:12px;
-  cursor:pointer;background:#fff
+input,select,textarea{
+  width:100%;
+  padding:6px;
+  margin:4px 0;
+  border:1px solid #ccc;
+  border-radius:6px;
+  font-size:13px;
 }
-.toggle button.active{background:#e8f5e9;color:var(--g)}
+textarea{resize:vertical}
 
-/* Footer */
-.footer-nav{
-  display:flex;justify-content:space-between;align-items:center;
-  padding:10px 14px;border-top:1px solid var(--b);
-  background:#fff;position:sticky;bottom:0
-}
-.status{font-size:12px;color:#2e7d32}
+small{color:#666;font-size:12px}
+
 .btn{
-  padding:8px 12px;border-radius:6px;
-  font-size:13px;cursor:pointer;
-  border:1px solid #ccc;background:#fafafa
+  padding:6px 10px;
+  border:1px solid #ccc;
+  border-radius:6px;
+  background:#fafafa;
+  cursor:pointer;
 }
 .btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.btn[disabled]{opacity:.5;cursor:not-allowed}
-
-/* Responsive */
-@media(max-width:720px){
-  .col-6,.col-4,.col-3{grid-column:span 12}
-}
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="h-wrap">
-    <div class="brand">FarmerBase BP Engine</div>
-    <div class="biz-name">
-      <select id="businessSwitcher"></select>
-    </div>
-  </div>
-</header>
-
-<main class="main">
-
-<!-- Business -->
-<section class="card">
-<h3>📌 व्यवसायको आधारभूत जानकारी</h3>
-<div class="body">
-<div class="row">
-  <div class="col-6">
-    <label>व्यवसायको नाम *</label>
-    <input id="businessName">
-  </div>
-  <div class="col-6">
-    <label>व्यवसायको प्रकार</label>
-    <select id="businessType">
-      <option>कृषि</option><option>पशुपालन</option>
-      <option>व्यापार</option><option>सेवा</option>
-    </select>
-  </div>
+<!-- 🔼 TOP NAV -->
+<div class="nav-bar top-nav">
+  <a href="index.html" class="nav-btn">⬅️ Home</a>
+  <a href="existing-status.html" class="nav-btn primary">➡️ अगाडि</a>
 </div>
-</div>
-</section>
 
-<!-- Address -->
-<section class="card">
-<h3>📍 ठेगाना विवरण</h3>
-<div class="body">
-<div class="row">
-  <div class="col-3"><label>प्रदेश</label><select id="province"></select></div>
-  <div class="col-3"><label>जिल्ला</label><select id="district"></select></div>
-  <div class="col-3"><label>न.पा./गा.पा.</label><input id="municipality"></div>
-  <div class="col-3"><label>वडा नं.</label><input id="ward"></div>
-</div>
-</div>
-</section>
+<div class="main">
 
-<!-- Preferences -->
-<section class="card">
-<h3>⚙️ प्राथमिकता</h3>
-<div class="body">
-<div class="row">
-  <div class="col-4">
-    <label>भाषा</label><br>
-    <div class="toggle" id="langToggle">
-      <button class="active" data-v="np">नेपाली</button>
-      <button data-v="en">English</button>
-    </div>
-  </div>
-  <div class="col-4">
-    <label>मुद्रा</label><br>
-    <div class="toggle" id="curToggle">
-      <button class="active" data-v="NPR">ने.रु.</button>
-      <button data-v="USD">USD</button>
+<!-- BASIC BUSINESS -->
+<div class="card">
+  <h3>📌 व्यवसाय / संस्था परिचय</h3>
+  <div class="body">
+    <div class="row">
+      <div class="col-6">
+        <label>व्यवसाय / संस्थाको नाम *</label>
+        <input id="bizName">
+      </div>
+      <div class="col-6">
+        <label>व्यवसायको प्रकृति</label>
+        <select id="bizNature">
+          <option>व्यक्तिगत</option>
+          <option>साझेदारी</option>
+          <option>सहकारी</option>
+          <option>कम्पनी</option>
+          <option>समूह</option>
+        </select>
+      </div>
+
+      <div class="col-12">
+        <label>संस्थागत परिचय (संक्षेप)</label>
+        <textarea id="bizIntro" rows="3"
+          placeholder="व्यवसाय/संस्थाको उद्देश्य, पृष्ठभूमि, अनुभव संक्षेपमा..."></textarea>
+      </div>
     </div>
   </div>
 </div>
-</div>
-</section>
 
-</main>
-
-<div class="footer-nav">
-  <div class="status" id="saveStatus">अन्तिम सेभ: —</div>
-  <div>
-    <button class="btn" onclick="location.href='index.html'">⬅ पछाडि</button>
-    <button class="btn primary" id="continueBtn" disabled>अगाडि बढ्नुहोस् ➜</button>
+<!-- ADDRESS -->
+<div class="card">
+  <h3>📍 ठेगाना विवरण</h3>
+  <div class="body">
+    <div class="row">
+      <div class="col-3"><label>प्रदेश</label><input id="province"></div>
+      <div class="col-3"><label>जिल्ला</label><input id="district"></div>
+      <div class="col-3"><label>न.पा./गा.पा.</label><input id="municipality"></div>
+      <div class="col-3"><label>वडा नं.</label><input id="ward"></div>
+      <div class="col-12">
+        <label>टोल / बस्ती</label>
+        <input id="locality">
+      </div>
+    </div>
   </div>
+</div>
+
+<!-- REGISTRATION -->
+<div class="card">
+  <h3>🏢 दर्ता तथा कानुनी विवरण</h3>
+  <div class="body">
+    <div class="row">
+      <div class="col-6">
+        <label>दर्ता भएको निकाय</label>
+        <input id="regOffice" placeholder="उद्योग कार्यालय, सहकारी कार्यालय आदि">
+      </div>
+      <div class="col-3">
+        <label>दर्ता मिति</label>
+        <input id="regDate" type="date">
+      </div>
+      <div class="col-3">
+        <label>दर्ता नं.</label>
+        <input id="regNo">
+      </div>
+
+      <div class="col-6">
+        <label>PAN / VAT नं.</label>
+        <input id="panNo">
+      </div>
+      <div class="col-6">
+        <label>अन्य संघ–संस्थासँग आबद्धता</label>
+        <input id="affiliation">
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="card">
+  <h3>👤 सम्पर्क विवरण</h3>
+  <div class="body">
+    <div class="row">
+      <div class="col-6">
+        <label>प्रमुख व्यक्ति / सञ्चालक</label>
+        <input id="ownerName">
+      </div>
+      <div class="col-6">
+        <label>सम्पर्क नं.</label>
+        <input id="phone">
+      </div>
+    </div>
+  </div>
+</div>
+
+</div>
+
+<!-- 🔽 BOTTOM NAV -->
+<div class="nav-bar bottom-nav">
+  <a href="index.html" class="nav-btn">⬅️ Home</a>
+  <a href="existing-status.html" class="nav-btn primary">➡️ अगाडि</a>
 </div>
 
 <script>
-/* ===== Province → District ===== */
-const NEPAL_P_D={
-"बागमती":["काठमाडौँ","ललितपुर","भक्तपुर","नुवाकोट","रसुवा","धादिङ","चितवन"],
-"गण्डकी":["कास्की","गोरखा","लमजुङ"],
-"लुम्बिनी":["रुपन्देही","दाङ","बाँके"],
-"कर्णाली":["सुर्खेत","जुम्ला"],
-"सुदूरपश्चिम":["कैलाली","कञ्चनपुर"]
-};
-const province=document.getElementById("province");
-const district=document.getElementById("district");
-province.innerHTML='<option value="">प्रदेश</option>'+Object.keys(NEPAL_P_D).map(p=>`<option>${p}</option>`).join("");
-province.onchange=()=>{
- district.innerHTML='<option value="">जिल्ला</option>';
- (NEPAL_P_D[province.value]||[]).forEach(d=>district.innerHTML+=`<option>${d}</option>`);
- save();
-};
+/* ======================
+   AUTO SAVE (Business-wise)
+====================== */
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const KEY = "fb_short_info_" + BID;
 
-/* ===== Business Registry ===== */
-const $=id=>document.getElementById(id);
-function getBiz(){return JSON.parse(localStorage.getItem("fb_businesses")||'{"list":{}}')}
-function setBiz(b){localStorage.setItem("fb_businesses",JSON.stringify(b))}
-let B=getBiz();
-if(!B.activeId){
- const id="b"+Date.now();
- B.activeId=id;B.list[id]={name:""};setBiz(B);
-}
-const BID=B.activeId,KEY="fb_business_info_"+BID;
-
-/* Switcher */
-function loadSwitcher(){
- const s=$("businessSwitcher");s.innerHTML="";
- Object.entries(B.list).forEach(([id,v])=>{
-  s.innerHTML+=`<option value="${id}" ${id===BID?"selected":""}>${v.name||"नाम नभएको व्यवसाय"}</option>`;
- });
- s.innerHTML+=`<option value="__new__">➕ नयाँ व्यवसाय</option>`;
-}
-$("businessSwitcher").onchange=e=>{
- if(e.target.value==="__new__"){
-  const id="b"+Date.now();B.list[id]={name:""};B.activeId=id;setBiz(B);location.reload();
- }else{B.activeId=e.target.value;setBiz(B);location.reload();}
-};
-loadSwitcher();
-
-/* Save / Load */
 function collect(){
- return{
-  name:$("businessName").value,
-  type:$("businessType").value,
-  address:{province:province.value,district:district.value},
-  pref:{
-   lang:document.querySelector("#langToggle .active").dataset.v,
-   cur:document.querySelector("#curToggle .active").dataset.v
-  }
- };
+  return {
+    name: bizName.value,
+    nature: bizNature.value,
+    intro: bizIntro.value,
+    address:{
+      province:province.value,
+      district:district.value,
+      municipality:municipality.value,
+      ward:ward.value,
+      locality:locality.value
+    },
+    registration:{
+      office:regOffice.value,
+      date:regDate.value,
+      number:regNo.value,
+      pan:panNo.value,
+      affiliation:affiliation.value
+    },
+    contact:{
+      owner:ownerName.value,
+      phone:phone.value
+    }
+  };
 }
-function save(){
- const d=collect();localStorage.setItem(KEY,JSON.stringify(d));
- B.list[BID].name=d.name;setBiz(B);
- $("saveStatus").textContent="अन्तिम सेभ: ✔";
- $("continueBtn").disabled=!d.name;
-}
-document.querySelectorAll("input,select").forEach(e=>{
- e.oninput=save;e.onchange=save;
-});
 
-/* Toggle */
-document.querySelectorAll(".toggle button").forEach(b=>{
- b.onclick=()=>{
-  b.parentElement.querySelectorAll("button").forEach(x=>x.classList.remove("active"));
-  b.classList.add("active");save();
- };
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(collect()));
+}
+
+/* Bind */
+document.querySelectorAll("input,select,textarea").forEach(e=>{
+  e.addEventListener("input",save);
+  e.addEventListener("change",save);
 });
 
 /* Load */
 const raw=localStorage.getItem(KEY);
 if(raw){
- const d=JSON.parse(raw);
- $("businessName").value=d.name||"";
- $("businessType").value=d.type||"";
- province.value=d.address?.province||"";
- if(province.value){
-  province.onchange();
+  const d=JSON.parse(raw);
+  bizName.value=d.name||"";
+  bizNature.value=d.nature||"";
+  bizIntro.value=d.intro||"";
+  province.value=d.address?.province||"";
   district.value=d.address?.district||"";
- }
+  municipality.value=d.address?.municipality||"";
+  ward.value=d.address?.ward||"";
+  locality.value=d.address?.locality||"";
+  regOffice.value=d.registration?.office||"";
+  regDate.value=d.registration?.date||"";
+  regNo.value=d.registration?.number||"";
+  panNo.value=d.registration?.pan||"";
+  affiliation.value=d.registration?.affiliation||"";
+  ownerName.value=d.contact?.owner||"";
+  phone.value=d.contact?.phone||"";
 }
-
-/* Continue */
-$("continueBtn").onclick=()=>location.href="existing-status.html";
 </script>
 
 </body>
