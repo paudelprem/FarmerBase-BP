@@ -3,111 +3,138 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>व्यवसाय विवरण | FarmerBase BP Engine</title>
+<title>Business Detail | FarmerBase BP Engine</title>
 
 <style>
 *{box-sizing:border-box}
 body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
 :root{--w:980px;--g:#1b5e20;--b:#ddd}
 
+/* ===== HEADER ===== */
+.header{
+  position:sticky;top:0;z-index:100;
+  background:#fff;border-bottom:1px solid var(--b)
+}
+.header-inner{
+  max-width:var(--w);margin:auto;padding:10px 14px
+}
+.header h1{margin:0;font-size:16px}
+.header .sub{font-size:12px;color:#555}
+
 /* ===== NAV ===== */
 .nav-bar{
-  max-width:var(--w);
-  margin:8px auto;
-  padding:8px 14px;
-  display:flex;
-  justify-content:space-between;
-  background:#f6f7f9
+  max-width:var(--w);margin:8px auto;padding:0 14px;
+  display:flex;justify-content:space-between
 }
 .nav-btn{
-  text-decoration:none;
-  font-size:13px;
-  padding:6px 14px;
-  border-radius:20px;
-  border:1px solid #ccc;
-  background:#fafafa;
-  color:#222
+  text-decoration:none;font-size:13px;padding:6px 14px;
+  border-radius:20px;border:1px solid #ccc;
+  background:#fafafa;color:#222
 }
-.nav-btn.primary{
-  background:var(--g);
-  color:#fff;
-  border-color:var(--g)
-}
-.top-nav{position:sticky;top:0;z-index:100}
-.bottom-nav{position:sticky;bottom:0;z-index:100}
+.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
+.top-nav{position:sticky;top:56px;z-index:90}
+.bottom-nav{position:sticky;bottom:0;z-index:90}
 
-/* ===== Layout ===== */
+/* ===== MAIN ===== */
 .main{
   max-width:var(--w);
   margin:10px auto 20px;
   padding:0 14px;
   position:relative;
-  z-index:1
+  z-index:2
 }
 .card{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:8px;
-  margin-bottom:16px
+  background:#fff;border:1px solid var(--b);
+  border-radius:8px;margin-bottom:16px
 }
 .card h3{
-  margin:0;
-  padding:10px 12px;
-  background:#f3f5f7;
-  border-bottom:1px solid var(--b);
+  margin:0;padding:10px 12px;
+  background:#f3f5f7;border-bottom:1px solid var(--b);
   font-size:14px
 }
 .card .body{padding:12px;font-size:13px}
 
+label{display:block;margin-top:6px;font-size:12px;color:#444}
+.value{font-size:13px;margin-bottom:4px}
+
 input,textarea{
-  width:100%;
-  padding:6px;
-  margin:4px 0;
-  border:1px solid #ccc;
-  border-radius:6px;
-  font-size:13px
+  width:100%;padding:6px;margin-top:4px;
+  border:1px solid #ccc;border-radius:6px;font-size:13px
 }
 input[readonly],textarea[readonly]{
-  background:#f9f9f9;
-  border-color:#eee
+  background:#f9f9f9;border-color:#eee
 }
 
-/* ===== Topic blocks ===== */
-.topic-block{
-  border-left:3px solid var(--g);
-  padding-left:10px;
-  margin-top:14px
-}
-.topic-head{
-  font-weight:600;
-  margin-top:6px
-}
 .btn{
-  font-size:12px;
-  padding:4px 10px;
-  margin:4px 4px 0 0;
-  cursor:pointer
+  font-size:12px;padding:4px 10px;margin:4px 4px 0 0;cursor:pointer
 }
 .btn.primary{color:#1b5e20;font-weight:600}
 .btn.danger{color:#b71c1c}
+
+/* ===== TOPIC ===== */
+.topic{
+  border-left:3px solid var(--g);
+  padding-left:10px;margin-top:12px
+}
+
+/* CLICK FIX */
+.top-nav,.bottom-nav{pointer-events:auto}
+
+/* PRINT */
+@media print{
+  .nav-bar{display:none}
+  body{background:#fff}
+}
 </style>
 </head>
 
 <body>
 
-<!-- 🔼 TOP NAV -->
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="header-inner">
+    <h1 id="pageTitle">परियोजनाको नाम</h1>
+    <div class="sub" id="pageSub">व्यवसाय / संस्थाको नाम</div>
+  </div>
+</div>
+
+<!-- ===== TOP NAV ===== -->
 <div class="nav-bar top-nav">
-  <a href="existing-status.html" class="nav-btn">⬅️ स्थिति तथा पूर्वाधार</a>
-  <a href="production.html" class="nav-btn primary">➡️ उत्पादन विवरण</a>
+  <a href="existing-status.html" class="nav-btn">⬅️ Existing Status</a>
+  <a href="production.html" class="nav-btn primary">➡️ उत्पादन</a>
 </div>
 
 <div class="main">
 
+<!-- ===== IDENTITY (AUTO) ===== -->
 <div class="card">
-  <h3>🧠 व्यवसाय विवरण (Proposal Narrative)</h3>
+  <h3>🏢 व्यवसाय परिचय (Auto)</h3>
   <div class="body">
 
-    <button class="btn primary" onclick="addTopic()">➕ नयाँ विषय थप्नुहोस्</button>
+    <label>व्यवसाय / संस्था</label>
+    <div class="value" id="vBusiness">—</div>
+
+    <label>परियोजना</label>
+    <div class="value" id="vProject">—</div>
+
+    <label>सञ्चालक</label>
+    <div class="value" id="vOwner">—</div>
+
+    <label>ठेगाना</label>
+    <div class="value" id="vAddress">—</div>
+
+  </div>
+</div>
+
+<!-- ===== BUSINESS DETAIL NARRATIVE ===== -->
+<div class="card">
+  <h3>🧾 व्यवसायिक विवरण (विषय–आधारित)</h3>
+  <div class="body">
+
+    <button class="btn primary" id="addTopicBtn">
+      ➕ नयाँ विषय थप्नुहोस्
+    </button>
+
     <div id="topicList"></div>
 
   </div>
@@ -115,23 +142,44 @@ input[readonly],textarea[readonly]{
 
 </div>
 
-<!-- 🔽 BOTTOM NAV -->
+<!-- ===== BOTTOM NAV ===== -->
 <div class="nav-bar bottom-nav">
-  <a href="existing-status.html" class="nav-btn">⬅️ स्थिति तथा पूर्वाधार</a>
-  <a href="production.html" class="nav-btn primary">➡️ उत्पादन विवरण</a>
+  <a href="existing-status.html" class="nav-btn">⬅️ Existing Status</a>
+  <a href="production.html" class="nav-btn primary">➡️ उत्पादन</a>
 </div>
 
 <script>
 /* ======================
-   CONTEXT
+   HELPERS
 ====================== */
-const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID = B.activeId || "b1";
+function getBusinessIdentity(){
+  const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+  const BID = B.activeId || "b1";
+  return JSON.parse(localStorage.getItem("fb_short_info_"+BID) || "{}");
+}
+
+/* ======================
+   HEADER AUTO INJECT
+====================== */
+const info = getBusinessIdentity();
+pageTitle.textContent = info.projectName || "परियोजनाको नाम";
+pageSub.textContent   = info.businessName || "व्यवसाय / संस्थाको नाम";
+
+/* ======================
+   IDENTITY PANEL
+====================== */
+vBusiness.textContent = info.businessName || "—";
+vProject.textContent  = info.projectName || "—";
+vOwner.textContent    = info.ownerName || "—";
+vAddress.textContent  = info.address || "—";
 
 /* ======================
    DATA STORE
 ====================== */
-const KEY = "fb_business_detail_" + BID;
+const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
+const BID = B.activeId || "b1";
+const KEY = "fb_business_detail_"+BID;
+
 let topics = JSON.parse(localStorage.getItem(KEY) || "[]");
 
 function save(){
@@ -140,9 +188,9 @@ function save(){
 }
 
 /* ======================
-   CRUD FUNCTIONS
+   ADD TOPIC (SAFE)
 ====================== */
-function addTopic(){
+addTopicBtn.addEventListener("click",()=>{
   topics.push({
     title:"",
     content:"",
@@ -150,28 +198,27 @@ function addTopic(){
     backup:{}
   });
   save();
-}
+});
 
+/* ======================
+   CRUD
+====================== */
 function editTopic(i){
   topics[i].backup = {...topics[i]};
   topics[i].edit = true;
   render();
 }
-
-function cancelEdit(i){
-  topics[i] = {...topics[i].backup, edit:false};
-  save();
-}
-
-function saveEdit(i){
+function saveTopic(i){
   topics[i].edit = false;
   save();
 }
-
-function deleteTopic(i){
-  if(!confirm("यो विषय हटाउने?")) return;
-  topics.splice(i,1);
+function cancelTopic(i){
+  topics[i] = {...topics[i].backup, edit:false};
   save();
+}
+function deleteTopic(i){
+  if(!confirm("यो विषय हटाउने?"))return;
+  topics.splice(i,1); save();
 }
 
 /* ======================
@@ -183,21 +230,23 @@ function render(){
 
   topics.forEach((t,i)=>{
     wrap.innerHTML+=`
-      <div class="topic-block">
+      <div class="topic">
 
-        <div class="topic-head">विषय</div>
+        <label>विषय</label>
         <input ${t.edit?"":"readonly"}
           value="${t.title||""}"
-          oninput="topics[${i}].title=this.value">
+          oninput="topics[${i}].title=this.value"
+          onblur="save()">
 
-        <div class="topic-head">कुरा (विवरण)</div>
-        <textarea rows="4" ${t.edit?"":"readonly"}
-          oninput="topics[${i}].content=this.value)">${t.content||""}</textarea>
+        <label>विवरण</label>
+        <textarea rows="3" ${t.edit?"":"readonly"}
+          oninput="topics[${i}].content=this.value"
+          onblur="save()">${t.content||""}</textarea>
 
-        ${t.edit ? `
-          <button class="btn primary" onclick="saveEdit(${i})">💾 Save</button>
-          <button class="btn" onclick="cancelEdit(${i})">↩️ Cancel</button>
-        ` : `
+        ${t.edit?`
+          <button class="btn primary" onclick="saveTopic(${i})">💾 Save</button>
+          <button class="btn" onclick="cancelTopic(${i})">↩️ Cancel</button>
+        `:`
           <button class="btn primary" onclick="editTopic(${i})">✏️ सच्याउनुहोस्</button>
         `}
         <button class="btn danger" onclick="deleteTopic(${i})">🗑️ हटाउनुहोस्</button>
@@ -206,7 +255,6 @@ function render(){
     `;
   });
 }
-
 render();
 </script>
 
