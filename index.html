@@ -2,160 +2,486 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>PDF Merge – FarmerBase BP Engine</title>
+<title>FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+/* ===== GLOBAL ===== */
 body{
-  font-family: system-ui, sans-serif;
-  background:#f5f7fa;
   margin:0;
+  font-family:system-ui, -apple-system, sans-serif;
+  background:#f5f7fa;
+  color:#222;
+}
+a{text-decoration:none;color:inherit}
+
+/* ===== HEADER ===== */
+header{
+  background:#1b5e20;
+  color:#fff;
+  padding:12px 16px;
+}
+header h1{
+  margin:0;
+  font-size:18px;
+}
+header small{
+  font-size:12px;
+  opacity:.9;
+}
+
+/* ===== CONTAINER ===== */
+.container{
+  max-width:920px;
+  margin:auto;
   padding:20px;
 }
 
-.container{
-  max-width:720px;
-  margin:auto;
+/* ===== INTRO ===== */
+.intro{
   background:#fff;
   padding:20px;
   border-radius:8px;
-  box-shadow:0 2px 10px rgba(0,0,0,.08);
+  margin-bottom:20px;
 }
-
-h1{
+.intro h2{
   margin-top:0;
   color:#1b5e20;
 }
 
-input[type=file]{
-  margin:10px 0;
-}
-
-ul{
-  list-style:none;
-  padding:0;
-}
-
-li{
-  padding:8px 12px;
-  margin-bottom:6px;
-  background:#e8f5e9;
-  border-radius:6px;
-  cursor:move;
+/* ===== ACTION BUTTONS ===== */
+.actions{
   display:flex;
-  justify-content:space-between;
-  align-items:center;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:20px 0;
 }
-
-li span{
-  font-size:14px;
-}
-
-button{
+.actions button{
+  flex:1;
+  min-width:220px;
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+  cursor:pointer;
   background:#1b5e20;
   color:#fff;
-  border:none;
-  padding:10px 18px;
-  border-radius:6px;
-  cursor:pointer;
+}
+.actions button.secondary{
+  background:#455a64;
+}
+
+/* ===== LOGIN BOX ===== */
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+  margin-bottom:20px;
+}
+.card h3{
+  margin-top:0;
+  color:#1b5e20;
+}
+label{
+  display:block;
+  margin-top:10px;
   font-size:14px;
 }
-
-button:disabled{
-  background:#aaa;
-  cursor:not-allowed;
+input{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid #ccc;
 }
 
-.note{
+/* ===== STATUS ===== */
+.status{
+  padding:10px;
+  border-radius:6px;
+  margin-top:10px;
+  font-size:14px;
+}
+.status.draft{background:#fff3cd}
+.status.final{background:#d1e7dd}
+.status.locked{background:#f8d7da}
+
+/* ===== FOOTER ===== */
+footer{
+  margin-top:40px;
+  padding:14px;
+  text-align:center;
   font-size:13px;
   color:#555;
-  margin-top:10px;
+  border-top:1px solid #ddd;
 }
 </style>
-
 </head>
+
 <body>
 
+<header>
+  <h1>FarmerBase BP Engine</h1>
+  <small>कृषकमैत्री व्यवसायिक योजना यन्त्र</small>
+</header>
+
 <div class="container">
-  <h1>PDF Merge</h1>
 
-  <p>
-    एकभन्दा बढी PDF फाइल छान्नुहोस्,  
-    क्रम मिलाएर <b>Merge PDF</b> थिच्नुहोस्।
-  </p>
+  <!-- INTRO -->
+  <div class="intro">
+    <h2>किन FarmerBase BP Engine ?</h2>
+    <p>
+      नेपालमा धेरै किसान तथा साना व्यवसायीहरूसँग
+      गणनामा आधारित व्यवसायिक योजना बनाउने
+      समय, ज्ञान वा प्राविधिक पहुँच हुँदैन।
+    </p>
+    <p>
+      FarmerBase BP Engine ले किसानलाई
+      <b>आफैं, सजिलै र छिटो</b>
+      आफ्नो व्यवसायिक योजना बनाउन सक्षम बनाउँछ।
+    </p>
+  </div>
 
-  <input type="file" id="pdfInput" accept="application/pdf" multiple>
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button onclick="showCreate()">➕ नयाँ व्यवसाय / परियोजना सुरु</button>
+    <button class="secondary" onclick="continueProposal()">▶️ अघिल्लो प्रस्ताव Continue</button>
+    <button class="secondary" onclick="openTools()">📄 Letters / PDF Merge</button>
+  </div>
 
-  <ul id="fileList"></ul>
+  <!-- CREATE / LOGIN -->
+  <div class="card" id="createBox" style="display:none">
+    <h3>नयाँ प्रस्ताव सुरु गर्नुहोस्</h3>
 
-  <button id="mergeBtn" onclick="mergePDF()" disabled>
-    Merge PDF
-  </button>
+    <label>व्यवसाय / संस्थाको नाम</label>
+    <input id="bizName" placeholder="जस्तै: नमूना कृषि फार्म">
 
-  <p class="note">
-    ✔️ Drag गरेर क्रम मिलाउन सक्नुहुन्छ<br>
-    ✔️ नयाँ tab मा merged PDF खुल्छ
-  </p>
+    <label>परियोजनाको नाम</label>
+    <input id="projName" placeholder="जस्तै: बंगुर पालन परियोजना">
+
+    <label>प्रोपाइटर / प्रतिनिधिको नाम</label>
+    <input id="ownerName" placeholder="नाम">
+
+    <button style="margin-top:14px" onclick="startProposal()">
+      सुरु गरौं →
+    </button>
+  </div>
+
+  <!-- STATUS -->
+  <div id="statusBox"></div>
+
 </div>
 
-<!-- PDF-lib CDN -->
-<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+<footer>
+  FarmerBase BP Engine<br>
+  Concept Development By:
+  <b>Prem Prasad Paudel</b><br>
+  Kalika–5, Maneswora, Rasuwa
+</footer>
 
 <script>
-let files = [];
+/* ===== STATUS ===== */
+const STATUS_KEY = "fb_proposal_status";
+const META_KEY = "fb_meta";
 
-const input = document.getElementById("pdfInput");
-const list = document.getElementById("fileList");
-const mergeBtn = document.getElementById("mergeBtn");
-
-input.addEventListener("change", () => {
-  files = Array.from(input.files);
-  renderList();
-  mergeBtn.disabled = files.length < 2;
-});
-
-function renderList(){
-  list.innerHTML="";
-  files.forEach((f,i)=>{
-    const li=document.createElement("li");
-    li.draggable=true;
-    li.dataset.index=i;
-    li.innerHTML=`
-      <span>${f.name}</span>
-      <span>☰</span>
-    `;
-
-    li.addEventListener("dragstart",e=>{
-      e.dataTransfer.setData("index",i);
-    });
-
-    li.addEventListener("dragover",e=>e.preventDefault());
-
-    li.addEventListener("drop",e=>{
-      const from = e.dataTransfer.getData("index");
-      const to = i;
-      files.splice(to,0,files.splice(from,1)[0]);
-      renderList();
-    });
-
-    list.appendChild(li);
-  });
+if(!localStorage.getItem(STATUS_KEY)){
+  localStorage.setItem(STATUS_KEY,"draft");
 }
 
-async function mergePDF(){
-  const mergedPdf = await PDFLib.PDFDocument.create();
+function renderStatus(){
+  const st = localStorage.getItem(STATUS_KEY);
+  let cls="draft", txt="Draft अवस्थामा छ";
 
-  for(const file of files){
-    const bytes = await file.arrayBuffer();
-    const pdf = await PDFLib.PDFDocument.load(bytes);
-    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
-    pages.forEach(p => mergedPdf.addPage(p));
+  if(st==="final"){
+    cls="final"; txt="Final अवस्थामा छ";
+  }
+  if(st==="locked"){
+    cls="locked"; txt="Locked (Edit गर्न मिल्दैन)";
   }
 
-  const mergedBytes = await mergedPdf.save();
-  const blob = new Blob([mergedBytes], {type:"application/pdf"});
-  const url = URL.createObjectURL(blob);
+  statusBox.innerHTML = `
+    <div class="status ${cls}">
+      प्रस्तावको अवस्था: <b>${txt}</b>
+    </div>`;
+}
+renderStatus();
 
-  window.open(url, "_blank");
+/* ===== CREATE / CONTINUE ===== */
+function showCreate(){
+  createBox.style.display="block";
+}
+
+function startProposal(){
+  if(!bizName.value || !projName.value){
+    alert("व्यवसाय र परियोजनाको नाम अनिवार्य छ");
+    return;
+  }
+
+  localStorage.setItem(META_KEY, JSON.stringify({
+    business:bizName.value,
+    project:projName.value,
+    owner:ownerName.value
+  }));
+
+  localStorage.setItem(STATUS_KEY,"draft");
+  location.href="short-info.html";
+}
+
+function continueProposal(){
+  if(!localStorage.getItem(META_KEY)){
+    alert("अघिल्लो प्रस्ताव भेटिएन");
+    return;
+  }
+  location.href="short-info.html";
+}
+
+function openTools(){
+  location.href="pdf-merge.html";
+}
+</script>
+
+</body>
+</html><!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+/* ===== GLOBAL ===== */
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, sans-serif;
+  background:#f5f7fa;
+  color:#222;
+}
+a{text-decoration:none;color:inherit}
+
+/* ===== HEADER ===== */
+header{
+  background:#1b5e20;
+  color:#fff;
+  padding:12px 16px;
+}
+header h1{
+  margin:0;
+  font-size:18px;
+}
+header small{
+  font-size:12px;
+  opacity:.9;
+}
+
+/* ===== CONTAINER ===== */
+.container{
+  max-width:920px;
+  margin:auto;
+  padding:20px;
+}
+
+/* ===== INTRO ===== */
+.intro{
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+  margin-bottom:20px;
+}
+.intro h2{
+  margin-top:0;
+  color:#1b5e20;
+}
+
+/* ===== ACTION BUTTONS ===== */
+.actions{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  margin:20px 0;
+}
+.actions button{
+  flex:1;
+  min-width:220px;
+  padding:14px;
+  border:none;
+  border-radius:8px;
+  font-size:15px;
+  cursor:pointer;
+  background:#1b5e20;
+  color:#fff;
+}
+.actions button.secondary{
+  background:#455a64;
+}
+
+/* ===== LOGIN BOX ===== */
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+  margin-bottom:20px;
+}
+.card h3{
+  margin-top:0;
+  color:#1b5e20;
+}
+label{
+  display:block;
+  margin-top:10px;
+  font-size:14px;
+}
+input{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+/* ===== STATUS ===== */
+.status{
+  padding:10px;
+  border-radius:6px;
+  margin-top:10px;
+  font-size:14px;
+}
+.status.draft{background:#fff3cd}
+.status.final{background:#d1e7dd}
+.status.locked{background:#f8d7da}
+
+/* ===== FOOTER ===== */
+footer{
+  margin-top:40px;
+  padding:14px;
+  text-align:center;
+  font-size:13px;
+  color:#555;
+  border-top:1px solid #ddd;
+}
+</style>
+</head>
+
+<body>
+
+<header>
+  <h1>FarmerBase BP Engine</h1>
+  <small>कृषकमैत्री व्यवसायिक योजना यन्त्र</small>
+</header>
+
+<div class="container">
+
+  <!-- INTRO -->
+  <div class="intro">
+    <h2>किन FarmerBase BP Engine ?</h2>
+    <p>
+      नेपालमा धेरै किसान तथा साना व्यवसायीहरूसँग
+      गणनामा आधारित व्यवसायिक योजना बनाउने
+      समय, ज्ञान वा प्राविधिक पहुँच हुँदैन।
+    </p>
+    <p>
+      FarmerBase BP Engine ले किसानलाई
+      <b>आफैं, सजिलै र छिटो</b>
+      आफ्नो व्यवसायिक योजना बनाउन सक्षम बनाउँछ।
+    </p>
+  </div>
+
+  <!-- ACTIONS -->
+  <div class="actions">
+    <button onclick="showCreate()">➕ नयाँ व्यवसाय / परियोजना सुरु</button>
+    <button class="secondary" onclick="continueProposal()">▶️ अघिल्लो प्रस्ताव Continue</button>
+    <button class="secondary" onclick="openTools()">📄 Letters / PDF Merge</button>
+  </div>
+
+  <!-- CREATE / LOGIN -->
+  <div class="card" id="createBox" style="display:none">
+    <h3>नयाँ प्रस्ताव सुरु गर्नुहोस्</h3>
+
+    <label>व्यवसाय / संस्थाको नाम</label>
+    <input id="bizName" placeholder="जस्तै: नमूना कृषि फार्म">
+
+    <label>परियोजनाको नाम</label>
+    <input id="projName" placeholder="जस्तै: बंगुर पालन परियोजना">
+
+    <label>प्रोपाइटर / प्रतिनिधिको नाम</label>
+    <input id="ownerName" placeholder="नाम">
+
+    <button style="margin-top:14px" onclick="startProposal()">
+      सुरु गरौं →
+    </button>
+  </div>
+
+  <!-- STATUS -->
+  <div id="statusBox"></div>
+
+</div>
+
+<footer>
+  FarmerBase BP Engine<br>
+  Concept Development By:
+  <b>Prem Prasad Paudel</b><br>
+  Kalika–5, Maneswora, Rasuwa
+</footer>
+
+<script>
+/* ===== STATUS ===== */
+const STATUS_KEY = "fb_proposal_status";
+const META_KEY = "fb_meta";
+
+if(!localStorage.getItem(STATUS_KEY)){
+  localStorage.setItem(STATUS_KEY,"draft");
+}
+
+function renderStatus(){
+  const st = localStorage.getItem(STATUS_KEY);
+  let cls="draft", txt="Draft अवस्थामा छ";
+
+  if(st==="final"){
+    cls="final"; txt="Final अवस्थामा छ";
+  }
+  if(st==="locked"){
+    cls="locked"; txt="Locked (Edit गर्न मिल्दैन)";
+  }
+
+  statusBox.innerHTML = `
+    <div class="status ${cls}">
+      प्रस्तावको अवस्था: <b>${txt}</b>
+    </div>`;
+}
+renderStatus();
+
+/* ===== CREATE / CONTINUE ===== */
+function showCreate(){
+  createBox.style.display="block";
+}
+
+function startProposal(){
+  if(!bizName.value || !projName.value){
+    alert("व्यवसाय र परियोजनाको नाम अनिवार्य छ");
+    return;
+  }
+
+  localStorage.setItem(META_KEY, JSON.stringify({
+    business:bizName.value,
+    project:projName.value,
+    owner:ownerName.value
+  }));
+
+  localStorage.setItem(STATUS_KEY,"draft");
+  location.href="short-info.html";
+}
+
+function continueProposal(){
+  if(!localStorage.getItem(META_KEY)){
+    alert("अघिल्लो प्रस्ताव भेटिएन");
+    return;
+  }
+  location.href="short-info.html";
+}
+
+function openTools(){
+  location.href="pdf-merge.html";
 }
 </script>
 
