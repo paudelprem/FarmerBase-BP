@@ -10,10 +10,10 @@ body{
   margin:0;
   font-family:system-ui;
   background:#f5f7fa;
+  min-height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  min-height:100vh;
 }
 .box{
   background:#fff;
@@ -23,11 +23,8 @@ body{
   border-radius:10px;
   box-shadow:0 8px 24px rgba(0,0,0,.08);
 }
-h1{
-  margin:0 0 8px;
-  color:#1b5e20;
-}
-p.small{font-size:14px;color:#555}
+h1{margin:0;color:#1b5e20}
+p.small{margin:6px 0 16px;color:#555}
 
 .grid{
   display:grid;
@@ -47,9 +44,9 @@ input{
 }
 
 button{
-  margin-top:16px;
-  padding:12px;
+  margin-top:20px;
   width:100%;
+  padding:14px;
   border:none;
   border-radius:8px;
   background:#1b5e20;
@@ -72,7 +69,7 @@ button:active{transform:scale(.98)}
   width:100%;
   border-radius:8px;
 }
-.footer small{color:#555}
+.footer small{color:#555;line-height:1.5}
 </style>
 </head>
 
@@ -82,7 +79,7 @@ button:active{transform:scale(.98)}
 
 <h1>FarmerBase BP Engine</h1>
 <p class="small">
-किसान तथा साना व्यवसायीका लागि
+किसान तथा साना व्यवसायीका लागि  
 Auto Business Planning System
 </p>
 
@@ -113,7 +110,7 @@ Auto Business Planning System
 <div class="footer">
   <img src="https://scontent.fktm3-1.fna.fbcdn.net/v/t39.30808-6/241174928_10162407914859852_3099747735535518838_n.jpg" alt="Prem Prasad Paudel">
   <small>
-    <b>Concept Development By:</b><br>
+    <b>Concept Development By</b><br>
     Prem Prasad Paudel<br>
     📧 paudelprem@gmail.com<br>
     📱 WhatsApp: 9843508470
@@ -124,7 +121,7 @@ Auto Business Planning System
 
 <script>
 function start(){
-  const data={
+  const identity={
     businessName:businessName.value.trim(),
     projectName:projectName.value.trim(),
     regBody:regBody.value.trim(),
@@ -134,17 +131,18 @@ function start(){
     contactPhone:contactPhone.value.trim()
   };
 
-  if(!data.businessName && !data.projectName){
+  if(!identity.businessName && !identity.projectName){
     alert("संस्था वा परियोजनाको नाम अनिवार्य छ");
     return;
   }
 
-  localStorage.setItem("fb_identity", JSON.stringify(data));
+  // 🔐 SINGLE SOURCE OF TRUTH
+  localStorage.setItem("fb_identity", JSON.stringify(identity));
 
-  // clear old proposal if needed
+  // optional: fresh start
   // localStorage.removeItem("fb_expenses_final");
 
-  location.href="short-info.html";
+  location.href = "short-info.html";
 }
 </script>
 
