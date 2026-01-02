@@ -2,202 +2,230 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Expenses | FarmerBase BP Engine</title>
+<title>Expenses – FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
-:root{--w:980px;--g:#1b5e20;--b:#ddd}
+body{margin:0;font-family:system-ui;background:#f5f7fa}
+.container{max-width:1000px;margin:auto;padding:16px}
+.card{background:#fff;padding:16px;border-radius:8px;margin-bottom:12px}
+h2,h3{margin:0 0 8px;color:#1b5e20}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea{
+  padding:8px;border:1px solid #ccc;border-radius:6px
+}
+button{
+  padding:8px 12px;border:none;border-radius:6px;
+  background:#1b5e20;color:#fff;cursor:pointer
+}
+button.secondary{background:#607d8b}
+button.ghost{background:#e8f5e9;color:#1b5e20}
 
-/* HEADER */
-.header{position:sticky;top:0;z-index:100;background:#fff;border-bottom:1px solid var(--b)}
-.header-inner{max-width:var(--w);margin:auto;padding:10px 14px}
-.header h1{margin:0;font-size:16px}
-.header .sub{font-size:12px;color:#555}
+.table{width:100%;border-collapse:collapse;margin-top:8px}
+.table th,.table td{border:1px solid #ddd;padding:8px;text-align:right}
+.table th{text-align:left;background:#e8f5e9}
 
-/* NAV */
-.nav-bar{max-width:var(--w);margin:8px auto;padding:0 14px;display:flex;justify-content:space-between}
-.nav-btn{text-decoration:none;font-size:13px;padding:6px 14px;border-radius:20px;border:1px solid #ccc;background:#fafafa;color:#222}
-.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.top-nav{position:sticky;top:56px}
-.bottom-nav{position:sticky;bottom:0}
+.section{border:1px solid #ddd;border-radius:8px;margin-top:10px}
+.section-head{
+  display:flex;justify-content:space-between;align-items:center;
+  padding:10px;background:#f1f8f4
+}
+.section-body{display:none;padding:10px}
+.section-body.open{display:block}
 
-/* MAIN */
-.main{max-width:var(--w);margin:10px auto 20px;padding:0 14px}
-.card{background:#fff;border:1px solid var(--b);border-radius:8px;margin-bottom:16px}
-.card h3{margin:0;padding:10px 12px;background:#f3f5f7;border-bottom:1px solid var(--b);font-size:14px}
-.card .body{padding:12px;font-size:13px}
+/* ===== GLOBAL NAV ===== */
+.g-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;background:#1b5e20;color:#fff
+}
+.g-header button{background:none;border:none;color:#fff;font-size:18px}
+.g-title{flex:1;text-align:center}
 
-table{width:100%;border-collapse:collapse}
-th,td{border:1px solid #ddd;padding:6px;font-size:12px;text-align:center}
-th{background:#f3f5f7}
-
-input,select{width:100%;padding:4px;font-size:12px}
-.small{font-size:11px;color:#555}
-.btn{font-size:12px;padding:4px 10px;margin:4px;cursor:pointer}
-.btn.primary{color:#1b5e20;font-weight:600}
-.btn.danger{color:#b71c1c}
-.collapsed{background:#fafafa}
-.warn{color:#b71c1c;font-size:12px;margin-top:6px}
-
-@media print{.nav-bar{display:none}}
+.g-footer{
+  display:flex;justify-content:space-between;
+  padding:10px;border-top:1px solid #ccc
+}
+.g-footer button{border-radius:20px}
+.g-header button:disabled,.g-footer button:disabled{
+  opacity:.4;cursor:not-allowed
+}
 </style>
 </head>
 
 <body>
 
-<!-- HEADER -->
-<div class="header">
-  <div class="header-inner">
-    <h1 id="pageTitle">परियोजनाको नाम</h1>
-    <div class="sub" id="pageSub">व्यवसाय / संस्थाको नाम</div>
+<!-- ===== GLOBAL HEADER ===== -->
+<header class="g-header">
+  <button id="prevTop" onclick="goPrev()">⬅️</button>
+  <div class="g-title">
+    <div id="bizHdr"></div>
+    <small id="projHdr"></small>
   </div>
-</div>
+  <button id="nextTop" onclick="goNext()">➡️</button>
+</header>
 
-<div class="nav-bar top-nav">
-  <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
-  <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
-</div>
-
-<div class="main">
+<div class="container">
 
 <div class="card">
-  <h3>🔄 चालु खर्च (Current Expenses)</h3>
-  <div class="body">
-    <button class="btn primary" onclick="addRow('current')">➕ चालु खर्च थप्नुहोस्</button>
-    <table>
-      <thead>
-        <tr>
-          <th>विवरण</th><th>इकाई</th><th>परिमाण</th><th>दर</th>
-          <th>केमा लाग्ने?</th><th>लागत</th><th></th>
-        </tr>
-      </thead>
-      <tbody id="currentTable"></tbody>
-    </table>
-  </div>
+  <h2>खर्च विवरण (Expenses)</h2>
+  <small>प्रत्येक खर्च कुन उत्पादनमा लाग्छ भनेर छान्न सकिन्छ।</small>
 </div>
 
+<!-- ================= RUNNING ================= -->
 <div class="card">
-  <h3>🏗️ स्थिर खर्च / सम्पत्ति (Fixed Assets)</h3>
-  <div class="body">
-    <button class="btn primary" onclick="addRow('fixed')">➕ स्थिर खर्च थप्नुहोस्</button>
-    <table>
-      <thead>
-        <tr>
-          <th>सम्पत्ति</th><th>इकाई</th><th>परिमाण</th><th>दर</th>
-          <th>ह्रास %</th><th>वार्षिक ह्रास</th>
-          <th>केमा लाग्ने?</th><th>लागत</th><th></th>
-        </tr>
-      </thead>
-      <tbody id="fixedTable"></tbody>
-    </table>
+  <h3>चालु खर्च</h3>
+  <div class="row">
+    <input id="newRunSec" placeholder="उपशीर्षक (जस्तै: दाना)">
+    <button onclick="addSection('run')">➕ उपशीर्षक थप्नुहोस्</button>
   </div>
+  <div id="runSecs"></div>
+</div>
+
+<!-- ================= FIXED ================= -->
+<div class="card">
+  <h3>स्थिर खर्च (ह्रासकट्टी सहित)</h3>
+  <div class="row">
+    <input id="newFixSec" placeholder="उपशीर्षक (जस्तै: भवन)">
+    <button onclick="addSection('fix')">➕ उपशीर्षक थप्नुहोस्</button>
+  </div>
+  <div id="fixSecs"></div>
 </div>
 
 </div>
 
-<div class="nav-bar bottom-nav">
-  <a href="production.html" class="nav-btn">⬅️ उत्पादन</a>
-  <a href="capital-source.html" class="nav-btn primary">➡️ पुँजी स्रोत</a>
-</div>
+<!-- ===== GLOBAL FOOTER ===== -->
+<footer class="g-footer">
+  <button id="prevBottom" class="secondary" onclick="goPrev()">⬅️ अघिल्लो</button>
+  <button id="nextBottom" onclick="goNext()">अर्को ➡️</button>
+</footer>
 
 <script>
-/* ========= IDENTITY ========= */
-const B=JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID=B.activeId||"b1";
-const info=JSON.parse(localStorage.getItem("fb_short_info_"+BID)||"{}");
-pageTitle.textContent=info.projectName||"परियोजनाको नाम";
-pageSub.textContent=info.businessName||"व्यवसाय";
+/* ================= GLOBAL NAV ================= */
+const flow=[
+"index.html","short-info.html","existing-status.html",
+"business-detail.html","production.html","expenses.html",
+"capital-source.html","income.html","profit-loss.html",
+"executive-summary.html","cover.html"
+];
+const cur=location.pathname.split("/").pop();
+const idx=flow.indexOf(cur);
+function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
+function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
+if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
+if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
 
-/* ========= PRODUCTION ========= */
-const PRODUCTS=JSON.parse(localStorage.getItem("fb_production_items_"+BID)||"[]");
+/* ================= HEADER META ================= */
+const meta=JSON.parse(localStorage.getItem("fb_meta")||"{}");
+bizHdr.textContent=meta.business||"व्यवसाय";
+projHdr.textContent=meta.project||"परियोजना";
 
-/* ========= STORAGE ========= */
-const KEY="fb_expenses_"+BID;
-let data=JSON.parse(localStorage.getItem(KEY)||"null");
-if(!data){
-  data={current:[],fixed:[]};
+/* ================= PRODUCTION (for mapping) ================= */
+const prod=JSON.parse(localStorage.getItem("fb_production")||"[]");
+const prodNames=[];
+prod.forEach(t=>t.products.forEach(p=>prodNames.push(p.name)));
+
+/* ================= DATA ================= */
+const KEY="fb_expenses";
+let data=JSON.parse(localStorage.getItem(KEY)||"{
+  \"run\":[],\"fix\":[]
+}");
+
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
+
+/* ================= SECTION CRUD ================= */
+function addSection(kind){
+  const inp = kind==="run"?newRunSec:newFixSec;
+  if(!inp.value) return alert("उपशीर्षक चाहिन्छ");
+  data[kind].unshift({name:inp.value, items:[], narration:""});
+  inp.value="";
+  save(); render();
 }
 
-/* ========= SAVE ========= */
-function save(){
-  localStorage.setItem(KEY,JSON.stringify(data));
-  render();
+function toggleBody(id){
+  document.getElementById(id).classList.toggle("open");
 }
 
-/* ========= ADD ROW ========= */
-function addRow(type){
-  const row={
-    name:"",unit:"",qty:1,rate:0,
-    depRate:10,
-    applyType:"selected",
-    products:[],
-    collapsed:false
+/* ================= ITEM ADD ================= */
+function addItem(kind,si){
+  const box=document.getElementById(add-${kind}-${si});
+  const it={
+    name:box.querySelector(".i-name").value,
+    unit:box.querySelector(".i-unit").value,
+    qty:+box.querySelector(".i-qty").value||0,
+    rate:+box.querySelector(".i-rate").value||0,
+    map:box.querySelector(".i-map").value
   };
-  data[type].unshift(row);
-  save();
+  if(!it.name||!it.unit) return alert("नाम र इकाई चाहिन्छ");
+  data[kind][si].items.unshift(it);
+  box.querySelectorAll("input").forEach(i=>i.value="");
+  save(); render(); // auto-collapse happens in render
 }
 
-/* ========= RENDER ========= */
+/* ================= RENDER ================= */
 function render(){
-  renderTable("current",currentTable,false);
-  renderTable("fixed",fixedTable,true);
-}
+  ["run","fix"].forEach(kind=>{
+    const wrap = kind==="run"?runSecs:fixSecs;
+    wrap.innerHTML="";
+    data[kind].forEach((s,si)=>{
+      const sid=`${kind}-${si}`;
+      const sec=document.createElement("div");
+      sec.className="section";
+      sec.innerHTML=`
+        <div class="section-head">
+          <b>${s.name}</b>
+          <div>
+            <button class="ghost" onclick="toggleBody('b-${sid}')">⤵️</button>
+            <button class="ghost" onclick="delSection('${kind}',${si})">🗑️</button>
+          </div>
+        </div>
+        <div class="section-body" id="b-${sid}">
+          <div class="row" id="add-${sid}">
+            <input class="i-name" placeholder="के सामान/सेवा">
+            <input class="i-unit" placeholder="इकाई">
+            <input class="i-qty" type="number" placeholder="परिमाण">
+            <input class="i-rate" type="number" placeholder="दर">
+            <select class="i-map">
+              <option value="ALL">सबै उत्पादन</option>
+              ${prodNames.map(p=>`<option>${p}</option>`).join("")}
+            </select>
+            <button onclick="addItem('${kind}',${si})">➕</button>
+          </div>
 
-/* ========= TABLE RENDER ========= */
-function renderTable(type,el,hasDep){
-  el.innerHTML="";
-  data[type].forEach((e,i)=>{
-    const cost=(+e.qty||0)*(+e.rate||0);
-    const dep=hasDep?cost*((+e.depRate||0)/100):0;
+          <table class="table">
+            <thead>
+              <tr>
+                <th>विवरण</th><th>इकाई</th><th>परिमाण</th>
+                <th>दर</th><th>कुल</th><th>लाग्ने उत्पादन</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${s.items.map(i=>`
+                <tr>
+                  <td style="text-align:left">${i.name}</td>
+                  <td style="text-align:left">${i.unit}</td>
+                  <td>${i.qty}</td>
+                  <td>${i.rate}</td>
+                  <td>${(i.qty*i.rate).toFixed(2)}</td>
+                  <td style="text-align:left">${i.map}</td>
+                </tr>`).join("")}
+            </tbody>
+          </table>
 
-    el.innerHTML+=`
-    <tr class="${e.collapsed?'collapsed':''}">
-      <td><input value="${e.name}" onblur="data.${type}[${i}].name=this.value;save()"></td>
-      <td><input value="${e.unit}" onblur="data.${type}[${i}].unit=this.value;save()"></td>
-      <td><input type="number" value="${e.qty}" onblur="data.${type}[${i}].qty=this.value;save()"></td>
-      <td><input type="number" value="${e.rate}" onblur="data.${type}[${i}].rate=this.value;save()"></td>
-
-      ${hasDep?`
-      <td><input type="number" value="${e.depRate}" onblur="data.${type}[${i}].depRate=this.value;save()"></td>
-      <td>रु ${dep.toLocaleString()}</td>`:""}
-
-      <td>
-        <select onchange="data.${type}[${i}].applyType=this.value;save()">
-          <option value="all" ${e.applyType==="all"?"selected":""}>सबै उत्पादन</option>
-          <option value="selected" ${e.applyType==="selected"?"selected":""}>छानिएका</option>
-        </select>
-        ${e.applyType==="selected"?`
-          <div class="small">
-            ${PRODUCTS.map(p=>`
-              <label>
-                <input type="checkbox"
-                  ${e.products.includes(p.name)?"checked":""}
-                  onchange="
-                    const a=data.${type}[${i}].products;
-                    this.checked?a.push('${p.name}'):a.splice(a.indexOf('${p.name}'),1);
-                    save();
-                  ">
-                ${p.name}
-              </label>
-            `).join("")}
-          </div>`:""}
-      </td>
-
-      <td>रु ${cost.toLocaleString()}</td>
-
-      <td>
-        <button class="btn" onclick="data.${type}[${i}].collapsed=!data.${type}[${i}].collapsed;save()">▾</button>
-        <button class="btn danger" onclick="data.${type}.splice(${i},1);save()">🗑️</button>
-      </td>
-    </tr>`;
+          <textarea rows="2" placeholder="Narration (समग्र)"
+            oninput="s.narration=this.value">${s.narration||""}</textarea>
+        </div>`;
+      wrap.appendChild(sec);
+    });
   });
 }
-
 render();
+
+function delSection(kind,si){
+  if(!confirm("उपशीर्षक हटाउने?")) return;
+  data[kind].splice(si,1);
+  save(); render();
+}
 </script>
 
 </body>
 </html>
-
