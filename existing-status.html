@@ -1,1 +1,357 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Proposal Home | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<style>
+body{margin:0;font-family:system-ui;background:#f5f7fa}
+header{
+  background:#1b5e20;color:#fff;
+  padding:10px 16px;
+  display:flex;justify-content:space-between;align-items:center
+}
+.container{max-width:1100px;margin:auto;padding:16px}
+.card{background:#fff;padding:16px;border-radius:8px;margin-bottom:16px}
+h2{margin:0 0 8px;color:#1b5e20}
+.small{font-size:14px;color:#555;line-height:1.5}
+
+table{width:100%;border-collapse:collapse}
+th,td{border:1px solid #ddd;padding:8px}
+thead{background:#f1f8f4}
+
+.status{
+  padding:2px 8px;border-radius:12px;
+  font-size:12px;white-space:nowrap
+}
+.ok{background:#2e7d32;color:#fff}
+.mid{background:#f9a825;color:#000}
+.no{background:#9e9e9e;color:#fff}
+
+button{
+  padding:6px 14px;
+  border:none;border-radius:6px;
+  background:#1b5e20;color:#fff;
+  cursor:pointer
+}
+button:active{transform:scale(.97)}
+</style>
+</head>
+
+<body>
+
+<header>
+  <div><b>FarmerBase BP Engine</b></div>
+  <div id="hdrName"></div>
+</header>
+
+<div class="container">
+
+<!-- प्रस्तावना -->
+<div class="card">
+  <h2>📌 प्रस्तावना</h2>
+  <p class="small">
+    यो पेज तपाईंको <b>व्यवसायिक प्रस्तावको होम पेज</b> हो।
+    FarmerBase BP Engine मार्फत तयार हुँदै गरेको
+    यो प्रस्तावमा कुन–कुन खण्ड छन्,
+    कति पाना छन् र कुन पेजबाट के विवरण
+    प्रविष्ट गर्ने हो भन्ने कुरा
+    यहाँबाट स्पष्ट रूपमा देखिन्छ।
+  </p>
+</div>
+
+<!-- प्रस्ताव संरचना -->
+<div class="card">
+  <h2>📑 प्रस्ताव संरचना</h2>
+
+  <table>
+    <thead>
+      <tr>
+        <th>क्र.</th>
+        <th>खण्ड</th>
+        <th>पाना</th>
+        <th>Status</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+
+      <tr>
+        <td>1</td>
+        <td>Existing Status</td>
+        <td>1</td>
+        <td id="st-existing"></td>
+        <td><button type="button" onclick="go('existing-status.html')">Go →</button></td>
+      </tr>
+
+      <tr>
+        <td>2</td>
+        <td>Business Detail</td>
+        <td>2</td>
+        <td id="st-business"></td>
+        <td><button type="button" onclick="go('business-detail.html')">Go →</button></td>
+      </tr>
+
+      <tr>
+        <td>3</td>
+        <td>Production</td>
+        <td>1</td>
+        <td id="st-production"></td>
+        <td><button type="button" onclick="go('production.html')">Go →</button></td>
+      </tr>
+
+      <tr>
+        <td>4</td>
+        <td>Expenses</td>
+        <td>2</td>
+        <td id="st-expenses"></td>
+        <td><button type="button" onclick="go('expenses.html')">Go →</button></td>
+      </tr>
+
+      <tr>
+        <td>5</td>
+        <td>Capital Source</td>
+        <td>1</td>
+        <td id="st-capital"></td>
+        <td><button type="button" onclick="go('capital-source.html')">Go →</button></td>
+      </tr>
+
+      <tr>
+        <td>6</td>
+        <td>Income</td>
+        <td>1</td>
+        <td id="st-income"></td>
+        <td><button type="button" onclick="go('income.html')">Go →</button></td>
+      </tr>
+
+      <tr>
+        <td>7</td>
+        <td>Profit & Loss</td>
+        <td>2</td>
+        <td id="st-profit"></td>
+        <td><button type="button" onclick="go('profit-loss.html')">Go →</button></td>
+      </tr>
+
+    </tbody>
+  </table>
+
+  <p class="small">
+    🔎 Status स्वतः अपडेट हुन्छ —
+    <span class="status ok">Completed</span>,
+    <span class="status mid">In progress</span>,
+    <span class="status no">Not started</span>
+  </p>
+</div>
+
+</div>
+
+<script>
+/* ===== IDENTITY FROM LOGIN ===== */
+const identity = JSON.parse(localStorage.getItem("fb_identity"));
+if(!identity){
+  alert("पहिले Login गर्नुहोस्");
+  location.href="login.html";
+}
+hdrName.textContent =
+  identity.projectName || identity.businessName || "";
+
+/* ===== NAV ===== */
+function go(p){ window.location.href = p; }
+
+/* ===== STATUS ===== */
+function statusOf(key){
+  const raw = localStorage.getItem(key);
+  if(!raw) return '<span class="status no">Not started</span>';
+  try{
+    const d = JSON.parse(raw);
+    if(Object.keys(d).length===0) return '<span class="status mid">In progress</span>';
+    return '<span class="status ok">Completed</span>';
+  }catch{
+    return '<span class="status mid">In progress</span>';
+  }
+}
+
+st_existing.innerHTML = statusOf("fb_existing_status");
+st_business.innerHTML = statusOf("fb_business_detail");
+st_production.innerHTML = statusOf("fb_production");
+st_expenses.innerHTML = statusOf("fb_expenses_final");
+st_capital.innerHTML  = statusOf("fb_capital_source");
+st_income.innerHTML   = statusOf("fb_income");
+st_profit.innerHTML   = statusOf("fb_profit_loss");
+</script>
+
+</body>
+</html>
+You sent
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Existing Status</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{margin:0;font-family:system-ui;background:#f5f7fa}
+header{
+  background:#1b5e20;color:#fff;
+  padding:10px 16px;
+  display:flex;justify-content:space-between;align-items:center
+}
+footer{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:8px 12px;
+  display:flex;justify-content:space-between
+}
+.container{
+  max-width:1100px;margin:auto;padding:16px;
+  padding-bottom:80px
+}
+.card{
+  background:#fff;padding:16px;border-radius:8px;
+  margin-bottom:16px
+}
+h2{margin:0 0 8px;color:#1b5e20}
+.small{font-size:14px;color:#555}
+
+input,textarea{
+  width:100%;padding:8px;
+  border:1px solid #ccc;border-radius:6px
+}
+button{
+  padding:6px 14px;border:none;border-radius:6px;
+  background:#1b5e20;color:#fff;cursor:pointer
+}
+button.ghost{background:#e8f5e9;color:#1b5e20}
+button.danger{background:#c62828}
+
+.block{
+  border:1px solid #ddd;border-radius:6px;
+  padding:12px;margin-top:10px
+}
+.block-head{
+  display:flex;justify-content:space-between;align-items:center
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<header>
+  <div><b>FarmerBase BP Engine</b></div>
+  <div id="hdrName"></div>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <h2>📌 हालको अवस्था (Existing Status)</h2>
+  <p class="small">
+    यस खण्डमा व्यवसायको हालको अवस्था,
+    उपलब्ध पूर्वाधार, अनुभव, समस्या तथा
+    अहिले सम्म गरिएका गतिविधिहरू
+    Paragraph शैलीमा उल्लेख गरिन्छ।
+  </p>
+</div>
+
+<!-- ADD BLOCK -->
+<div class="card">
+  <h2>➕ नयाँ शीर्षक थप्नुहोस्</h2>
+  <input id="titleInput" placeholder="शीर्षक (जस्तै: हालको व्यवसायिक अवस्था)">
+  <br><br>
+  <textarea id="contentInput" rows="4"
+    placeholder="यस शीर्षकसँग सम्बन्धित विवरण लेख्नुहोस्..."></textarea>
+  <br><br>
+  <button type="button" onclick="addBlock()">थप्नुहोस्</button>
+</div>
+
+<!-- LIST -->
+<div id="list"></div>
+
+</div>
+
+<!-- FOOTER NAV -->
+<footer>
+  <button type="button" onclick="goPrev()">⬅️</button>
+  <button type="button" onclick="goNext()">➡️</button>
+</footer>
+
+<script>
+/* ===== IDENTITY (LOGIN) ===== */
+const identity = JSON.parse(localStorage.getItem("fb_identity"));
+if(!identity){
+  alert("पहिले Login गर्नुहोस्");
+  location.href="login.html";
+}
+document.getElementById("hdrName").textContent =
+  identity.projectName || identity.businessName || "";
+
+/* ===== DATA ===== */
+const KEY="fb_existing_status";
+let blocks = JSON.parse(localStorage.getItem(KEY)) || [];
+
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(blocks));
+}
+
+/* ===== ADD ===== */
+function addBlock(){
+  const t = titleInput.value.trim();
+  const c = contentInput.value.trim();
+  if(!t || !c){
+    alert("शीर्षक र विवरण दुवै लेख्नुहोस्");
+    return;
+  }
+  blocks.unshift({title:t,content:c});
+  titleInput.value="";
+  contentInput.value="";
+  save();render();
+}
+
+/* ===== EDIT / DELETE ===== */
+function editBlock(i){
+  const nt = prompt("शीर्षक:", blocks[i].title);
+  if(!nt) return;
+  const nc = prompt("विवरण:", blocks[i].content);
+  if(!nc) return;
+  blocks[i] = {title:nt,content:nc};
+  save();render();
+}
+function delBlock(i){
+  if(!confirm("हटाउने?")) return;
+  blocks.splice(i,1);
+  save();render();
+}
+
+/* ===== RENDER ===== */
+function render(){
+  list.innerHTML="";
+  blocks.forEach((b,i)=>{
+    const d=document.createElement("div");
+    d.className="block";
+    d.innerHTML=`
+      <div class="block-head">
+        <b>${b.title}</b>
+        <div>
+          <button class="ghost" type="button"
+            onclick="editBlock(${i})">✏️</button>
+          <button class="danger" type="button"
+            onclick="delBlock(${i})">✖</button>
+        </div>
+      </div>
+      <p class="small" style="margin-top:8px">${b.content}</p>
+    `;
+    list.appendChild(d);
+  });
+}
+render();
+
+/* ===== NAV ===== */
+function goPrev(){ location.href="short-info.html"; }
+function goNext(){ location.href="business-detail.html"; }
+</script>
+
+</body>
+</html>
