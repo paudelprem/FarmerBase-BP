@@ -33,7 +33,7 @@ table{width:100%;border-collapse:collapse}
 th,td{border:1px solid #ddd;padding:6px 8px}
 thead{background:#f1f8f4}
 
-/* ===== HIGHLIGHT ===== */
+/* ===== STATUS HIGHLIGHT ===== */
 tr.completed{background:#e8f5e9}
 tr.progress{background:#fffde7}
 tr.empty{background:#fafafa;color:#777}
@@ -50,6 +50,7 @@ button{
   padding:6px 12px;border:none;border-radius:6px;
   background:#1b5e20;color:#fff;cursor:pointer
 }
+button:active{transform:scale(.98)}
 input{
   width:100%;padding:8px;
   border:1px solid #ccc;border-radius:6px
@@ -76,9 +77,9 @@ input{
     <h2>📌 प्रस्ताव परिचय</h2>
     <p class="small">
       यो पेज तपाईंको व्यवसायिक प्रस्तावको होम पेज हो।
-      यहाँबाट प्रस्तावभित्र के–के खण्ड छन्,
-      कति पाना छन् र कुन पेजमा के विवरण हुन्छ
-      भन्ने कुरा एकै नजरमा बुझ्न सकिन्छ।
+      यहाँबाट प्रस्तावभित्र के–के खण्ड छन्, कति पाना छन्
+      र कुन पेजमा के विवरण हुन्छ भन्ने कुरा
+      एकै नजरमा बुझ्न सक्नुहुन्छ।
     </p>
   </div>
 
@@ -96,41 +97,119 @@ input{
           <th></th>
         </tr>
       </thead>
+
       <tbody>
 
-        <tr id="row-existing" onclick="go('existing-status.html')" style="cursor:pointer">
-          <td>1</td><td>Existing Status</td><td>हालको अवस्था</td><td>1</td>
-          <td id="st-existing"></td><td><button type="button">Go →</button></td>
+        <tr id="row-existing"
+            onclick="goPage('existing-status.html')"
+            style="cursor:pointer">
+          <td>1</td>
+          <td>Existing Status</td>
+          <td>हालको अवस्था</td>
+          <td>1</td>
+          <td id="st-existing"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('existing-status.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
-        <tr id="row-business" onclick="go('business-detail.html')" style="cursor:pointer">
-          <td>2</td><td>Business Detail</td><td>प्रस्तावना, लक्ष्य</td><td>2</td>
-          <td id="st-business"></td><td><button type="button">Go →</button></td>
+        <tr id="row-business"
+            onclick="goPage('business-detail.html')"
+            style="cursor:pointer">
+          <td>2</td>
+          <td>Business Detail</td>
+          <td>प्रस्तावना, लक्ष्य</td>
+          <td>2</td>
+          <td id="st-business"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('business-detail.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
-        <tr id="row-production" onclick="go('production.html')" style="cursor:pointer">
-          <td>3</td><td>Production</td><td>उत्पादन विवरण</td><td>1</td>
-          <td id="st-production"></td><td><button type="button">Go →</button></td>
+        <tr id="row-production"
+            onclick="goPage('production.html')"
+            style="cursor:pointer">
+          <td>3</td>
+          <td>Production</td>
+          <td>उत्पादन विवरण</td>
+          <td>1</td>
+          <td id="st-production"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('production.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
-        <tr id="row-expenses" onclick="go('expenses.html')" style="cursor:pointer">
-          <td>4</td><td>Expenses</td><td>खर्च विवरण</td><td>2</td>
-          <td id="st-expenses"></td><td><button type="button">Go →</button></td>
+        <tr id="row-expenses"
+            onclick="goPage('expenses.html')"
+            style="cursor:pointer">
+          <td>4</td>
+          <td>Expenses</td>
+          <td>खर्च विवरण</td>
+          <td>2</td>
+          <td id="st-expenses"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('expenses.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
-        <tr id="row-capital" onclick="go('capital-source.html')" style="cursor:pointer">
-          <td>5</td><td>Capital Source</td><td>पुँजीको स्रोत</td><td>1</td>
-          <td id="st-capital"></td><td><button type="button">Go →</button></td>
+        <tr id="row-capital"
+            onclick="goPage('capital-source.html')"
+            style="cursor:pointer">
+          <td>5</td>
+          <td>Capital Source</td>
+          <td>पुँजी स्रोत</td>
+          <td>1</td>
+          <td id="st-capital"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('capital-source.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
-        <tr id="row-income" onclick="go('income.html')" style="cursor:pointer">
-          <td>6</td><td>Income</td><td>आम्दानी</td><td>1</td>
-          <td id="st-income"></td><td><button type="button">Go →</button></td>
+        <tr id="row-income"
+            onclick="goPage('income.html')"
+            style="cursor:pointer">
+          <td>6</td>
+          <td>Income</td>
+          <td>आम्दानी</td>
+          <td>1</td>
+          <td id="st-income"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('income.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
-        <tr id="row-profit" onclick="go('profit-loss.html')" style="cursor:pointer">
-          <td>7</td><td>Profit & Loss</td><td>ROI / 5-Year</td><td>2</td>
-          <td id="st-profit"></td><td><button type="button">Go →</button></td>
+        <tr id="row-profit"
+            onclick="goPage('profit-loss.html')"
+            style="cursor:pointer">
+          <td>7</td>
+          <td>Profit & Loss</td>
+          <td>ROI / 5-Year</td>
+          <td>2</td>
+          <td id="st-profit"></td>
+          <td>
+            <button type="button"
+              onclick="event.stopPropagation();goPage('profit-loss.html')">
+              Go →
+            </button>
+          </td>
         </tr>
 
       </tbody>
@@ -144,12 +223,10 @@ input{
 
   <div class="card">
     <h2>✍️ आधारभूत विवरण</h2>
-
     <input id="businessName" placeholder="संस्था / व्यवसायको नाम">
     <br><br>
     <input id="projectName" placeholder="परियोजनाको नाम">
     <br><br>
-
     <button type="button" onclick="saveShortInfo()">💾 सुरक्षित</button>
   </div>
 
@@ -178,7 +255,6 @@ function saveShortInfo(){
   localStorage.setItem("fb_business",
     JSON.stringify({businessName,projectName})
   );
-  alert("सुरक्षित भयो");
   location.reload();
 }
 
@@ -188,7 +264,9 @@ document.getElementById("hdrBiz").textContent=
   biz.projectName||biz.businessName||"";
 
 /* ===== NAV ===== */
-function go(p){location.href=p}
+function goPage(page){
+  window.location.href = page;
+}
 
 /* ===== STATUS HIGHLIGHT ===== */
 const map={
@@ -206,10 +284,13 @@ function getStatus(key){
   if(!raw) return "empty";
   try{
     const d=JSON.parse(raw);
-    if((Array.isArray(d)&&d.length===0)||Object.keys(d).length===0)
+    if((Array.isArray(d)&&d.length===0)||
+       (typeof d==="object"&&Object.keys(d).length===0))
       return "progress";
     return "completed";
-  }catch(e){return "progress"}
+  }catch(e){
+    return "progress";
+  }
 }
 
 Object.values(map).forEach(s=>{
