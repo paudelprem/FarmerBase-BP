@@ -2,201 +2,150 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>FarmerBase BP Engine | Login</title>
+<title>Login | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box}
 body{
   margin:0;
   font-family:system-ui;
-  background:#f6f7f9;
-  color:#222
+  background:#f5f7fa;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  min-height:100vh;
 }
-:root{--g:#1b5e20;--b:#ddd;--w:1000px}
+.box{
+  background:#fff;
+  padding:24px;
+  max-width:900px;
+  width:100%;
+  border-radius:10px;
+  box-shadow:0 8px 24px rgba(0,0,0,.08);
+}
+h1{
+  margin:0 0 8px;
+  color:#1b5e20;
+}
+p.small{font-size:14px;color:#555}
 
-/* LAYOUT */
-.wrap{
-  max-width:var(--w);
-  margin:30px auto;
+.grid{
   display:grid;
-  grid-template-columns:1.2fr 1fr;
-  gap:20px;
-  padding:0 14px
+  grid-template-columns:1fr 1fr;
+  gap:16px;
 }
-@media(max-width:900px){
-  .wrap{grid-template-columns:1fr}
+@media(max-width:768px){
+  .grid{grid-template-columns:1fr}
 }
 
-/* LEFT */
-.left{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:10px;
-  padding:20px
-}
-.left h1{margin-top:0;font-size:20px;color:var(--g)}
-.left p{font-size:14px;line-height:1.6}
-
-/* RIGHT */
-.right{
-  background:#fff;
-  border:1px solid var(--b);
-  border-radius:10px;
-  padding:20px
-}
-.right h2{margin-top:0;font-size:18px}
-
-/* FORM */
-label{display:block;margin-top:10px;font-size:13px}
 input{
   width:100%;
-  padding:8px;
-  margin-top:4px;
+  padding:10px;
   border:1px solid #ccc;
   border-radius:6px;
-  font-size:14px
+  font-size:14px;
 }
+
 button{
   margin-top:16px;
+  padding:12px;
   width:100%;
-  padding:10px;
-  font-size:15px;
-  background:var(--g);
-  color:#fff;
   border:none;
-  border-radius:30px;
-  cursor:pointer
+  border-radius:8px;
+  background:#1b5e20;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
 }
-button:hover{opacity:.95}
+button:active{transform:scale(.98)}
 
-/* FOOTER BLOCK */
-.dev{
-  margin-top:20px;
-  border-top:1px dashed #ccc;
-  padding-top:14px;
+.footer{
+  margin-top:24px;
+  padding-top:16px;
+  border-top:1px solid #ddd;
   display:grid;
   grid-template-columns:120px 1fr;
-  gap:14px;
-  align-items:center
+  gap:16px;
+  align-items:center;
 }
-.dev img{
-  width:120px;
-  border-radius:8px
+.footer img{
+  width:100%;
+  border-radius:8px;
 }
-.dev small{font-size:12px;color:#444}
+.footer small{color:#555}
 </style>
 </head>
 
 <body>
 
-<div class="wrap">
+<div class="box">
 
-  <!-- LEFT : CONCEPT -->
-  <div class="left">
-    <h1>किन FarmerBase BP Engine ?</h1>
+<h1>FarmerBase BP Engine</h1>
+<p class="small">
+किसान तथा साना व्यवसायीका लागि
+Auto Business Planning System
+</p>
 
-    <p>
-      नेपालमा धेरै किसान तथा साना व्यवसायीहरूसँग
-      <b>व्यवसायिक योजना</b> बनाउने समय, ज्ञान वा प्राविधिक पहुँच हुँदैन।
-    </p>
+<div class="grid">
 
-    <p>
-      बैंक, सहकारी, अनुदान वा साझेदारीका लागि
-      <b>गणनामा आधारित, यथार्थ र विश्वासयोग्य योजना</b>
-      चाहिन्छ — जुन हातैले बनाउन कठिन हुन्छ।
-    </p>
+<div>
+  <input id="businessName" placeholder="संस्था / व्यवसायको नाम">
+  <br><br>
+  <input id="projectName" placeholder="परियोजनाको नाम">
+  <br><br>
+  <input id="regBody" placeholder="दर्ता भएको निकाय (पालिका / उद्योग / कम्पनी)">
+  <br><br>
+  <input id="regNo" placeholder="दर्ता नं">
+</div>
 
-    <p>
-      <b>FarmerBase BP Engine</b> ले यही समस्या समाधान गर्छ —
-      किसान आफैंले, सजिलै, छिटो र सही तरिकाले
-      आफ्नो व्यवसायिक योजना बनाउन।
-    </p>
+<div>
+  <input id="panNo" placeholder="PAN नं (यदि छ)">
+  <br><br>
+  <input id="contactName" placeholder="सम्पर्क व्यक्ति नाम">
+  <br><br>
+  <input id="contactPhone" placeholder="मोबाइल नं">
+</div>
 
-    <p><b>के–के स्वतः बन्छ?</b></p>
-    <ul style="font-size:14px">
-      <li>उत्पादन, खर्च, आम्दानी</li>
-      <li>नाफा–नोक्सान</li>
-      <li>ROI, Payback Period</li>
-      <li>५ वर्षे प्रक्षेपण</li>
-    </ul>
+</div>
 
-    <!-- DEVELOPER -->
-    <div class="dev">
-      <img src="Screenshot 2026-01-01 203450.png" alt="Prem Prasad Paudel">
-      <small>
-        <b>Concept Development By:</b><br>
-        Prem Prasad Paudel<br>
-        ✉️ paudelprem@gmail.com<br>
-        📱 WhatsApp: 9843508470
-      </small>
-    </div>
-  </div>
+<button type="button" onclick="start()">🚀 व्यवसाय सुरु गरौं</button>
 
-  <!-- RIGHT : LOGIN -->
-  <div class="right">
-    <h2>व्यवसाय सुरू गरौँ</h2>
-
-    <label>व्यवसाय / संस्थाको नाम</label>
-    <input id="businessName" placeholder="जस्तै: किसान कृषि फार्म">
-
-    <label>परियोजनाको नाम</label>
-    <input id="projectName" placeholder="जस्तै: तरकारी उत्पादन योजना">
-
-    <label>प्रोप्राइटर / सञ्चालकको नाम</label>
-    <input id="ownerName" placeholder="नाम">
-
-    <button id="startBtn">🚀 व्यवसाय सुरू गरौँ</button>
-  </div>
+<div class="footer">
+  <img src="https://scontent.fktm3-1.fna.fbcdn.net/v/t39.30808-6/241174928_10162407914859852_3099747735535518838_n.jpg" alt="Prem Prasad Paudel">
+  <small>
+    <b>Concept Development By:</b><br>
+    Prem Prasad Paudel<br>
+    📧 paudelprem@gmail.com<br>
+    📱 WhatsApp: 9843508470
+  </small>
+</div>
 
 </div>
 
 <script>
-/* =========================
-   LOGIN CORE (ROOT FIX)
-========================= */
-document.getElementById("startBtn").addEventListener("click", ()=>{
+function start(){
+  const data={
+    businessName:businessName.value.trim(),
+    projectName:projectName.value.trim(),
+    regBody:regBody.value.trim(),
+    regNo:regNo.value.trim(),
+    panNo:panNo.value.trim(),
+    contactName:contactName.value.trim(),
+    contactPhone:contactPhone.value.trim()
+  };
 
-  const bName = businessName.value.trim();
-  const pName = projectName.value.trim();
-  const oName = ownerName.value.trim();
-
-  if(!bName || !pName){
-    alert("कृपया व्यवसाय र परियोजनाको नाम लेख्नुहोस्");
+  if(!data.businessName && !data.projectName){
+    alert("संस्था वा परियोजनाको नाम अनिवार्य छ");
     return;
   }
 
-  // CREATE BUSINESS CONTEXT
-  let B = JSON.parse(localStorage.getItem("fb_businesses") || "null");
-  if(!B){
-    B = { activeId:null, list:{} };
-  }
+  localStorage.setItem("fb_identity", JSON.stringify(data));
 
-  const id = "b_" + Date.now();
+  // clear old proposal if needed
+  // localStorage.removeItem("fb_expenses_final");
 
-  B.activeId = id;
-  B.list[id] = {
-    businessName:bName,
-    projectName:pName,
-    ownerName:oName,
-    created:new Date().toISOString()
-  };
-
-  localStorage.setItem("fb_businesses", JSON.stringify(B));
-
-  // PREFILL SHORT INFO
-  localStorage.setItem(
-    "fb_short_info_" + id,
-    JSON.stringify({
-      businessName:bName,
-      projectName:pName,
-      ownerName:oName
-    })
-  );
-
-  // GO NEXT
-  window.location.href = "short-info.html";
-});
+  location.href="short-info.html";
+}
 </script>
 
 </body>
