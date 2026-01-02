@@ -124,12 +124,9 @@ const prod=JSON.parse(localStorage.getItem("fb_production")||"[]");
 const prodNames=[];
 prod.forEach(t=>t.products.forEach(p=>prodNames.push(p.name)));
 
-/* ================= DATA ================= */
+/* ================= DATA (FIXED) ================= */
 const KEY="fb_expenses";
-let data=JSON.parse(localStorage.getItem(KEY)||"{
-  \"run\":[],\"fix\":[]
-}");
-
+let data = JSON.parse(localStorage.getItem(KEY)) || { run: [], fix: [] };
 const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
 
 /* ================= SECTION CRUD ================= */
@@ -138,6 +135,12 @@ function addSection(kind){
   if(!inp.value) return alert("उपशीर्षक चाहिन्छ");
   data[kind].unshift({name:inp.value, items:[], narration:""});
   inp.value="";
+  save(); render();
+}
+
+function delSection(kind,si){
+  if(!confirm("उपशीर्षक हटाउने?")) return;
+  data[kind].splice(si,1);
   save(); render();
 }
 
@@ -156,9 +159,9 @@ function addItem(kind,si){
     map:box.querySelector(".i-map").value
   };
   if(!it.name||!it.unit) return alert("नाम र इकाई चाहिन्छ");
-  data[kind][si].items.unshift(it);
+  data[kind][si].items.unshift(it);   // newest on top
   box.querySelectorAll("input").forEach(i=>i.value="");
-  save(); render(); // auto-collapse happens in render
+  save(); render();
 }
 
 /* ================= RENDER ================= */
@@ -219,12 +222,6 @@ function render(){
   });
 }
 render();
-
-function delSection(kind,si){
-  if(!confirm("उपशीर्षक हटाउने?")) return;
-  data[kind].splice(si,1);
-  save(); render();
-}
 </script>
 
 </body>
