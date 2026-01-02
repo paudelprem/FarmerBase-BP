@@ -30,7 +30,7 @@ footer{
 
 <div class="container">
 
-<!-- ===== READ EXPENSE SUMMARY ===== -->
+<!-- ===== EXPENSE SUMMARY ===== -->
 <div class="box" id="needBox"></div>
 
 <!-- ===== ADD SOURCE ===== -->
@@ -47,10 +47,10 @@ footer{
   <label><input type="checkbox" id="mapFix" checked> स्थिर खर्च</label>
   <br><br>
   <button class="green" onclick="addSource()">+ थप्नुहोस्</button>
-  <div class="small">नोट: % को आधारमा रकम auto-calculated हुन्छ।</div>
+  <div class="small">नोट: % को आधारमा रकम auto-calculate हुन्छ।</div>
 </div>
 
-<!-- ===== SOURCE LIST ===== -->
+<!-- ===== LIST ===== -->
 <div class="box">
   <h2>पुँजी स्रोत विवरण</h2>
   <table>
@@ -75,12 +75,6 @@ footer{
   <div id="warnFix" class="red"></div>
 </div>
 
-<!-- ===== SAVE ===== -->
-<div class="box">
-  <button class="green" onclick="saveAll()">💾 सुरक्षित</button>
-  <span class="small">Profit–Loss का लागि</span>
-</div>
-
 </div>
 
 <!-- ===== FOOTER NAV ===== -->
@@ -90,7 +84,7 @@ footer{
 </footer>
 
 <script>
-/* ========= READ EXPENSES (AUTO-SYNC GUARD) ========= */
+/* ========= READ EXPENSES ========= */
 const exp = JSON.parse(localStorage.getItem("fb_expense_summary"));
 if(!exp || !exp.total){
   alert("पहिले Expenses मा खर्च प्रविष्ट गर्नुहोस्");
@@ -100,7 +94,7 @@ const RUN_NEED = +exp.run;
 const FIX_NEED = +exp.fix;
 const TOTAL_NEED = +exp.total;
 
-document.getElementById("needBox").innerHTML = `
+needBox.innerHTML = `
   <b>पुँजी आवश्यकता सारांश</b><br>
   कुल पुँजी: <b>${TOTAL_NEED.toFixed(2)}</b><br>
   चालु खर्च आवश्यकता: <b>${RUN_NEED.toFixed(2)}</b><br>
@@ -138,7 +132,7 @@ function addSource(){
   srcName.value = srcPct.value = srcRate.value = srcYear.value = "";
   mapRun.checked = mapFix.checked = true;
 
-  render();
+  render(); // auto-save inside render
 }
 
 /* ========= CALC COVERAGE ========= */
@@ -151,13 +145,12 @@ function calcCoverage(){
   return { runAlloc, fixAlloc };
 }
 
-/* ========= RENDER ========= */
+/* ========= RENDER + AUTO SAVE ========= */
 function render(){
-  const tbody = document.getElementById("srcList");
-  tbody.innerHTML = "";
+  srcList.innerHTML = "";
 
   sources.forEach((s,i)=>{
-    tbody.innerHTML += `
+    srcList.innerHTML += `
       <tr>
         <td>${s.name}</td>
         <td>${s.pct}%</td>
@@ -176,25 +169,20 @@ function render(){
   warnFix.innerText = c.fixAlloc < FIX_NEED
     ? "⚠️ स्थिर खर्चका लागि पुँजी अपुग"
     : "";
+
+  // 🔐 AUTO-SAVE (CRITICAL)
+  localStorage.setItem(
+    "fb_capital_source",
+    JSON.stringify(sources)
+  );
 }
 
 /* ========= REMOVE ========= */
 function removeItem(i){
   if(confirm("हटाउने?")){
     sources.splice(i,1);
-    render();
+    render(); // auto-save
   }
-}
-
-/* ========= SAVE ========= */
-function saveAll(){
-  const pctSum = sources.reduce((s,x)=>s+x.pct,0);
-  if(pctSum !== 100){
-    alert("कुल % 100 हुनुपर्छ");
-    return;
-  }
-  localStorage.setItem("fb_capital_source",JSON.stringify(sources));
-  alert("Capital Source सुरक्षित भयो");
 }
 
 /* ========= NEXT ========= */
@@ -204,6 +192,11 @@ function goNext(){
     alert("कुल % 100 हुनुपर्छ");
     return;
   }
+  // ensure saved
+  localStorage.setItem(
+    "fb_capital_source",
+    JSON.stringify(sources)
+  );
   location.href = "income.html";
 }
 
