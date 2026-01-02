@@ -6,75 +6,117 @@
 <title>Short Info | FarmerBase BP Engine</title>
 
 <style>
-/* ================= HEADER ================= */
+/* ===== PAGE ===== */
+body{
+  margin:0;
+  font-family:system-ui;
+  background:#eef2f3;
+}
+
+/* ===== HEADER ===== */
 #fbHeader{
-  position:sticky;top:0;z-index:1000;
-  display:flex;justify-content:space-between;
-  align-items:center;
-  padding:10px 18px;
+  position:sticky;
+  top:0;
+  z-index:1000;
   background:#fff;
   border-bottom:1px solid #ddd;
+  padding:10px 18px;
   transition:.25s;
 }
 #fbHeader.shrink{padding:4px 18px}
-
-.brand{line-height:1.2}
-#hBusiness{
-  font-weight:700;color:#1b5e20;font-size:16px;
-  display:flex;align-items:center;gap:6px;
-}
+.fb-brand{line-height:1.2}
+#hBusiness{font-weight:700;color:#1b5e20;font-size:16px}
 #hProject{font-size:12px;color:#555}
 
-.editBtn{cursor:pointer;font-size:13px;color:#388e3c}
-.editBtn:hover{color:#1b5e20}
-
-.h-right button{
-  margin-left:6px;padding:4px 8px;font-size:12px;
-  border:1px solid #ccc;background:#f8f8f8;
+/* ===== CONTENT ===== */
+.wrap{
+  max-width:900px;
+  margin:auto;
+  padding:20px;
 }
-#mMenuBtn{display:none}
-
-@media(max-width:768px){
-  #fbHeader{padding:6px 12px}
-  #hProject{display:none}
-  #hBusiness{font-size:14px;max-width:220px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-  #mMenuBtn{display:inline-block}
-}
-
-/* ================= PAGE ================= */
-body{margin:0;font-family:system-ui;background:#eef2f3}
-.wrap{max-width:900px;margin:auto;padding:20px}
-
 .card{
-  background:#fff;padding:16px;border-radius:8px;
+  background:#fff;
+  padding:18px;
+  border-radius:8px;
   box-shadow:0 2px 6px rgba(0,0,0,.08);
-  margin-bottom:16px
 }
-.card h2{margin-top:0;color:#1b5e20}
+.card h2{
+  margin-top:0;
+  color:#1b5e20;
+}
 
-label{display:block;font-size:13px;margin-top:10px}
+label{
+  display:block;
+  margin-top:12px;
+  font-size:13px;
+  font-weight:600;
+}
 input,textarea{
-  width:100%;padding:8px;margin-top:4px;
-  border:1px solid #ccc;border-radius:4px;
-  font-size:14px
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  border:1px solid #ccc;
+  border-radius:4px;
+  font-size:14px;
 }
 textarea{min-height:70px}
 
-.row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-@media(max-width:768px){.row{grid-template-columns:1fr}}
-
-/* ================= FOOTER ================= */
+/* ===== FOOTER ===== */
 #fbFooter{
-  margin-top:40px;padding:14px 18px;
-  border-top:1px solid #ddd;font-size:12px;color:#444;
-  display:flex;justify-content:space-between;gap:10px;
+  margin-top:40px;
+  padding:14px 18px;
+  border-top:1px solid #ddd;
+  font-size:12px;
+  color:#444;
+  display:flex;
+  justify-content:space-between;
+  gap:10px;
 }
 #fbFooter .f-right{text-align:right}
 
+/* ===== GLOBAL NAV ===== */
+.page-nav{
+  position:fixed;
+  right:16px;
+  bottom:24px;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+  z-index:2000;
+}
+.page-nav button{
+  width:44px;
+  height:44px;
+  border:none;
+  border-radius:50%;
+  background:#1b5e20;
+  color:#fff;
+  font-size:16px;
+  cursor:pointer;
+  box-shadow:0 2px 6px rgba(0,0,0,.25);
+}
+.page-nav button:hover{background:#2e7d32}
+
+.step-indicator{
+  background:#fff;
+  color:#1b5e20;
+  font-size:11px;
+  text-align:center;
+  padding:4px 6px;
+  border-radius:12px;
+  border:1px solid #c8e6c9;
+  box-shadow:0 1px 4px rgba(0,0,0,.15);
+}
+
+/* ===== PRINT ===== */
 @media print{
-  #fbHeader{position:static;border:none}
+  .page-nav{display:none}
   #fbFooter{
-    position:fixed;bottom:0;left:0;right:0;background:#fff
+    position:fixed;
+    bottom:0;
+    left:0;
+    right:0;
+    background:#fff;
   }
 }
 </style>
@@ -82,25 +124,18 @@ textarea{min-height:70px}
 
 <body>
 
-<!-- ================= HEADER ================= -->
+<!-- ===== GLOBAL HEADER ===== -->
 <header id="fbHeader">
-  <div class="brand">
-    <div id="hBusiness">
-      Business Name
-      <span class="editBtn" onclick="focusName()">✏️</span>
-    </div>
+  <div class="fb-brand">
+    <div id="hBusiness">Business Name</div>
     <small id="hProject"></small>
-  </div>
-  <div class="h-right">
-    <button id="mMenuBtn">☰</button>
   </div>
 </header>
 
-<!-- ================= CONTENT ================= -->
 <div class="wrap">
 
 <div class="card">
-  <h2>व्यवसाय / परियोजनाको संक्षिप्त विवरण</h2>
+  <h2>संक्षिप्त विवरण (Short Info)</h2>
 
   <label>व्यवसाय / संस्थाको नाम</label>
   <input id="businessName">
@@ -108,28 +143,23 @@ textarea{min-height:70px}
   <label>परियोजनाको नाम</label>
   <input id="projectName">
 
-  <div class="row">
-    <div>
-      <label>प्रोप्राइटरको नाम</label>
-      <input id="ownerName">
-    </div>
-    <div>
-      <label>सम्पर्क नम्बर</label>
-      <input id="contact">
-    </div>
-  </div>
+  <label>प्रोप्राइटर / अध्यक्षको नाम</label>
+  <input id="ownerName">
 
-  <label>ठेगाना (प्रदेश / जिल्ला / पालिका / वडा)</label>
+  <label>सम्पर्क नम्बर</label>
+  <input id="contact">
+
+  <label>ठेगाना</label>
   <textarea id="address"></textarea>
 
   <label>संक्षिप्त परिचय</label>
   <textarea id="intro"
-    placeholder="यो व्यवसाय के हो, किन सुरु गर्न लागिएको हो?"></textarea>
+    placeholder="व्यवसाय / परियोजनाको छोटो परिचय लेख्नुहोस्"></textarea>
 </div>
 
 </div>
 
-<!-- ================= FOOTER ================= -->
+<!-- ===== GLOBAL FOOTER ===== -->
 <footer id="fbFooter">
   <div>
     🌱 FarmerBase BP Engine<br>
@@ -143,52 +173,98 @@ textarea{min-height:70px}
   </div>
 </footer>
 
-<!-- ================= SCRIPT ================= -->
+<!-- ===== GLOBAL NAV ===== -->
+<div class="page-nav">
+  <div class="step-indicator" id="stepInfo">Step</div>
+  <button onclick="goPrev()">⬅️</button>
+  <button onclick="goNext()">➡️</button>
+</div>
+
+<!-- ===== SCRIPT ===== -->
 <script>
+/* ===== BUSINESS STORAGE ===== */
 const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID = B.activeId || "b1";
-const KEY = "fb_short_info_"+BID;
-
-const data = JSON.parse(localStorage.getItem(KEY)||"{}");
-
-businessName.value = data.businessName || "";
-projectName.value  = data.projectName  || "";
-ownerName.value    = data.ownerName    || "";
-contact.value      = data.contact      || "";
-address.value      = data.address      || "";
-intro.value        = data.intro        || "";
-
-function save(){
-  localStorage.setItem(KEY, JSON.stringify({
-    businessName: businessName.value,
-    projectName : projectName.value,
-    ownerName   : ownerName.value,
-    contact     : contact.value,
-    address     : address.value,
-    intro       : intro.value
-  }));
-  renderHeader();
+if(!B.activeId){
+  B.activeId="b1";
+  localStorage.setItem("fb_businesses",JSON.stringify(B));
 }
+const BID=B.activeId;
 
+const KEY="fb_short_info_"+BID;
+let data = JSON.parse(localStorage.getItem(KEY)||"{}");
+
+/* LOAD */
+businessName.value=data.businessName||"";
+projectName.value=data.projectName||"";
+ownerName.value=data.ownerName||"";
+contact.value=data.contact||"";
+address.value=data.address||"";
+intro.value=data.intro||"";
+
+/* SAVE */
+function save(){
+  data={
+    businessName:businessName.value,
+    projectName:projectName.value,
+    ownerName:ownerName.value,
+    contact:contact.value,
+    address:address.value,
+    intro:intro.value
+  };
+  localStorage.setItem(KEY,JSON.stringify(data));
+  hBusiness.textContent=data.businessName||"Business Name";
+  hProject.textContent=data.projectName
+    ? "Project: "+data.projectName:"";
+}
 document.querySelectorAll("input,textarea")
   .forEach(e=>e.addEventListener("blur",save));
 
-function renderHeader(){
-  hBusiness.childNodes[0].nodeValue =
-    businessName.value || "Business Name";
-  hProject.textContent =
-    projectName.value ? "Project: "+projectName.value : "";
+/* HEADER AUTO INJECT */
+hBusiness.textContent=data.businessName||"Business Name";
+hProject.textContent=data.projectName
+  ? "Project: "+data.projectName:"";
+
+/* ===== GLOBAL PAGE FLOW ===== */
+const pages=[
+  "login.html",
+  "short-info.html",
+  "existing-status.html",
+  "business-detail.html",
+  "production.html",
+  "expenses.html",
+  "capital-source.html",
+  "income.html",
+  "profit-loss.html",
+  "executive-summary.html",
+  "cover.html",
+  "create-letter.html"
+];
+const current=location.pathname.split("/").pop();
+const pageIndex=pages.indexOf(current);
+
+function goPrev(){
+  if(pageIndex>0) location.href=pages[pageIndex-1];
+}
+function goNext(){
+  if(pageIndex<pages.length-1) location.href=pages[pageIndex+1];
 }
 
-function focusName(){
-  businessName.focus();
-}
+/* STEP INDICATOR */
+stepInfo.textContent=
+  "Step "+(pageIndex+1)+" / "+pages.length;
 
-renderHeader();
-
-/* shrink on scroll */
+/* HEADER SHRINK */
 addEventListener("scroll",()=>{
   fbHeader.classList.toggle("shrink",scrollY>40);
+});
+
+/* KEYBOARD NAV */
+document.addEventListener("keydown",e=>{
+  if(e.ctrlKey||e.altKey||e.metaKey||e.shiftKey) return;
+  const t=document.activeElement.tagName;
+  if(["INPUT","TEXTAREA","SELECT"].includes(t)) return;
+  if(e.key==="ArrowLeft"){e.preventDefault();goPrev();}
+  if(e.key==="ArrowRight"){e.preventDefault();goNext();}
 });
 </script>
 
