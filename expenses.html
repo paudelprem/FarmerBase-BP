@@ -21,10 +21,6 @@ button{
 button.secondary{background:#607d8b}
 button.ghost{background:#e8f5e9;color:#1b5e20}
 
-.table{width:100%;border-collapse:collapse;margin-top:8px}
-.table th,.table td{border:1px solid #ddd;padding:8px;text-align:right}
-.table th{text-align:left;background:#e8f5e9}
-
 .section{border:1px solid #ddd;border-radius:8px;margin-top:10px}
 .section-head{
   display:flex;justify-content:space-between;align-items:center;
@@ -32,6 +28,10 @@ button.ghost{background:#e8f5e9;color:#1b5e20}
 }
 .section-body{display:none;padding:10px}
 .section-body.open{display:block}
+
+.table{width:100%;border-collapse:collapse;margin-top:8px}
+.table th,.table td{border:1px solid #ddd;padding:8px;text-align:right}
+.table th{text-align:left;background:#e8f5e9}
 
 /* ===== GLOBAL NAV ===== */
 .g-header{
@@ -45,8 +45,12 @@ button.ghost{background:#e8f5e9;color:#1b5e20}
   display:flex;justify-content:space-between;
   padding:10px;border-top:1px solid #ccc
 }
-.g-footer button{border-radius:20px}
-.g-header button:disabled,.g-footer button:disabled{
+.g-footer button{
+  padding:8px 14px;border-radius:20px;
+  border:none;background:#1b5e20;color:#fff
+}
+.g-header button:disabled,
+.g-footer button:disabled{
   opacity:.4;cursor:not-allowed
 }
 </style>
@@ -68,10 +72,10 @@ button.ghost{background:#e8f5e9;color:#1b5e20}
 
 <div class="card">
   <h2>खर्च विवरण (Expenses)</h2>
-  <small>प्रत्येक खर्च कुन उत्पादनमा लाग्छ भनेर छान्न सकिन्छ।</small>
+  <small>खर्च कुन उत्पादनमा लाग्छ भन्ने छान्न सकिन्छ।</small>
 </div>
 
-<!-- ================= RUNNING ================= -->
+<!-- ===== RUNNING COST ===== -->
 <div class="card">
   <h3>चालु खर्च</h3>
   <div class="row">
@@ -81,9 +85,9 @@ button.ghost{background:#e8f5e9;color:#1b5e20}
   <div id="runSecs"></div>
 </div>
 
-<!-- ================= FIXED ================= -->
+<!-- ===== FIXED COST ===== -->
 <div class="card">
-  <h3>स्थिर खर्च (ह्रासकट्टी सहित)</h3>
+  <h3>स्थिर खर्च</h3>
   <div class="row">
     <input id="newFixSec" placeholder="उपशीर्षक (जस्तै: भवन)">
     <button onclick="addSection('fix')">➕ उपशीर्षक थप्नुहोस्</button>
@@ -100,55 +104,66 @@ button.ghost{background:#e8f5e9;color:#1b5e20}
 </footer>
 
 <script>
-/* ================= GLOBAL NAV ================= */
-const flow=[
+/* ========= GLOBAL NAV ========= */
+const FLOW=[
 "index.html","short-info.html","existing-status.html",
 "business-detail.html","production.html","expenses.html",
 "capital-source.html","income.html","profit-loss.html",
 "executive-summary.html","cover.html"
 ];
 const cur=location.pathname.split("/").pop();
-const idx=flow.indexOf(cur);
-function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
-function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
-if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
-if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
+const pageIndex=FLOW.indexOf(cur);
 
-/* ================= HEADER META ================= */
+function goPrev(){
+  if(pageIndex>0) location.href=FLOW[pageIndex-1];
+}
+function goNext(){
+  if(pageIndex<FLOW.length-1) location.href=FLOW[pageIndex+1];
+}
+["prevTop","prevBottom"].forEach(id=>{
+  const b=document.getElementById(id);
+  if(b) b.disabled = pageIndex<=0;
+});
+["nextTop","nextBottom"].forEach(id=>{
+  const b=document.getElementById(id);
+  if(b) b.disabled = pageIndex>=FLOW.length-1;
+});
+
+/* ========= HEADER META ========= */
 const meta=JSON.parse(localStorage.getItem("fb_meta")||"{}");
-bizHdr.textContent=meta.business||"व्यवसाय";
-projHdr.textContent=meta.project||"परियोजना";
+document.getElementById("bizHdr").textContent=meta.business||"व्यवसाय";
+document.getElementById("projHdr").textContent=meta.project||"परियोजना";
 
-/* ================= PRODUCTION (for mapping) ================= */
+/* ========= PRODUCTION (for mapping) ========= */
 const prod=JSON.parse(localStorage.getItem("fb_production")||"[]");
 const prodNames=[];
 prod.forEach(t=>t.products.forEach(p=>prodNames.push(p.name)));
 
-/* ================= DATA (FIXED) ================= */
+/* ========= DATA ========= */
 const KEY="fb_expenses";
 let data = JSON.parse(localStorage.getItem(KEY)) || { run: [], fix: [] };
 const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
 
-/* ================= SECTION CRUD ================= */
+/* ========= SECTION CRUD ========= */
 function addSection(kind){
-  const inp = kind==="run"?newRunSec:newFixSec;
+  const inp=document.getElementById(
+    kind==="run" ? "newRunSec" : "newFixSec"
+  );
   if(!inp.value) return alert("उपशीर्षक चाहिन्छ");
-  data[kind].unshift({name:inp.value, items:[], narration:""});
+  data[kind].unshift({name:inp.value, items:[]});
   inp.value="";
   save(); render();
 }
-
 function delSection(kind,si){
   if(!confirm("उपशीर्षक हटाउने?")) return;
   data[kind].splice(si,1);
   save(); render();
 }
-
 function toggleBody(id){
   document.getElementById(id).classList.toggle("open");
 }
 
-/* ================= ITEM ADD ================= */
+/* ========= ITEM CRUD ========= */
 function addItem(kind,si){
   const box=document.getElementById(add-${kind}-${si});
   const it={
@@ -159,15 +174,15 @@ function addItem(kind,si){
     map:box.querySelector(".i-map").value
   };
   if(!it.name||!it.unit) return alert("नाम र इकाई चाहिन्छ");
-  data[kind][si].items.unshift(it);   // newest on top
+  data[kind][si].items.unshift(it);
   box.querySelectorAll("input").forEach(i=>i.value="");
   save(); render();
 }
 
-/* ================= RENDER ================= */
+/* ========= RENDER ========= */
 function render(){
-  ["run","fix"].forEach(kind=>{
-    const wrap = kind==="run"?runSecs:fixSecs;
+  [["run","runSecs"],["fix","fixSecs"]].forEach(([kind,wrapId])=>{
+    const wrap=document.getElementById(wrapId);
     wrap.innerHTML="";
     data[kind].forEach((s,si)=>{
       const sid=`${kind}-${si}`;
@@ -213,9 +228,6 @@ function render(){
                 </tr>`).join("")}
             </tbody>
           </table>
-
-          <textarea rows="2" placeholder="Narration (समग्र)"
-            oninput="s.narration=this.value">${s.narration||""}</textarea>
         </div>`;
       wrap.appendChild(sec);
     });
