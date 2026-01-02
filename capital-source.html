@@ -7,7 +7,7 @@
 <style>
 body{font-family:system-ui;background:#f4f6f8;margin:0}
 header{background:#2e7d32;color:#fff;padding:10px 16px;font-size:18px}
-.container{max-width:1100px;margin:auto;padding:16px}
+.container{max-width:1100px;margin:auto;padding:16px;padding-bottom:90px}
 .box{background:#fff;border-radius:8px;padding:16px;margin-bottom:20px}
 h2{margin-top:0}
 input,button{padding:6px;font-size:14px}
@@ -17,6 +17,11 @@ button{cursor:pointer}
 table{width:100%;border-collapse:collapse;margin-top:10px}
 th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}
 .small{font-size:13px;color:#555}
+footer{
+  position:fixed;left:0;right:0;bottom:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:8px 12px;display:flex;justify-content:space-between
+}
 </style>
 </head>
 
@@ -42,6 +47,7 @@ th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}
   <label><input type="checkbox" id="mapFix" checked> स्थिर खर्च</label>
   <br><br>
   <button class="green" onclick="addSource()">+ थप्नुहोस्</button>
+  <div class="small">नोट: % को आधारमा रकम auto-calculated हुन्छ।</div>
 </div>
 
 <!-- ===== SOURCE LIST ===== -->
@@ -77,16 +83,22 @@ th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}
 
 </div>
 
+<!-- ===== FOOTER NAV ===== -->
+<footer>
+  <button onclick="location.href='expenses.html'">⬅️</button>
+  <button onclick="goNext()">➡️</button>
+</footer>
+
 <script>
-/* ========= READ EXPENSES ========= */
+/* ========= READ EXPENSES (AUTO-SYNC GUARD) ========= */
 const exp = JSON.parse(localStorage.getItem("fb_expense_summary"));
 if(!exp || !exp.total){
   alert("पहिले Expenses मा खर्च प्रविष्ट गर्नुहोस्");
   location.href = "expenses.html";
 }
-const RUN_NEED = exp.run;
-const FIX_NEED = exp.fix;
-const TOTAL_NEED = exp.total;
+const RUN_NEED = +exp.run;
+const FIX_NEED = +exp.fix;
+const TOTAL_NEED = +exp.total;
 
 document.getElementById("needBox").innerHTML = `
   <b>पुँजी आवश्यकता सारांश</b><br>
@@ -152,9 +164,7 @@ function render(){
         <td>${s.amt.toFixed(2)}</td>
         <td>${s.map.run?"चालु ":""}${s.map.fix?"स्थिर":""}</td>
         <td>${s.rate ? s.rate+"%" : "-"}</td>
-        <td>
-          <button onclick="remove(${i})">✖</button>
-        </td>
+        <td><button onclick="removeItem(${i})">✖</button></td>
       </tr>
     `;
   });
@@ -169,7 +179,7 @@ function render(){
 }
 
 /* ========= REMOVE ========= */
-function remove(i){
+function removeItem(i){
   if(confirm("हटाउने?")){
     sources.splice(i,1);
     render();
@@ -185,6 +195,16 @@ function saveAll(){
   }
   localStorage.setItem("fb_capital_source",JSON.stringify(sources));
   alert("Capital Source सुरक्षित भयो");
+}
+
+/* ========= NEXT ========= */
+function goNext(){
+  const pctSum = sources.reduce((s,x)=>s+x.pct,0);
+  if(pctSum !== 100){
+    alert("कुल % 100 हुनुपर्छ");
+    return;
+  }
+  location.href = "income.html";
 }
 
 render();
