@@ -1,1 +1,197 @@
-jvkh
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Income | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<!-- CACHE OFF -->
+<meta http-equiv="Cache-Control" content="no-store, no-cache, must-revalidate, max-age=0">
+<meta http-equiv="Pragma" content="no-cache">
+<meta http-equiv="Expires" content="0">
+
+<style>
+body{font-family:system-ui;background:#f4f6f8;margin:0}
+header{background:#2e7d32;color:#fff;padding:10px 16px;font-size:18px}
+.container{max-width:1000px;margin:auto;padding:16px;padding-bottom:90px}
+.box{background:#fff;border-radius:8px;padding:16px;margin-bottom:16px}
+h2{margin-top:0}
+.row{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+select,input,button{padding:8px;border:1px solid #ccc;border-radius:6px}
+button{cursor:pointer}
+.btn{background:#2e7d32;color:#fff;border:none}
+.btn-red{background:#c62828;color:#fff;border:none}
+.small{font-size:13px;color:#555}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #ddd;padding:8px;text-align:left}
+tfoot td{font-weight:bold}
+footer{
+  position:fixed;left:0;right:0;bottom:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:8px 12px;display:flex;justify-content:space-between
+}
+</style>
+</head>
+
+<body>
+<header>FarmerBase BP Engine – Income</header>
+
+<div class="container">
+
+<!-- INFO -->
+<div class="box">
+  <h2>आम्दानी विवरण</h2>
+  <p class="small">
+    उत्पादनमा आधारित आम्दानी गणना हुन्छ। नाफा % राख्दा बिक्री मूल्य स्वतः निकालिन्छ।
+  </p>
+</div>
+
+<!-- ADD INCOME -->
+<div class="box">
+  <h3>आम्दानी स्रोत थप्नुहोस्</h3>
+  <div class="row">
+    <select id="iProduct"></select>
+    <input id="iMargin" type="number" placeholder="नाफा %">
+    <button class="btn" onclick="addIncome()">+ थप्नुहोस्</button>
+  </div>
+  <div class="small">
+    नोट: उत्पादन, परिमाण र लागत Production र Expenses बाट स्वतः लिइन्छ।
+  </div>
+</div>
+
+<!-- LIST -->
+<div class="box">
+  <h3>आम्दानी सूची</h3>
+  <table>
+    <thead>
+      <tr>
+        <th>उत्पादन</th>
+        <th>परिमाण</th>
+        <th>लागत/इकाई</th>
+        <th>नाफा %</th>
+        <th>बिक्री मूल्य/इकाई</th>
+        <th>कुल आम्दानी</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="incomeList"></tbody>
+    <tfoot>
+      <tr>
+        <td colspan="5">कुल आम्दानी</td>
+        <td id="totalIncome">0.00</td>
+        <td></td>
+      </tr>
+    </tfoot>
+  </table>
+</div>
+
+</div>
+
+<footer>
+  <button onclick="location.href='capital-source.html'">⬅️</button>
+  <button onclick="location.href='profit-loss.html'">➡️</button>
+</footer>
+
+<script>
+// ===== LOAD BASE DATA =====
+const products = JSON.parse(localStorage.getItem("fb_products")) || [];
+const costMap = JSON.parse(localStorage.getItem("fb_product_cost")) || {};
+let incomes = JSON.parse(localStorage.getItem("fb_incomes")) || [];
+
+// ===== INIT PRODUCT DROPDOWN =====
+function loadProducts(){
+  iProduct.innerHTML = "";
+  if(!products.length){
+    alert("पहिले Production मा उत्पादन थप्नुहोस्");
+    location.href="production.html";
+    return;
+  }
+  products.forEach(p=>{
+    const o=document.createElement("option");
+    o.value=p.id;
+    o.textContent=`${p.name} (${p.qty} ${p.unit})`;
+    iProduct.appendChild(o);
+  });
+}
+
+// ===== ADD INCOME =====
+function addIncome(){
+  const pid = iProduct.value;
+  const margin = +iMargin.value;
+
+  if(isNaN(margin)){
+    alert("नाफा % राख्नुहोस्");
+    return;
+  }
+
+  const p = products.find(x=>x.id===pid);
+  if(!p) return;
+
+  const totalCost = costMap[pid] || 0;
+  const costPerUnit = p.qty ? totalCost / p.qty : 0;
+  const sellRate = costPerUnit * (1 + margin/100);
+  const totalIncome = sellRate * p.qty;
+
+  // prevent duplicate product income
+  incomes = incomes.filter(i=>i.productId!==pid);
+
+  incomes.push({
+    productId: pid,
+    name: p.name,
+    qty: p.qty,
+    unit: p.unit,
+    costPerUnit,
+    margin,
+    sellRate,
+    totalIncome
+  });
+
+  iMargin.value="";
+  save(); render();
+}
+
+// ===== REMOVE =====
+function removeIncome(pid){
+  if(confirm("हटाउने?")){
+    incomes = incomes.filter(i=>i.productId!==pid);
+    save(); render();
+  }
+}
+
+// ===== SAVE =====
+function save(){
+  localStorage.setItem("fb_incomes", JSON.stringify(incomes));
+}
+
+// ===== RENDER =====
+function render(){
+  incomeList.innerHTML="";
+  let sum=0;
+
+  incomes.forEach(i=>{
+    sum += i.totalIncome;
+    incomeList.innerHTML += `
+      <tr>
+        <td>${i.name}</td>
+        <td>${i.qty} ${i.unit}</td>
+        <td>${i.costPerUnit.toFixed(2)}</td>
+        <td>${i.margin}%</td>
+        <td>${i.sellRate.toFixed(2)}</td>
+        <td>${i.totalIncome.toFixed(2)}</td>
+        <td>
+          <button class="btn-red" onclick="removeIncome('${i.productId}')">✕</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  totalIncome.innerText = sum.toFixed(2);
+}
+
+// ===== INIT =====
+loadProducts();
+render();
+</script>
+
+</body>
+</html>
