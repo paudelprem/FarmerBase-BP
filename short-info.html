@@ -9,32 +9,42 @@
 body{margin:0;font-family:system-ui;background:#f5f7fa}
 .container{max-width:900px;margin:auto;padding:20px}
 .card{background:#fff;padding:20px;border-radius:8px}
-label{display:block;margin-top:10px}
-input,textarea{width:100%;padding:8px;margin-top:4px}
+label{display:block;margin-top:10px;font-weight:600}
+input,textarea,select{
+  width:100%;padding:8px;margin-top:4px;
+  border:1px solid #ccc;border-radius:6px;
+  font-family:inherit
+}
+small{color:#666}
 
+/* ===== GLOBAL HEADER ===== */
 .g-header{
   display:flex;align-items:center;gap:10px;
-  padding:10px;background:#1b5e20;color:#fff;
+  padding:10px;background:#1b5e20;color:#fff
 }
 .g-header button{
-  background:none;border:none;color:#fff;font-size:18px;
+  background:none;border:none;color:#fff;font-size:18px
 }
 .g-title{flex:1;text-align:center}
 
+/* ===== GLOBAL FOOTER ===== */
 .g-footer{
   display:flex;justify-content:space-between;
-  padding:10px;border-top:1px solid #ccc;
+  padding:10px;border-top:1px solid #ccc
 }
 .g-footer button{
   padding:8px 14px;border-radius:20px;
-  border:none;background:#1b5e20;color:#fff;
+  border:none;background:#1b5e20;color:#fff
+}
+.g-header button:disabled,.g-footer button:disabled{
+  opacity:.4;cursor:not-allowed
 }
 </style>
 </head>
 
 <body>
 
-<!-- GLOBAL HEADER -->
+<!-- ===== GLOBAL HEADER ===== -->
 <header class="g-header">
   <button id="prevTop" onclick="goPrev()">⬅️</button>
   <div class="g-title">
@@ -46,77 +56,126 @@ input,textarea{width:100%;padding:8px;margin-top:4px}
 
 <div class="container">
 <div class="card">
-<h2>संक्षिप्त जानकारी</h2>
 
-<label>व्यवसाय / संस्थाको नाम</label>
+<h2>संक्षिप्त जानकारी (Short Info)</h2>
+
+<!-- ===== BASIC IDENTITY ===== -->
+<label>व्यवसाय / संस्थाको नाम *</label>
 <input id="business">
 
-<label>परियोजनाको नाम</label>
+<label>परियोजनाको नाम *</label>
 <input id="project">
 
-<label>प्रोपाइटर / प्रतिनिधि</label>
+<label>प्रोपाइटर / प्रतिनिधिको नाम *</label>
 <input id="owner">
 
-<label>सम्पर्क नम्बर</label>
+<label>सम्पर्क नम्बर *</label>
 <input id="contact">
 
-<label>दर्ता नं</label>
-<input id="reg">
+<!-- ===== REGISTRATION ===== -->
+<hr>
 
-<label>PAN नं</label>
-<input id="pan">
+<label>संस्था दर्ता भएको छ?</label>
+<select id="registered" onchange="toggleReg()">
+  <option value="no">छैन</option>
+  <option value="yes">छ</option>
+</select>
 
-<button style="margin-top:14px" onclick="saveInfo()">💾 Save</button>
+<div id="regBox" style="display:none">
+  <label>दर्ता मिति</label>
+  <input type="date" id="regDate">
+
+  <label>दर्ता नं</label>
+  <input id="regNo">
+
+  <label>दर्ता भएको निकाय</label>
+  <input id="regOffice">
+
+  <label>PAN नं</label>
+  <input id="panNo">
+</div>
+
+<!-- ===== AFFILIATION ===== -->
+<hr>
+
+<label>अन्य संघ–संस्थासँग आवद्धता (छ भने)</label>
+<textarea id="affiliation" rows="3"
+placeholder="जस्तै: सहकारी, समूह, संघ आदि"></textarea>
+
+<!-- ===== ACTION ===== -->
+<button style="margin-top:16px" onclick="saveInfo()">💾 सुरक्षित गर्नुहोस्</button>
+
+<small>* चिन्हित विवरण अनिवार्य छन्</small>
+
 </div>
 </div>
 
-<!-- GLOBAL FOOTER -->
+<!-- ===== GLOBAL FOOTER ===== -->
 <footer class="g-footer">
   <button id="prevBottom" onclick="goPrev()">⬅️ अघिल्लो</button>
   <button id="nextBottom" onclick="goNext()">अर्को ➡️</button>
 </footer>
 
 <script>
-/* ===== GLOBAL NAV ===== */
+/* ================= GLOBAL NAV ================= */
 const flow=[
 "index.html","short-info.html","existing-status.html",
 "business-detail.html","production.html","expenses.html",
 "capital-source.html","income.html","profit-loss.html",
 "executive-summary.html","cover.html"
 ];
-const current=location.pathname.split("/").pop();
-const idx=flow.indexOf(current);
-
+const cur=location.pathname.split("/").pop();
+const idx=flow.indexOf(cur);
 function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
 function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
-
 if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
 if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
 
-/* ===== DATA ===== */
+/* ================= DATA ================= */
 const KEY="fb_meta";
-const data=JSON.parse(localStorage.getItem(KEY)||"{}");
+const data = JSON.parse(localStorage.getItem(KEY)) || {};
 
-business.value=data.business||"";
-project.value=data.project||"";
-owner.value=data.owner||"";
-contact.value=data.contact||"";
-reg.value=data.reg||"";
-pan.value=data.pan||"";
+business.value = data.business || "";
+project.value  = data.project  || "";
+owner.value    = data.owner    || "";
+contact.value  = data.contact  || "";
 
-bizHdr.textContent=data.business||"व्यवसाय";
-projHdr.textContent=data.project||"परियोजना";
+registered.value = data.registered || "no";
+regDate.value    = data.regDate || "";
+regNo.value      = data.regNo || "";
+regOffice.value  = data.regOffice || "";
+panNo.value      = data.panNo || "";
+affiliation.value= data.affiliation || "";
+
+toggleReg();
+
+/* ===== HEADER INJECT ===== */
+bizHdr.textContent = data.business || "व्यवसाय";
+projHdr.textContent= data.project  || "परियोजना";
+
+/* ================= FUNCTIONS ================= */
+function toggleReg(){
+  regBox.style.display = registered.value==="yes" ? "block" : "none";
+}
 
 function saveInfo(){
+  if(!business.value || !project.value || !owner.value || !contact.value){
+    alert("अनिवार्य विवरण पूरा गर्नुहोस्");
+    return;
+  }
   localStorage.setItem(KEY,JSON.stringify({
     business:business.value,
     project:project.value,
     owner:owner.value,
     contact:contact.value,
-    reg:reg.value,
-    pan:pan.value
+    registered:registered.value,
+    regDate:regDate.value,
+    regNo:regNo.value,
+    regOffice:regOffice.value,
+    panNo:panNo.value,
+    affiliation:affiliation.value
   }));
-  alert("Saved");
+  alert("Short Info सुरक्षित भयो");
 }
 </script>
 
