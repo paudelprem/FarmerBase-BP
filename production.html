@@ -6,303 +6,261 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== BASE ===== */
-body{
-  margin:0;
-  font-family:system-ui, -apple-system, sans-serif;
-  background:#f5f7fa;
-  color:#222;
-}
-.container{
-  max-width:920px;
-  margin:auto;
-  padding:20px;
-}
+body{margin:0;font-family:system-ui;background:#f5f7fa}
+.container{max-width:980px;margin:auto;padding:16px}
+.card{background:#fff;padding:16px;border-radius:8px;margin-bottom:12px}
+h2{margin:0 0 8px;color:#1b5e20}
+h3{margin:8px 0;color:#2e7d32}
+.row{display:flex;gap:8px;flex-wrap:wrap}
+input,select,textarea{padding:8px;border:1px solid #ccc;border-radius:6px}
+button{padding:8px 12px;border:none;border-radius:6px;background:#1b5e20;color:#fff;cursor:pointer}
+button.secondary{background:#607d8b}
+button.ghost{background:#e8f5e9;color:#1b5e20}
+small{color:#666}
 
-/* ===== HEADER ===== */
-header{
-  background:#1b5e20;
-  color:#fff;
-  padding:10px 16px;
-}
-header .title{font-size:18px;font-weight:600}
-header .sub{font-size:12px;opacity:.9}
+.table{width:100%;border-collapse:collapse;margin-top:8px}
+.table th,.table td{border:1px solid #ddd;padding:8px;text-align:right}
+.table th{text-align:left;background:#e8f5e9}
 
-/* ===== CARD ===== */
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:8px;
-  margin-bottom:20px;
-}
-.card h2{margin-top:0;color:#1b5e20}
+.type-box{border:1px solid #ddd;border-radius:8px;margin-top:10px}
+.type-head{display:flex;align-items:center;justify-content:space-between;padding:10px;background:#f1f8f4}
+.type-head b{color:#1b5e20}
+.type-actions button{margin-left:6px}
+.type-body{display:none;padding:10px}
+.type-body.open{display:block}
 
-/* ===== FORM ===== */
-label{
-  display:block;
-  margin-top:10px;
-  font-size:14px;
-}
-input, select, textarea{
-  width:100%;
-  padding:10px;
-  margin-top:4px;
-  font-size:14px;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-textarea{resize:vertical}
+.prod-row{display:grid;grid-template-columns:2fr 1fr 1fr 1fr 2fr auto;gap:6px;margin-top:6px}
+.prod-row input,.prod-row select{width:100%}
 
-/* ===== FILTER ===== */
-.filter{
-  display:flex;
-  gap:10px;
-  margin-bottom:10px;
-}
-.filter input, .filter select{flex:1}
+.summary{display:flex;gap:12px;flex-wrap:wrap}
+.summary .chip{background:#e8f5e9;border-radius:999px;padding:6px 10px}
 
-/* ===== ITEM ===== */
-.prod-item{
-  border:1px solid #ddd;
-  border-radius:6px;
-  margin-bottom:10px;
-}
-.prod-head{
-  padding:10px;
-  background:#e8f5e9;
-  cursor:pointer;
-  display:flex;
-  justify-content:space-between;
-}
-.prod-body{
-  padding:10px;
-  display:none;
-}
-.prod-item.open .prod-body{display:block}
+.search{margin-left:auto}
 
-/* ===== ACTIONS ===== */
-.actions button{
-  margin-right:6px;
-  border:none;
-  padding:4px 10px;
-  border-radius:14px;
-  font-size:12px;
-  cursor:pointer;
+/* ===== GLOBAL NAV ===== */
+.g-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;background:#1b5e20;color:#fff
 }
-.edit{background:#607d8b;color:#fff}
-.delete{background:#c62828;color:#fff}
+.g-header button{background:none;border:none;color:#fff;font-size:18px}
+.g-title{flex:1;text-align:center}
 
-/* ===== NAV ===== */
-.nav{
-  display:flex;
-  justify-content:space-between;
-  margin-top:20px;
+.g-footer{
+  display:flex;justify-content:space-between;
+  padding:10px;border-top:1px solid #ccc
 }
-.nav button{
-  padding:10px 16px;
-  border:none;
-  border-radius:20px;
-  background:#1b5e20;
-  color:#fff;
-  cursor:pointer;
+.g-footer button{
+  border-radius:20px
 }
-.nav button.secondary{background:#607d8b}
+.g-header button:disabled,.g-footer button:disabled{opacity:.4;cursor:not-allowed}
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="title" id="hdrBiz"></div>
-  <div class="sub" id="hdrProj"></div>
+<!-- ===== GLOBAL HEADER ===== -->
+<header class="g-header">
+  <button id="prevTop" onclick="goPrev()">⬅️</button>
+  <div class="g-title">
+    <div id="bizHdr"></div>
+    <small id="projHdr"></small>
+  </div>
+  <button id="nextTop" onclick="goNext()">➡️</button>
 </header>
 
 <div class="container">
 
-<!-- ADD FORM -->
+<!-- ===== PAGE TITLE ===== -->
 <div class="card">
-  <h2>उत्पादन विवरण</h2>
-
-  <label>उत्पादनको प्रकार</label>
-  <input id="pType" placeholder="कृषि / पशु / सेवा">
-
-  <label>उत्पादन वस्तु / सेवा</label>
-  <input id="pName">
-
-  <label>उत्पादन इकाई</label>
-  <input id="pUnit" placeholder="kg / लिटर / वटा">
-
-  <label>उत्पादन परिमाण</label>
-  <input id="pQty" type="number">
-
-  <label>कैफियत</label>
-  <textarea id="pNote" rows="2"></textarea>
-
-  <button style="margin-top:12px" onclick="addProduction()">➕ थप्नुहोस्</button>
-</div>
-
-<!-- FILTER -->
-<div class="card">
-  <div class="filter">
-    <input id="search" placeholder="🔍 खोज्नुहोस्..." oninput="applyFilter()">
-    <select id="typeFilter" onchange="applyFilter()">
-      <option value="">सबै प्रकार</option>
-    </select>
+  <h2>उत्पादन (Production)</h2>
+  <div class="row">
+    <small>उत्पादनको प्रकार थप्नुहोस्, त्यसपछि वस्तु/सेवा राख्नुहोस्। धेरै भए collapse गरेर खोज्न सकिन्छ।</small>
+    <input class="search" id="q" placeholder="Search product…" oninput="render()">
   </div>
-
-  <div id="prodList"></div>
 </div>
 
-<!-- SUMMARY -->
+<!-- ===== ADD TYPE ===== -->
 <div class="card">
-  <h3>उत्पादन संक्षेप</h3>
-  <div id="prodSummary"></div>
+  <h3>उत्पादनको प्रकार</h3>
+  <div class="row">
+    <input id="newType" placeholder="जस्तै: कृषि / पशु / सेवा">
+    <button onclick="addType()">➕ प्रकार थप्नुहोस्</button>
+  </div>
 </div>
 
-<!-- NAV -->
-<div class="nav">
-  <button class="secondary" onclick="goBack()">⬅️ Business Detail</button>
-  <button onclick="goNext()">Next ➡️</button>
+<!-- ===== TYPES LIST ===== -->
+<div id="types"></div>
+
+<!-- ===== SUMMARY ===== -->
+<div class="card">
+  <h3>संक्षेप (Type-wise)</h3>
+  <div class="summary" id="summary"></div>
 </div>
 
 </div>
+
+<!-- ===== GLOBAL FOOTER ===== -->
+<footer class="g-footer">
+  <button id="prevBottom" class="secondary" onclick="goPrev()">⬅️ अघिल्लो</button>
+  <button id="nextBottom" onclick="goNext()">अर्को ➡️</button>
+</footer>
 
 <script>
-/* ===== KEYS ===== */
-const META_KEY="fb_meta";
+/* ================= GLOBAL NAV ================= */
+const flow=[
+"index.html","short-info.html","existing-status.html",
+"business-detail.html","production.html","expenses.html",
+"capital-source.html","income.html","profit-loss.html",
+"executive-summary.html","cover.html"
+];
+const cur=location.pathname.split("/").pop();
+const idx=flow.indexOf(cur);
+function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
+function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
+if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
+if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
+
+/* ================= HEADER META ================= */
+const meta=JSON.parse(localStorage.getItem("fb_meta")||"{}");
+bizHdr.textContent=meta.business||"व्यवसाय";
+projHdr.textContent=meta.project||"परियोजना";
+
+/* ================= DATA =================
+Structure:
+types = [
+{ id, name, products:[
+   { name, unit, qty, note }
+]}
+]
+*/
 const KEY="fb_production";
+let types=JSON.parse(localStorage.getItem(KEY)||"[]");
 
-/* ===== HEADER ===== */
-const meta=JSON.parse(localStorage.getItem(META_KEY)||"{}");
-hdrBiz.textContent=meta.business||"व्यवसाय";
-hdrProj.textContent=meta.project||"परियोजना";
+/* ================= HELPERS ================= */
+const uid=()=>Math.random().toString(36).slice(2,9);
+const save=()=>localStorage.setItem(KEY,JSON.stringify(types));
 
-/* ===== DATA ===== */
-let list=JSON.parse(localStorage.getItem(KEY)||"[]");
-let editIndex=null;
+/* ================= TYPE CRUD ================= */
+function addType(){
+  if(!newType.value) return alert("प्रकारको नाम चाहिन्छ");
+  types.push({id:uid(),name:newType.value,products:[]});
+  newType.value="";
+  save(); render();
+}
+function editType(id){
+  const t=prompt("प्रकार सच्याउनुहोस्", types.find(x=>x.id===id).name);
+  if(t===null) return;
+  types.find(x=>x.id===id).name=t;
+  save(); render();
+}
+function delType(id){
+  if(!confirm("यो प्रकार र भित्रका सबै उत्पादन हटाउने?")) return;
+  types=types.filter(x=>x.id!==id);
+  save(); render();
+}
+function toggleType(id){
+  const el=document.getElementById("tb-"+id);
+  el.classList.toggle("open");
+}
 
-/* ===== ADD ===== */
-function addProduction(){
-  if(!pType.value||!pName.value||!pQty.value){
-    alert("प्रकार, वस्तु र परिमाण अनिवार्य");
-    return;
-  }
-
-  const obj={
-    type:pType.value,
-    name:pName.value,
-    unit:pUnit.value,
-    qty:+pQty.value,
-    note:pNote.value
+/* ================= PRODUCT CRUD ================= */
+function addProd(tid){
+  const box=document.getElementById("add-"+tid);
+  const p={
+    name:box.querySelector(".p-name").value,
+    unit:box.querySelector(".p-unit").value,
+    qty:+box.querySelector(".p-qty").value||0,
+    note:box.querySelector(".p-note").value
   };
-
-  if(editIndex===null) list.unshift(obj);
-  else{ list[editIndex]=obj; editIndex=null; }
-
-  pType.value=pName.value=pUnit.value=pQty.value=pNote.value="";
-  save();
+  if(!p.name||!p.unit) return alert("नाम र इकाई अनिवार्य");
+  types.find(t=>t.id===tid).products.unshift(p); // newest on top
+  box.querySelectorAll("input").forEach(i=>i.value="");
+  save(); render();
+}
+function editProd(tid,idxp){
+  const t=types.find(t=>t.id===tid);
+  const p=t.products[idxp];
+  const n=prompt("नाम",p.name); if(n===null) return;
+  const u=prompt("इकाई",p.unit); if(u===null) return;
+  const q=prompt("परिमाण",p.qty); if(q===null) return;
+  const no=prompt("कैफियत",p.note||""); if(no===null) return;
+  t.products[idxp]={name:n,unit:u,qty:+q,note:no};
+  save(); render();
+}
+function delProd(tid,idxp){
+  if(!confirm("उत्पादन हटाउने?")) return;
+  const t=types.find(t=>t.id===tid);
+  t.products.splice(idxp,1);
+  save(); render();
 }
 
-/* ===== SAVE ===== */
-function save(){
-  localStorage.setItem(KEY,JSON.stringify(list));
-  render();
-}
-
-/* ===== RENDER ===== */
+/* ================= RENDER ================= */
 function render(){
-  prodList.innerHTML="";
-  typeFilter.innerHTML='<option value="">सबै प्रकार</option>';
-  const types={};
+  const qv=(q.value||"").toLowerCase();
+  const wrap=document.getElementById("types");
+  wrap.innerHTML="";
+  let summary={};
 
-  list.forEach((p,i)=>{
-    types[p.type]=true;
-
-    const div=document.createElement("div");
-    div.className="prod-item";
-    div.dataset.text=(p.type+p.name+p.unit).toLowerCase();
-    div.dataset.type=p.type;
-
-    div.innerHTML=`
-      <div class="prod-head" onclick="divToggle(this)">
-        <b>${p.type}: ${p.name}</b>
-        <span>${p.qty} ${p.unit}</span>
-      </div>
-      <div class="prod-body">
-        <p><b>कैफियत:</b> ${p.note||"-"}</p>
-        <div class="actions">
-          <button class="edit" onclick="edit(${i})">✏️ सच्याउने</button>
-          <button class="delete" onclick="del(${i})">🗑 हटाउने</button>
+  types.forEach(t=>{
+    const box=document.createElement("div");
+    box.className="type-box";
+    box.innerHTML=`
+      <div class="type-head">
+        <b>${t.name}</b>
+        <div class="type-actions">
+          <button class="ghost" onclick="toggleType('${t.id}')">⤵️</button>
+          <button class="ghost" onclick="editType('${t.id}')">✏️</button>
+          <button class="ghost" onclick="delType('${t.id}')">🗑️</button>
         </div>
       </div>
-    `;
-    prodList.appendChild(div);
+      <div class="type-body open" id="tb-${t.id}">
+        <div class="prod-row" id="add-${t.id}">
+          <input class="p-name" placeholder="वस्तु/सेवा">
+          <input class="p-unit" placeholder="इकाई">
+          <input class="p-qty" type="number" placeholder="परिमाण">
+          <input class="p-note" placeholder="कैफियत">
+          <button onclick="addProd('${t.id}')">➕</button>
+        </div>
+        <table class="table">
+          <thead>
+            <tr><th>वस्तु/सेवा</th><th>इकाई</th><th>परिमाण</th><th>कैफियत</th><th></th></tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>`;
+    const tbody=box.querySelector("tbody");
+
+    t.products.forEach((p,i)=>{
+      if(qv && !(p.name.toLowerCase().includes(qv)||t.name.toLowerCase().includes(qv))) return;
+      summary[t.name]=(summary[t.name]||0)+(+p.qty||0);
+      const tr=document.createElement("tr");
+      tr.innerHTML=`
+        <td style="text-align:left">${p.name}</td>
+        <td style="text-align:left">${p.unit}</td>
+        <td>${p.qty}</td>
+        <td style="text-align:left">${p.note||""}</td>
+        <td>
+          <button class="ghost" onclick="editProd('${t.id}',${i})">✏️</button>
+          <button class="ghost" onclick="delProd('${t.id}',${i})">🗑️</button>
+        </td>`;
+      tbody.appendChild(tr);
+    });
+
+    wrap.appendChild(box);
   });
 
-  Object.keys(types).forEach(t=>{
-    const o=document.createElement("option");
-    o.value=t; o.textContent=t;
-    typeFilter.appendChild(o);
-  });
-
-  renderSummary();
-}
-
-/* ===== TOGGLE ===== */
-function divToggle(el){
-  el.parentElement.classList.toggle("open");
-}
-
-/* ===== FILTER ===== */
-function applyFilter(){
-  const q=search.value.toLowerCase();
-  const t=typeFilter.value;
-
-  document.querySelectorAll(".prod-item").forEach(d=>{
-    const okText=d.dataset.text.includes(q);
-    const okType=!t||d.dataset.type===t;
-    d.style.display=(okText&&okType)?"block":"none";
+  // summary
+  const sum=document.getElementById("summary");
+  sum.innerHTML="";
+  const total=Object.values(summary).reduce((a,b)=>a+b,0)||0;
+  Object.keys(summary).forEach(k=>{
+    const pct=total?((summary[k]/total)*100).toFixed(1):"0";
+    const chip=document.createElement("div");
+    chip.className="chip";
+    chip.textContent=`${k}: ${summary[k]} (${pct}%)`;
+    sum.appendChild(chip);
   });
 }
-
-/* ===== EDIT / DELETE ===== */
-function edit(i){
-  const p=list[i];
-  pType.value=p.type;
-  pName.value=p.name;
-  pUnit.value=p.unit;
-  pQty.value=p.qty;
-  pNote.value=p.note;
-  editIndex=i;
-}
-function del(i){
-  if(confirm("हटाउने?")){
-    list.splice(i,1);
-    save();
-  }
-}
-
-/* ===== SUMMARY ===== */
-function renderSummary(){
-  const byType={}, total=list.reduce((s,p)=>s+p.qty,0);
-
-  list.forEach(p=>{
-    byType[p.type]=(byType[p.type]||0)+p.qty;
-  });
-
-  let html="";
-  Object.entries(byType).forEach(([k,v])=>{
-    const pct=total?((v/total)*100).toFixed(1):0;
-    html+=`${k}: ${v} (${pct}%)<br>`;
-  });
-
-  prodSummary.innerHTML=html||"—";
-}
-
-/* ===== NAV ===== */
-function goBack(){location.href="business-detail.html"}
-function goNext(){location.href="expenses.html"}
-
 render();
 </script>
 
