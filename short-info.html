@@ -2,270 +2,261 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Short Info | FarmerBase BP Engine</title>
+<title>Short Info – FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== PAGE ===== */
+/* ===== BASE ===== */
 body{
   margin:0;
-  font-family:system-ui;
-  background:#eef2f3;
+  font-family:system-ui, -apple-system, sans-serif;
+  background:#f5f7fa;
+  color:#222;
 }
-
-/* ===== HEADER ===== */
-#fbHeader{
-  position:sticky;
-  top:0;
-  z-index:1000;
-  background:#fff;
-  border-bottom:1px solid #ddd;
-  padding:10px 18px;
-  transition:.25s;
-}
-#fbHeader.shrink{padding:4px 18px}
-.fb-brand{line-height:1.2}
-#hBusiness{font-weight:700;color:#1b5e20;font-size:16px}
-#hProject{font-size:12px;color:#555}
-
-/* ===== CONTENT ===== */
-.wrap{
-  max-width:900px;
+.container{
+  max-width:920px;
   margin:auto;
   padding:20px;
 }
+a{text-decoration:none;color:inherit}
+
+/* ===== HEADER ===== */
+header{
+  background:#1b5e20;
+  color:#fff;
+  padding:10px 16px;
+}
+header .title{
+  font-size:18px;
+  font-weight:600;
+}
+header .sub{
+  font-size:12px;
+  opacity:.9;
+}
+
+/* ===== CARD ===== */
 .card{
   background:#fff;
-  padding:18px;
+  padding:20px;
   border-radius:8px;
-  box-shadow:0 2px 6px rgba(0,0,0,.08);
+  margin-bottom:20px;
 }
 .card h2{
   margin-top:0;
   color:#1b5e20;
 }
-
 label{
   display:block;
-  margin-top:12px;
-  font-size:13px;
-  font-weight:600;
-}
-input,textarea{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  border:1px solid #ccc;
-  border-radius:4px;
+  margin-top:10px;
   font-size:14px;
 }
-textarea{min-height:70px}
+input, textarea, select{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+textarea{resize:vertical}
 
-/* ===== FOOTER ===== */
-#fbFooter{
-  margin-top:40px;
-  padding:14px 18px;
-  border-top:1px solid #ddd;
-  font-size:12px;
-  color:#444;
+/* ===== GRID ===== */
+.grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:16px;
+}
+@media(max-width:700px){
+  .grid{grid-template-columns:1fr}
+}
+
+/* ===== NAV ===== */
+.nav{
   display:flex;
   justify-content:space-between;
-  gap:10px;
+  margin-top:20px;
 }
-#fbFooter .f-right{text-align:right}
-
-/* ===== GLOBAL NAV ===== */
-.page-nav{
-  position:fixed;
-  right:16px;
-  bottom:24px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  z-index:2000;
-}
-.page-nav button{
-  width:44px;
-  height:44px;
+.nav button{
+  padding:10px 16px;
   border:none;
-  border-radius:50%;
+  border-radius:20px;
   background:#1b5e20;
   color:#fff;
-  font-size:16px;
   cursor:pointer;
-  box-shadow:0 2px 6px rgba(0,0,0,.25);
 }
-.page-nav button:hover{background:#2e7d32}
+.nav button.secondary{
+  background:#607d8b;
+}
 
-.step-indicator{
-  background:#fff;
-  color:#1b5e20;
-  font-size:11px;
+/* ===== FOOTER ===== */
+footer{
   text-align:center;
-  padding:4px 6px;
-  border-radius:12px;
-  border:1px solid #c8e6c9;
-  box-shadow:0 1px 4px rgba(0,0,0,.15);
-}
-
-/* ===== PRINT ===== */
-@media print{
-  .page-nav{display:none}
-  #fbFooter{
-    position:fixed;
-    bottom:0;
-    left:0;
-    right:0;
-    background:#fff;
-  }
+  padding:14px;
+  font-size:13px;
+  color:#555;
+  border-top:1px solid #ddd;
+  margin-top:30px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== GLOBAL HEADER ===== -->
-<header id="fbHeader">
-  <div class="fb-brand">
-    <div id="hBusiness">Business Name</div>
-    <small id="hProject"></small>
-  </div>
+<header>
+  <div class="title" id="hdrBiz"></div>
+  <div class="sub" id="hdrProj"></div>
 </header>
 
-<div class="wrap">
+<div class="container">
 
-<div class="card">
-  <h2>संक्षिप्त विवरण (Short Info)</h2>
+  <!-- BASIC INFO -->
+  <div class="card">
+    <h2>संक्षिप्त विवरण (Short Info)</h2>
 
-  <label>व्यवसाय / संस्थाको नाम</label>
-  <input id="businessName">
+    <div class="grid">
+      <div>
+        <label>व्यवसाय / संस्थाको नाम</label>
+        <input id="businessName">
+      </div>
+      <div>
+        <label>परियोजनाको नाम</label>
+        <input id="projectName">
+      </div>
+    </div>
 
-  <label>परियोजनाको नाम</label>
-  <input id="projectName">
+    <label>प्रोपाइटर / प्रतिनिधिको नाम</label>
+    <input id="ownerName">
 
-  <label>प्रोप्राइटर / अध्यक्षको नाम</label>
-  <input id="ownerName">
+    <label>सम्पर्क नम्बर</label>
+    <input id="contact">
 
-  <label>सम्पर्क नम्बर</label>
-  <input id="contact">
+  </div>
 
-  <label>ठेगाना</label>
-  <textarea id="address"></textarea>
+  <!-- ADDRESS -->
+  <div class="card">
+    <h2>ठेगाना</h2>
 
-  <label>संक्षिप्त परिचय</label>
-  <textarea id="intro"
-    placeholder="व्यवसाय / परियोजनाको छोटो परिचय लेख्नुहोस्"></textarea>
+    <div class="grid">
+      <div>
+        <label>प्रदेश</label>
+        <input id="province">
+      </div>
+      <div>
+        <label>जिल्ला</label>
+        <input id="district">
+      </div>
+      <div>
+        <label>न.पा./गा.पा.</label>
+        <input id="municipality">
+      </div>
+      <div>
+        <label>वडा नं</label>
+        <input id="ward">
+      </div>
+    </div>
+
+    <label>टोल / बस्ती</label>
+    <input id="tole">
+
+    <label>Google Map Link</label>
+    <input id="mapLink" placeholder="https://maps.google.com/...">
+  </div>
+
+  <!-- REGISTRATION -->
+  <div class="card">
+    <h2>दर्ता / कानुनी विवरण</h2>
+
+    <div class="grid">
+      <div>
+        <label>दर्ता मिति</label>
+        <input type="date" id="regDate">
+      </div>
+      <div>
+        <label>दर्ता नं</label>
+        <input id="regNo">
+      </div>
+      <div>
+        <label>दर्ता भएको निकाय</label>
+        <input id="regOffice">
+      </div>
+      <div>
+        <label>PAN नं</label>
+        <input id="panNo">
+      </div>
+    </div>
+
+    <label>अन्य संघ–संस्थासँग आवद्धता (छोटो)</label>
+    <textarea id="affiliation" rows="3"></textarea>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="secondary" onclick="goBack()">⬅️ Index</button>
+    <button onclick="saveAndNext()">Next ➡️</button>
+  </div>
+
 </div>
 
-</div>
-
-<!-- ===== GLOBAL FOOTER ===== -->
-<footer id="fbFooter">
-  <div>
-    🌱 FarmerBase BP Engine<br>
-    <small>किसानमैत्री व्यवसायिक योजना यन्त्र</small>
-  </div>
-  <div class="f-right">
-    <b>Concept Development By:</b><br>
-    Prem Prasad Paudel<br>
-    Kalika–5, Maneshwara, Rasuwa<br>
-    📞 9843508470 | ✉️ paudelprem@gmail.com
-  </div>
+<footer>
+  FarmerBase BP Engine<br>
+  Concept Development By:
+  <b>Prem Prasad Paudel</b>
 </footer>
 
-<!-- ===== GLOBAL NAV ===== -->
-<div class="page-nav">
-  <div class="step-indicator" id="stepInfo">Step</div>
-  <button onclick="goPrev()">⬅️</button>
-  <button onclick="goNext()">➡️</button>
-</div>
-
-<!-- ===== SCRIPT ===== -->
 <script>
-/* ===== BUSINESS STORAGE ===== */
-const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-if(!B.activeId){
-  B.activeId="b1";
-  localStorage.setItem("fb_businesses",JSON.stringify(B));
+/* ===== KEYS ===== */
+const META_KEY = "fb_meta";
+const SHORT_KEY = "fb_short_info";
+
+/* ===== LOAD META ===== */
+const meta = JSON.parse(localStorage.getItem(META_KEY)||"{}");
+hdrBiz.textContent = meta.business || "व्यवसायको नाम";
+hdrProj.textContent = meta.project || "परियोजना";
+
+/* ===== LOAD SHORT INFO ===== */
+const data = JSON.parse(localStorage.getItem(SHORT_KEY)||"{}");
+
+function fill(id){ if(data[id]) document.getElementById(id).value=data[id]; }
+
+[
+  "businessName","projectName","ownerName","contact",
+  "province","district","municipality","ward","tole",
+  "mapLink","regDate","regNo","regOffice","panNo","affiliation"
+].forEach(fill);
+
+/* Prefill from index meta */
+if(!businessName.value) businessName.value = meta.business||"";
+if(!projectName.value) projectName.value = meta.project||"";
+if(!ownerName.value) ownerName.value = meta.owner||"";
+
+/* ===== SAVE ===== */
+function saveData(){
+  const obj = {};
+  [
+    "businessName","projectName","ownerName","contact",
+    "province","district","municipality","ward","tole",
+    "mapLink","regDate","regNo","regOffice","panNo","affiliation"
+  ].forEach(id=>{
+    obj[id]=document.getElementById(id).value;
+  });
+
+  localStorage.setItem(SHORT_KEY, JSON.stringify(obj));
 }
-const BID=B.activeId;
 
-const KEY="fb_short_info_"+BID;
-let data = JSON.parse(localStorage.getItem(KEY)||"{}");
-
-/* LOAD */
-businessName.value=data.businessName||"";
-projectName.value=data.projectName||"";
-ownerName.value=data.ownerName||"";
-contact.value=data.contact||"";
-address.value=data.address||"";
-intro.value=data.intro||"";
-
-/* SAVE */
-function save(){
-  data={
-    businessName:businessName.value,
-    projectName:projectName.value,
-    ownerName:ownerName.value,
-    contact:contact.value,
-    address:address.value,
-    intro:intro.value
-  };
-  localStorage.setItem(KEY,JSON.stringify(data));
-  hBusiness.textContent=data.businessName||"Business Name";
-  hProject.textContent=data.projectName
-    ? "Project: "+data.projectName:"";
-}
+/* Auto save on blur */
 document.querySelectorAll("input,textarea")
-  .forEach(e=>e.addEventListener("blur",save));
+  .forEach(el=>el.addEventListener("blur",saveData));
 
-/* HEADER AUTO INJECT */
-hBusiness.textContent=data.businessName||"Business Name";
-hProject.textContent=data.projectName
-  ? "Project: "+data.projectName:"";
-
-/* ===== GLOBAL PAGE FLOW ===== */
-const pages=[
-  "login.html",
-  "short-info.html",
-  "existing-status.html",
-  "business-detail.html",
-  "production.html",
-  "expenses.html",
-  "capital-source.html",
-  "income.html",
-  "profit-loss.html",
-  "executive-summary.html",
-  "cover.html",
-  "create-letter.html"
-];
-const current=location.pathname.split("/").pop();
-const pageIndex=pages.indexOf(current);
-
-function goPrev(){
-  if(pageIndex>0) location.href=pages[pageIndex-1];
-}
-function goNext(){
-  if(pageIndex<pages.length-1) location.href=pages[pageIndex+1];
+function saveAndNext(){
+  saveData();
+  location.href="existing-status.html";
 }
 
-/* STEP INDICATOR */
-stepInfo.textContent=
-  "Step "+(pageIndex+1)+" / "+pages.length;
-
-/* HEADER SHRINK */
-addEventListener("scroll",()=>{
-  fbHeader.classList.toggle("shrink",scrollY>40);
-});
-
-/* KEYBOARD NAV */
-document.addEventListener("keydown",e=>{
-  if(e.ctrlKey||e.altKey||e.metaKey||e.shiftKey) return;
-  const t=document.activeElement.tagName;
-  if(["INPUT","TEXTAREA","SELECT"].includes(t)) return;
-  if(e.key==="ArrowLeft"){e.preventDefault();goPrev();}
-  if(e.key==="ArrowRight"){e.preventDefault();goNext();}
-});
+function goBack(){
+  saveData();
+  location.href="index.html";
+}
 </script>
 
 </body>
