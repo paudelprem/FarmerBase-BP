@@ -9,8 +9,10 @@
 body{margin:0;font-family:system-ui;background:#f5f7fa}
 .container{max-width:900px;margin:auto;padding:20px}
 .card{background:#fff;padding:20px;border-radius:8px}
-label{display:block;margin-top:10px;font-weight:600}
-input,textarea,select{
+h2{margin-top:0;color:#1b5e20}
+
+label{display:block;margin-top:12px;font-weight:600}
+input,textarea{
   width:100%;padding:8px;margin-top:4px;
   border:1px solid #ccc;border-radius:6px;
   font-family:inherit
@@ -36,7 +38,8 @@ small{color:#666}
   padding:8px 14px;border-radius:20px;
   border:none;background:#1b5e20;color:#fff
 }
-.g-header button:disabled,.g-footer button:disabled{
+.g-header button:disabled,
+.g-footer button:disabled{
   opacity:.4;cursor:not-allowed
 }
 </style>
@@ -61,49 +64,38 @@ small{color:#666}
 
 <!-- ===== BASIC IDENTITY ===== -->
 <label>व्यवसाय / संस्थाको नाम *</label>
-<input id="business">
+<input id="business" placeholder="व्यवसाय वा संस्थाको नाम">
 
 <label>परियोजनाको नाम *</label>
-<input id="project">
+<input id="project" placeholder="परियोजनाको नाम">
 
 <label>प्रोपाइटर / प्रतिनिधिको नाम *</label>
-<input id="owner">
+<input id="owner" placeholder="नाम">
 
 <label>सम्पर्क नम्बर *</label>
-<input id="contact">
+<input id="contact" placeholder="मोबाइल नम्बर">
 
-<!-- ===== REGISTRATION ===== -->
 <hr>
 
-<label>संस्था दर्ता भएको छ?</label>
-<select id="registered" onchange="toggleReg()">
-  <option value="no">छैन</option>
-  <option value="yes">छ</option>
-</select>
+<!-- ===== REGISTRATION DETAILS ===== -->
+<label>दर्ता भएको निकाय</label>
+<input id="regOffice" placeholder="जस्तै: वडा कार्यालय / उद्योग कार्यालय">
 
-<div id="regBox" style="display:none">
-  <label>दर्ता मिति</label>
-  <input type="date" id="regDate">
+<label>दर्ता नं</label>
+<input id="regNo" placeholder="दर्ता नम्बर">
 
-  <label>दर्ता नं</label>
-  <input id="regNo">
+<label>PAN नं</label>
+<input id="panNo" placeholder="PAN नम्बर">
 
-  <label>दर्ता भएको निकाय</label>
-  <input id="regOffice">
-
-  <label>PAN नं</label>
-  <input id="panNo">
-</div>
+<hr>
 
 <!-- ===== AFFILIATION ===== -->
-<hr>
-
 <label>अन्य संघ–संस्थासँग आवद्धता (छ भने)</label>
 <textarea id="affiliation" rows="3"
-placeholder="जस्तै: सहकारी, समूह, संघ आदि"></textarea>
+placeholder="जस्तै: सहकारी, कृषक समूह, संघ आदि"></textarea>
 
 <!-- ===== ACTION ===== -->
-<button style="margin-top:16px" onclick="saveInfo()">💾 सुरक्षित गर्नुहोस्</button>
+<button style="margin-top:18px" onclick="saveInfo()">💾 सुरक्षित गर्नुहोस्</button>
 
 <small>* चिन्हित विवरण अनिवार्य छन्</small>
 
@@ -119,20 +111,40 @@ placeholder="जस्तै: सहकारी, समूह, संघ आद
 <script>
 /* ================= GLOBAL NAV ================= */
 const flow=[
-"index.html","short-info.html","existing-status.html",
-"business-detail.html","production.html","expenses.html",
-"capital-source.html","income.html","profit-loss.html",
-"executive-summary.html","cover.html"
+"index.html",
+"short-info.html",
+"existing-status.html",
+"business-detail.html",
+"production.html",
+"expenses.html",
+"capital-source.html",
+"income.html",
+"profit-loss.html",
+"executive-summary.html",
+"cover.html"
 ];
-const cur=location.pathname.split("/").pop();
-const idx=flow.indexOf(cur);
-function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
-function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
-if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
-if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
+
+const cur = location.pathname.split("/").pop();
+const idx = flow.indexOf(cur);
+
+function goPrev(){
+  if(idx>0) location.href = flow[idx-1];
+}
+function goNext(){
+  if(idx<flow.length-1) location.href = flow[idx+1];
+}
+
+if(idx<=0){
+  prevTop.disabled = true;
+  prevBottom.disabled = true;
+}
+if(idx>=flow.length-1){
+  nextTop.disabled = true;
+  nextBottom.disabled = true;
+}
 
 /* ================= DATA ================= */
-const KEY="fb_meta";
+const KEY = "fb_meta";
 const data = JSON.parse(localStorage.getItem(KEY)) || {};
 
 business.value = data.business || "";
@@ -140,40 +152,30 @@ project.value  = data.project  || "";
 owner.value    = data.owner    || "";
 contact.value  = data.contact  || "";
 
-registered.value = data.registered || "no";
-regDate.value    = data.regDate || "";
-regNo.value      = data.regNo || "";
-regOffice.value  = data.regOffice || "";
-panNo.value      = data.panNo || "";
-affiliation.value= data.affiliation || "";
-
-toggleReg();
+regOffice.value = data.regOffice || "";
+regNo.value     = data.regNo || "";
+panNo.value     = data.panNo || "";
+affiliation.value = data.affiliation || "";
 
 /* ===== HEADER INJECT ===== */
-bizHdr.textContent = data.business || "व्यवसाय";
-projHdr.textContent= data.project  || "परियोजना";
+bizHdr.textContent  = data.business || "व्यवसाय";
+projHdr.textContent = data.project  || "परियोजना";
 
-/* ================= FUNCTIONS ================= */
-function toggleReg(){
-  regBox.style.display = registered.value==="yes" ? "block" : "none";
-}
-
+/* ================= SAVE ================= */
 function saveInfo(){
   if(!business.value || !project.value || !owner.value || !contact.value){
     alert("अनिवार्य विवरण पूरा गर्नुहोस्");
     return;
   }
-  localStorage.setItem(KEY,JSON.stringify({
-    business:business.value,
-    project:project.value,
-    owner:owner.value,
-    contact:contact.value,
-    registered:registered.value,
-    regDate:regDate.value,
-    regNo:regNo.value,
-    regOffice:regOffice.value,
-    panNo:panNo.value,
-    affiliation:affiliation.value
+  localStorage.setItem(KEY, JSON.stringify({
+    business: business.value,
+    project: project.value,
+    owner: owner.value,
+    contact: contact.value,
+    regOffice: regOffice.value,
+    regNo: regNo.value,
+    panNo: panNo.value,
+    affiliation: affiliation.value
   }));
   alert("Short Info सुरक्षित भयो");
 }
