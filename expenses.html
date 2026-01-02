@@ -7,7 +7,22 @@
 
 <style>
 body{margin:0;font-family:system-ui;background:#f5f7fa}
-.container{max-width:1100px;margin:auto;padding:16px}
+header{
+  position:sticky;top:0;z-index:1000;
+  background:#1b5e20;color:#fff;
+  padding:8px 16px;
+  display:flex;justify-content:space-between;align-items:center
+}
+footer{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:6px 12px;
+  display:flex;justify-content:flex-end;gap:12px
+}
+.container{
+  max-width:1100px;margin:auto;padding:16px;
+  padding-bottom:70px
+}
 .card{background:#fff;padding:16px;border-radius:8px;margin-bottom:16px}
 h2{margin:0 0 12px;color:#1b5e20}
 
@@ -41,6 +56,13 @@ button.danger{background:#c62828}
 </head>
 
 <body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div style="font-weight:600">FarmerBase BP Engine</div>
+  <div id="hdrBiz" style="font-size:14px;opacity:.9"></div>
+</header>
+
 <div class="container">
 
 <!-- ===== SUMMARY ===== -->
@@ -49,7 +71,7 @@ button.danger{background:#c62828}
   <div id="summaryText" class="small"></div>
 </div>
 
-<!-- ===== RUNNING COST (LOCKED TITLE) ===== -->
+<!-- ===== RUNNING COST ===== -->
 <div class="card">
   <h2>चालु खर्च</h2>
   <div class="row">
@@ -59,7 +81,7 @@ button.danger{background:#c62828}
   <div id="runList"></div>
 </div>
 
-<!-- ===== FIXED COST (LOCKED TITLE) ===== -->
+<!-- ===== FIXED COST ===== -->
 <div class="card">
   <h2>स्थिर खर्च</h2>
   <div class="row">
@@ -71,7 +93,7 @@ button.danger{background:#c62828}
 
 <!-- ===== NARRATION ===== -->
 <div class="card">
-  <h2>समग्र खर्च विवरण</h2>
+  <h2>समग्र खर्च विवरण (Narration)</h2>
   <textarea id="narration" rows="4"
     placeholder="यहाँ समग्र खर्चको विवरण लेख्नुहोस्..."></textarea>
   <div class="row" style="margin-top:8px">
@@ -82,107 +104,110 @@ button.danger{background:#c62828}
 
 </div>
 
+<!-- ===== FOOTER NAV ===== -->
+<footer>
+  <button type="button" onclick="location.href='production.html'">⬅️</button>
+  <button type="button" onclick="location.href='capital-source.html'">➡️</button>
+</footer>
+
 <script>
-/* ================= PRODUCTION ================= */
+/* ===== HEADER AUTO NAME ===== */
+const biz = JSON.parse(localStorage.getItem("fb_business")||"{}");
+document.getElementById("hdrBiz").textContent =
+  biz.projectName || biz.businessName || "";
+
+/* ===== PRODUCTION ===== */
 const prodRaw = JSON.parse(localStorage.getItem("fb_production") || "[]");
-const PRODUCTS = [];
-prodRaw.forEach(t => (t.products||[]).forEach(p => p.name && PRODUCTS.push(p.name)));
+const PRODUCTS=[];
+prodRaw.forEach(t=>(t.products||[]).forEach(p=>p.name&&PRODUCTS.push(p.name)));
 
-/* ================= DATA ================= */
-const KEY = "fb_expenses_final";
-let data = JSON.parse(localStorage.getItem(KEY)) || { run: [], fix: [] };
-const save = () => localStorage.setItem(KEY, JSON.stringify(data));
+/* ===== DATA ===== */
+const KEY="fb_expenses_final";
+let data=JSON.parse(localStorage.getItem(KEY))||{run:[],fix:[]};
+const save=()=>localStorage.setItem(KEY,JSON.stringify(data));
 
-/* ================= SECTION ================= */
+/* ===== SECTION ===== */
 function addSection(type){
-  const inp = document.getElementById(type==="run" ? "runInput" : "fixInput");
-  if(!inp.value){ alert("उपशीर्षक लेख्नुहोस्"); return; }
-  data[type].push({ name: inp.value, items: [] });
-  inp.value="";
-  save(); render();
+  const inp=document.getElementById(type==="run"?"runInput":"fixInput");
+  if(!inp.value){alert("उपशीर्षक लेख्नुहोस्");return;}
+  data[type].push({name:inp.value,items:[]});
+  inp.value="";save();render();
 }
 function editSection(type,i){
-  const n = prompt("नयाँ नाम:", data[type][i].name);
-  if(n){ data[type][i].name=n; save(); render(); }
+  const n=prompt("नयाँ नाम:",data[type][i].name);
+  if(n){data[type][i].name=n;save();render();}
 }
 function delSection(type,i){
-  if(!confirm("उपशीर्षक हटाउने?")) return;
-  data[type].splice(i,1); save(); render();
+  if(!confirm("उपशीर्षक हटाउने?"))return;
+  data[type].splice(i,1);save();render();
 }
 
-/* ================= ITEM ================= */
+/* ===== ITEM ===== */
 function addItem(type,si){
-  const box = document.getElementById(${type}-item-${si});
-  const applies = [...box.querySelectorAll(".map:checked")].map(c=>c.value);
-  const it = {
-    name: box.querySelector(".i-name").value,
-    unit: box.querySelector(".i-unit").value,
-    qty: +box.querySelector(".i-qty").value || 0,
-    rate:+box.querySelector(".i-rate").value || 0,
-    appliesTo: applies.length ? applies : ["ALL"]
+  const box=document.getElementById(${type}-item-${si});
+  const applies=[...box.querySelectorAll(".map:checked")].map(c=>c.value);
+  const it={
+    name:box.querySelector(".i-name").value,
+    unit:box.querySelector(".i-unit").value,
+    qty:+box.querySelector(".i-qty").value||0,
+    rate:+box.querySelector(".i-rate").value||0,
+    appliesTo:applies.length?applies:["ALL"]
   };
-  if(!it.name || !it.unit){
-    alert("नाम र इकाई चाहिन्छ"); return;
-  }
+  if(!it.name||!it.unit){alert("नाम र इकाई चाहिन्छ");return;}
   data[type][si].items.unshift(it);
   box.querySelectorAll("input").forEach(i=>{
-    if(i.type!=="checkbox") i.value="";
+    if(i.type!=="checkbox")i.value="";
   });
-  save(); render();
+  save();render();
 }
 function editItem(type,si,ii){
-  const it = data[type][si].items[ii];
-  const n = prompt("खर्च नाम:", it.name); if(!n) return;
-  it.unit = prompt("इकाई:", it.unit) || it.unit;
-  it.qty  = +prompt("परिमाण:", it.qty) || it.qty;
-  it.rate = +prompt("दर:", it.rate) || it.rate;
-  it.name = n;
-  save(); render();
+  const it=data[type][si].items[ii];
+  const n=prompt("खर्च नाम:",it.name);if(!n)return;
+  it.unit=prompt("इकाई:",it.unit)||it.unit;
+  it.qty=+prompt("परिमाण:",it.qty)||it.qty;
+  it.rate=+prompt("दर:",it.rate)||it.rate;
+  it.name=n;save();render();
 }
 function delItem(type,si,ii){
-  if(!confirm("हटाउने?")) return;
-  data[type][si].items.splice(ii,1);
-  save(); render();
+  if(!confirm("हटाउने?"))return;
+  data[type][si].items.splice(ii,1);save();render();
 }
 
-/* ================= CALC ================= */
+/* ===== CALC & SUMMARY ===== */
 function calc(){
-  let run=0, fix=0;
+  let run=0,fix=0;
   data.run.forEach(s=>s.items.forEach(i=>run+=i.qty*i.rate));
   data.fix.forEach(s=>s.items.forEach(i=>fix+=i.qty*i.rate));
-  const t = run + fix;
-  return {t, run, fix};
+  return {t:run+fix,run,fix};
 }
-
-/* ================= SUMMARY ================= */
 function renderSummary(){
-  const c = calc();
-  summaryText.textContent =
+  const c=calc();
+  summaryText.textContent=
     कुल खर्च ${c.t.toFixed(2)} | चालु ${(c.run/c.t*100||0).toFixed(1)}% | स्थिर ${(c.fix/c.t*100||0).toFixed(1)}%;
 }
 
-/* ================= NARRATION ================= */
+/* ===== NARRATION ===== */
 function autoNarrate(){
-  const c = calc();
-  narration.value =
-    यस व्यवसायको कुल खर्च ${c.t.toFixed(2)} रहेको छ।  +
-    चालु खर्च ${(c.run/c.t*100||0).toFixed(1)}% र  +
+  const c=calc();
+  narration.value=
+    `यस व्यवसायको कुल खर्च ${c.t.toFixed(2)} रहेको छ। `+
+    `चालु खर्च ${(c.run/c.t*100||0).toFixed(1)}% र `+
     स्थिर खर्च ${(c.fix/c.t*100||0).toFixed(1)}% रहेको छ।;
 }
 function saveSummary(){
   localStorage.setItem("fb_expense_summary",
-    JSON.stringify({ ...calc(), narration: narration.value })
+    JSON.stringify({...calc(),narration:narration.value})
   );
   alert("खर्च सारांश सुरक्षित भयो");
 }
 
-/* ================= RENDER ================= */
+/* ===== RENDER ===== */
 function render(){
   ["run","fix"].forEach(type=>{
-    const wrap = document.getElementById(type+"List");
+    const wrap=document.getElementById(type+"List");
     wrap.innerHTML="";
     data[type].forEach((s,si)=>{
-      const d = document.createElement("div");
+      const d=document.createElement("div");
       d.className="section";
       d.innerHTML=`
         <div class="section-head">
@@ -192,7 +217,6 @@ function render(){
             <button type="button" class="danger" onclick="delSection('${type}',${si})">✖</button>
           </div>
         </div>
-
         <div class="items">
           <div class="item" id="${type}-item-${si}">
             <input class="i-name" placeholder="नाम">
@@ -207,7 +231,6 @@ function render(){
             </div>
             <button type="button" onclick="addItem('${type}',${si})">➕</button>
           </div>
-
           ${s.items.map((it,ii)=>`
             <div class="item">
               <span>${it.name}</span>
@@ -223,8 +246,7 @@ function render(){
               </div>
             </div>
           `).join("")}
-        </div>
-      `;
+        </div>`;
       wrap.appendChild(d);
     });
   });
