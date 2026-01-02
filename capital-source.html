@@ -1,1 +1,194 @@
-bjb
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Capital Source | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:system-ui;background:#f4f6f8;margin:0}
+header{background:#2e7d32;color:#fff;padding:10px 16px;font-size:18px}
+.container{max-width:1100px;margin:auto;padding:16px}
+.box{background:#fff;border-radius:8px;padding:16px;margin-bottom:20px}
+h2{margin-top:0}
+input,button{padding:6px;font-size:14px}
+button{cursor:pointer}
+.green{background:#2e7d32;color:#fff;border:0;border-radius:4px;padding:6px 10px}
+.red{color:#c62828;font-weight:600}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}
+.small{font-size:13px;color:#555}
+</style>
+</head>
+
+<body>
+<header>FarmerBase BP Engine – Capital Source</header>
+
+<div class="container">
+
+<!-- ===== READ EXPENSE SUMMARY ===== -->
+<div class="box" id="needBox"></div>
+
+<!-- ===== ADD SOURCE ===== -->
+<div class="box">
+  <h2>पुँजीको स्रोत थप्नुहोस्</h2>
+  <input id="srcName" placeholder="स्रोत (स्व–लगानी / बैंक ऋण)">
+  <input id="srcPct" type="number" placeholder="%">
+  <input id="srcRate" type="number" placeholder="ब्याजदर % (ऋण भए)">
+  <input id="srcYear" type="number" placeholder="अवधि (वर्ष)">
+  <br><br>
+  <b>यो पुँजी प्रयोग हुने खर्च:</b><br>
+  <label><input type="checkbox" id="mapRun" checked> चालु खर्च</label>
+  &nbsp;&nbsp;
+  <label><input type="checkbox" id="mapFix" checked> स्थिर खर्च</label>
+  <br><br>
+  <button class="green" onclick="addSource()">+ थप्नुहोस्</button>
+</div>
+
+<!-- ===== SOURCE LIST ===== -->
+<div class="box">
+  <h2>पुँजी स्रोत विवरण</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>स्रोत</th>
+        <th>%</th>
+        <th>रकम</th>
+        <th>Mapping</th>
+        <th>ब्याज</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="srcList"></tbody>
+  </table>
+</div>
+
+<!-- ===== VALIDATION ===== -->
+<div class="box">
+  <b>Coverage जाँच</b><br>
+  <div id="warnRun" class="red"></div>
+  <div id="warnFix" class="red"></div>
+</div>
+
+<!-- ===== SAVE ===== -->
+<div class="box">
+  <button class="green" onclick="saveAll()">💾 सुरक्षित</button>
+  <span class="small">Profit–Loss का लागि</span>
+</div>
+
+</div>
+
+<script>
+/* ========= READ EXPENSES ========= */
+const exp = JSON.parse(localStorage.getItem("fb_expense_summary"));
+if(!exp || !exp.total){
+  alert("पहिले Expenses मा खर्च प्रविष्ट गर्नुहोस्");
+  location.href = "expenses.html";
+}
+const RUN_NEED = exp.run;
+const FIX_NEED = exp.fix;
+const TOTAL_NEED = exp.total;
+
+document.getElementById("needBox").innerHTML = `
+  <b>पुँजी आवश्यकता सारांश</b><br>
+  कुल पुँजी: <b>${TOTAL_NEED.toFixed(2)}</b><br>
+  चालु खर्च आवश्यकता: <b>${RUN_NEED.toFixed(2)}</b><br>
+  स्थिर खर्च आवश्यकता: <b>${FIX_NEED.toFixed(2)}</b>
+`;
+
+/* ========= DATA ========= */
+let sources = JSON.parse(localStorage.getItem("fb_capital_source")) || [];
+
+/* ========= ADD SOURCE ========= */
+function addSource(){
+  const name = srcName.value.trim();
+  const pct  = +srcPct.value;
+  const rate = +srcRate.value || 0;
+  const year = +srcYear.value || 0;
+  const mRun = mapRun.checked;
+  const mFix = mapFix.checked;
+
+  if(!name || !pct){
+    alert("स्रोत र % अनिवार्य");
+    return;
+  }
+  if(!mRun && !mFix){
+    alert("कम्तीमा एक खर्च प्रकार छान्नुहोस्");
+    return;
+  }
+
+  const amt = TOTAL_NEED * pct / 100;
+
+  sources.push({
+    name, pct, amt, rate, year,
+    map:{ run:mRun, fix:mFix }
+  });
+
+  srcName.value = srcPct.value = srcRate.value = srcYear.value = "";
+  mapRun.checked = mapFix.checked = true;
+
+  render();
+}
+
+/* ========= CALC COVERAGE ========= */
+function calcCoverage(){
+  let runAlloc = 0, fixAlloc = 0;
+  sources.forEach(s=>{
+    if(s.map.run) runAlloc += s.amt;
+    if(s.map.fix) fixAlloc += s.amt;
+  });
+  return { runAlloc, fixAlloc };
+}
+
+/* ========= RENDER ========= */
+function render(){
+  const tbody = document.getElementById("srcList");
+  tbody.innerHTML = "";
+
+  sources.forEach((s,i)=>{
+    tbody.innerHTML += `
+      <tr>
+        <td>${s.name}</td>
+        <td>${s.pct}%</td>
+        <td>${s.amt.toFixed(2)}</td>
+        <td>${s.map.run?"चालु ":""}${s.map.fix?"स्थिर":""}</td>
+        <td>${s.rate ? s.rate+"%" : "-"}</td>
+        <td>
+          <button onclick="remove(${i})">✖</button>
+        </td>
+      </tr>
+    `;
+  });
+
+  const c = calcCoverage();
+  warnRun.innerText = c.runAlloc < RUN_NEED
+    ? "⚠️ चालु खर्चका लागि पुँजी अपुग"
+    : "";
+  warnFix.innerText = c.fixAlloc < FIX_NEED
+    ? "⚠️ स्थिर खर्चका लागि पुँजी अपुग"
+    : "";
+}
+
+/* ========= REMOVE ========= */
+function remove(i){
+  if(confirm("हटाउने?")){
+    sources.splice(i,1);
+    render();
+  }
+}
+
+/* ========= SAVE ========= */
+function saveAll(){
+  const pctSum = sources.reduce((s,x)=>s+x.pct,0);
+  if(pctSum !== 100){
+    alert("कुल % 100 हुनुपर्छ");
+    return;
+  }
+  localStorage.setItem("fb_capital_source",JSON.stringify(sources));
+  alert("Capital Source सुरक्षित भयो");
+}
+
+render();
+</script>
+
+</body>
+</html>
