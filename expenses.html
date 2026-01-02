@@ -10,20 +10,12 @@ body{margin:0;font-family:system-ui;background:#f5f7fa}
 header{
   background:#1b5e20;color:#fff;
   padding:10px 16px;
-  display:flex;
-  justify-content:space-between;
-  align-items:center
+  display:flex;justify-content:space-between;align-items:center
 }
-header .right{
-  display:flex;align-items:center;gap:8px
-}
+header .right{display:flex;align-items:center;gap:8px}
 header button{
-  background:transparent;
-  border:1px solid #c8e6c9;
-  color:#fff;
-  border-radius:4px;
-  padding:2px 6px;
-  cursor:pointer
+  background:transparent;border:1px solid #c8e6c9;
+  color:#fff;border-radius:4px;padding:2px 6px;cursor:pointer
 }
 
 footer{
@@ -69,9 +61,7 @@ button.danger{background:#c62828}
 }
 
 .summary{
-  background:#fafafa;
-  padding:12px;border-radius:6px;
-  font-size:14px
+  background:#fafafa;padding:12px;border-radius:6px;font-size:14px
 }
 </style>
 </head>
@@ -121,50 +111,73 @@ button.danger{background:#c62828}
 
 </div>
 
-<!-- FOOTER NAV -->
 <footer>
   <button type="button" onclick="location.href='production.html'">⬅️</button>
   <button type="button" onclick="location.href='capital-source.html'">➡️</button>
 </footer>
 
 <script>
-/* ===== HEADER IDENTITY FIX ===== */
-const identity = JSON.parse(localStorage.getItem("fb_identity"));
-if(identity){
+/* ================= HEADER / IDENTITY ================= */
+const rawId = localStorage.getItem("fb_identity");
+if(rawId){
+  const identity = JSON.parse(rawId);
   document.getElementById("hdrName").textContent =
     identity.projectName || identity.businessName || "";
 }
 
-/* ===== PRODUCTION PRODUCTS ===== */
-const prod = JSON.parse(localStorage.getItem("fb_production")||"[]");
-const PRODUCTS=[];
-prod.forEach(c=>c.products?.forEach(p=>{
-  if(p.name) PRODUCTS.push(p.name);
-}));
+/* ================= LOAD PRODUCTION ================= */
+const prod = JSON.parse(localStorage.getItem("fb_production") || "[]");
+const PRODUCTS = [];
+prod.forEach(c=>{
+  (c.products||[]).forEach(p=>{
+    if(p.name) PRODUCTS.push(p.name);
+  });
+});
 
-/* ===== DATA ===== */
-const KEY="fb_expenses_final";
-let data = JSON.parse(localStorage.getItem(KEY)) || {run:[],fix:[]};
+/* ================= DATA INIT ================= */
+const KEY = "fb_expenses_final";
+let data = JSON.parse(localStorage.getItem(KEY));
+if(!data || typeof data !== "object"){
+  data = { run: [], fix: [] };
+}
 
 function save(){
   localStorage.setItem(KEY, JSON.stringify(data));
 }
 
-/* ===== SECTION ===== */
+/* ================= ADD SECTION (FIXED) ================= */
 function addSection(type){
-  const inp = document.getElementById(type==="run"?"runInput":"fixInput");
-  if(!inp.value){
+  const inputId = type === "run" ? "runInput" : "fixInput";
+  const inp = document.getElementById(inputId);
+
+  if(!inp){
+    alert("Input field भेटिएन");
+    return;
+  }
+
+  const val = inp.value.trim();
+  if(!val){
     alert("उपशीर्षक लेख्नुहोस्");
     return;
   }
-  data[type].push({name:inp.value,items:[]});
-  inp.value="";
-  save();render();
+
+  if(!Array.isArray(data[type])) data[type] = [];
+
+  data[type].push({
+    name: val,
+    items: []
+  });
+
+  inp.value = "";
+  save();
+  render();
 }
+
+/* ================= SECTION EDIT / DELETE ================= */
 function editSection(type,i){
   const n = prompt("नयाँ नाम:", data[type][i].name);
   if(n){
-    data[type][i].name=n;
+    data[type][i].name = n;
     save();render();
   }
 }
@@ -174,34 +187,38 @@ function delSection(type,i){
   save();render();
 }
 
-/* ===== ITEM ===== */
+/* ================= ITEM ================= */
 function addItem(type,si){
-  const box=document.getElementById(type+"-add-"+si);
-  const applies=[...box.querySelectorAll(".map:checked")]
-                .map(c=>c.value);
+  const box = document.getElementById(type+"-add-"+si);
+  const applies=[...box.querySelectorAll(".map:checked")].map(c=>c.value);
+
   const it={
-    name: box.querySelector(".i-name").value,
-    unit: box.querySelector(".i-unit").value,
+    name: box.querySelector(".i-name").value.trim(),
+    unit: box.querySelector(".i-unit").value.trim(),
     qty: +box.querySelector(".i-qty").value||0,
     rate:+box.querySelector(".i-rate").value||0,
     appliesTo: applies.length?applies:["ALL"]
   };
+
   if(!it.name || !it.unit){
     alert("खर्च नाम र इकाई अनिवार्य");
     return;
   }
+
   data[type][si].items.unshift(it);
   box.querySelectorAll("input").forEach(i=>{
     if(i.type!=="checkbox") i.value="";
   });
+
   save();render();
 }
+
 function editItem(type,si,ii){
-  const it=data[type][si].items[ii];
-  it.name=prompt("नाम:",it.name)||it.name;
-  it.unit=prompt("इकाई:",it.unit)||it.unit;
-  it.qty=+prompt("परिमाण:",it.qty)||it.qty;
-  it.rate=+prompt("दर:",it.rate)||it.rate;
+  const it = data[type][si].items[ii];
+  it.name = prompt("नाम:", it.name) || it.name;
+  it.unit = prompt("इकाई:", it.unit) || it.unit;
+  it.qty  = +prompt("परिमाण:", it.qty) || it.qty;
+  it.rate = +prompt("दर:", it.rate) || it.rate;
   save();render();
 }
 function delItem(type,si,ii){
@@ -210,7 +227,7 @@ function delItem(type,si,ii){
   save();render();
 }
 
-/* ===== CALC ===== */
+/* ================= CALC / SUMMARY ================= */
 function calc(){
   let run=0,fix=0;
   data.run.forEach(s=>s.items.forEach(i=>run+=i.qty*i.rate));
@@ -218,38 +235,37 @@ function calc(){
   return {run,fix,total:run+fix};
 }
 function renderSummary(){
-  const c=calc();
-  summaryBox.innerHTML=
+  const c = calc();
+  summaryBox.innerHTML =
     `<b>कुल खर्च:</b> ${c.total.toFixed(2)}<br>
      चालु खर्च: ${c.run.toFixed(2)} (${(c.run/c.total*100||0).toFixed(1)}%)<br>
      स्थिर खर्च: ${c.fix.toFixed(2)} (${(c.fix/c.total*100||0).toFixed(1)}%)`;
 }
 
-/* ===== NARRATION ===== */
+/* ================= NARRATION ================= */
 function autoNarrate(){
-  const c=calc();
-  narration.value=
+  const c = calc();
+  narration.value =
     `यस व्यवसायका लागि कुल खर्च ${c.total.toFixed(2)} रहेको छ। `+
     `जसमध्ये ${(c.run/c.total*100||0).toFixed(1)}% चालु खर्च र `+
-    `${(c.fix/c.total*100||0).toFixed(1)}% स्थिर खर्च रहेको छ। `+
-    `खर्च संरचना उत्पादन परिमाण र आवश्यक पूर्वाधारलाई ध्यानमा राखेर तयार गरिएको छ।`;
+    `${(c.fix/c.total*100||0).toFixed(1)}% स्थिर खर्च रहेको छ।`;
 }
 function saveNarration(){
-  const c=calc();
+  const c = calc();
   localStorage.setItem(
     "fb_expense_summary",
-    JSON.stringify({
-      ...c,
-      narration: narration.value
-    })
+    JSON.stringify({ ...c, narration: narration.value })
   );
   alert("खर्च विवरण सुरक्षित भयो");
 }
 
-/* ===== RENDER ===== */
+/* ================= RENDER ================= */
 function render(){
+  if(!Array.isArray(data.run)) data.run=[];
+  if(!Array.isArray(data.fix)) data.fix=[];
+
   ["run","fix"].forEach(type=>{
-    const wrap=document.getElementById(type+"List");
+    const wrap = document.getElementById(type+"List");
     wrap.innerHTML="";
     data[type].forEach((s,si)=>{
       const d=document.createElement("div");
