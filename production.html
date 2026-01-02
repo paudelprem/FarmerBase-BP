@@ -2,244 +2,146 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Production</title>
+<title>Income | FarmerBase BP Engine</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
-body{margin:0;font-family:system-ui;background:#f5f7fa}
-header{
-  background:#1b5e20;color:#fff;
-  padding:10px 16px;
-  display:flex;justify-content:space-between;align-items:center
-}
+body{font-family:system-ui;background:#f4f6f8;margin:0}
+header{background:#2e7d32;color:#fff;padding:10px 16px;font-size:18px}
+.container{max-width:1100px;margin:auto;padding:16px;padding-bottom:90px}
+.box{background:#fff;border-radius:8px;padding:16px;margin-bottom:20px}
+h2{margin-top:0}
+input,button{padding:6px;font-size:14px}
+button{cursor:pointer}
+.green{background:#2e7d32;color:#fff;border:0;border-radius:4px;padding:6px 10px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}
+.right{text-align:right}
+.small{font-size:13px;color:#555}
 footer{
-  position:fixed;bottom:0;left:0;right:0;
+  position:fixed;left:0;right:0;bottom:0;
   background:#f1f8f4;border-top:1px solid #ccc;
-  padding:8px 12px;
-  display:flex;justify-content:space-between
-}
-.container{
-  max-width:1100px;margin:auto;padding:16px;
-  padding-bottom:80px
-}
-.card{
-  background:#fff;padding:16px;border-radius:8px;
-  margin-bottom:16px
-}
-h2{margin:0 0 8px;color:#1b5e20}
-.small{font-size:14px;color:#555}
-
-input{
-  padding:8px;border:1px solid #ccc;border-radius:6px
-}
-button{
-  padding:6px 14px;border:none;border-radius:6px;
-  background:#1b5e20;color:#fff;cursor:pointer
-}
-button.ghost{background:#e8f5e9;color:#1b5e20}
-button.danger{background:#c62828}
-
-.category{
-  border:1px solid #ddd;border-radius:6px;
-  margin-top:10px
-}
-.cat-head{
-  background:#f1f8f4;
-  padding:10px;
-  display:flex;justify-content:space-between;align-items:center;
-  cursor:pointer
-}
-.cat-body{padding:10px}
-
-.item{
-  display:grid;
-  grid-template-columns:2fr 1fr 1fr 1fr auto;
-  gap:6px;align-items:center;
-  border-bottom:1px dashed #ddd;padding:6px 0
-}
-.summary{
-  margin-top:8px;
-  background:#fafafa;padding:8px;border-radius:6px;
-  font-size:13px
+  padding:8px 12px;display:flex;justify-content:space-between
 }
 </style>
 </head>
 
 <body>
-
-<!-- HEADER -->
-<header>
-  <div><b>FarmerBase BP Engine</b></div>
-  <div id="hdrName"></div>
-</header>
+<header>FarmerBase BP Engine – Income</header>
 
 <div class="container">
 
-<div class="card">
-  <h2>📦 उत्पादन विवरण (Production)</h2>
-  <p class="small">
-    यस खण्डमा उत्पादनको प्रकार, वस्तु/सेवा,
-    उत्पादन इकाई, परिमाण तथा कैफियत
-    विवरण प्रविष्ट गरिन्छ।
-    यही विवरण खर्च र आम्दानीसँग जोडिन्छ।
-  </p>
+<!-- ===== INFO ===== -->
+<div class="box">
+  <b>आम्दानी विवरण</b><br>
+  उत्पादन वा सेवाको बिक्री परिमाण र मूल्यको आधारमा आम्दानी गणना गरिन्छ।
 </div>
 
-<!-- ADD CATEGORY -->
-<div class="card">
-  <h2>➕ उत्पादनको प्रकार थप्नुहोस्</h2>
-  <input id="catInput" placeholder="उत्पादन प्रकार (जस्तै: पशुपालन)">
-  <button type="button" onclick="addCategory()">थप्नुहोस्</button>
+<!-- ===== ADD INCOME ===== -->
+<div class="box">
+  <h2>आम्दानी स्रोत थप्नुहोस्</h2>
+  <input id="iName" placeholder="उत्पादन / सेवा नाम">
+  <input id="iQty" type="number" placeholder="परिमाण">
+  <input id="iRate" type="number" placeholder="प्रति इकाई मूल्य">
+  <button class="green" onclick="addIncome()">+ थप्नुहोस्</button>
 </div>
 
-<!-- CATEGORY LIST -->
-<div id="catList"></div>
+<!-- ===== LIST ===== -->
+<div class="box">
+  <h2>आम्दानी सूची</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>उत्पादन / सेवा</th>
+        <th>परिमाण</th>
+        <th>दर</th>
+        <th class="right">जम्मा</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="incomeList"></tbody>
+  </table>
+</div>
+
+<!-- ===== SUMMARY ===== -->
+<div class="box">
+  <b>कुल आम्दानी:</b>
+  <span id="totalIncome">0.00</span>
+</div>
 
 </div>
 
-<!-- FOOTER NAV -->
+<!-- ===== FOOTER NAV ===== -->
 <footer>
-  <button type="button" onclick="goPrev()">⬅️</button>
-  <button type="button" onclick="goNext()">➡️</button>
+  <button onclick="location.href='capital-source.html'">⬅️</button>
+  <button onclick="goNext()">➡️</button>
 </footer>
 
 <script>
-/* ===== IDENTITY ===== */
-const identity = JSON.parse(localStorage.getItem("fb_identity"));
-if(!identity){
-  alert("पहिले Login गर्नुहोस्");
-  location.href="login.html";
-}
-hdrName.textContent =
-  identity.projectName || identity.businessName || "";
+/* ========= DATA ========= */
+let incomes = JSON.parse(localStorage.getItem("fb_income")) || [];
 
-/* ===== DATA ===== */
-const KEY="fb_production";
-let data = JSON.parse(localStorage.getItem(KEY)) || [];
+/* ========= ADD ========= */
+function addIncome(){
+  const name = iName.value.trim();
+  const qty  = +iQty.value || 0;
+  const rate = +iRate.value || 0;
 
-function save(){
-  localStorage.setItem(KEY, JSON.stringify(data));
-}
-
-/* ===== CATEGORY ===== */
-function addCategory(){
-  const name = catInput.value.trim();
-  if(!name){
-    alert("उत्पादन प्रकार लेख्नुहोस्");
+  if(!name || !qty || !rate){
+    alert("नाम, परिमाण र दर अनिवार्य");
     return;
   }
-  data.unshift({name, open:true, products:[]});
-  catInput.value="";
-  save();render();
+
+  incomes.push({ name, qty, rate });
+  iName.value = iQty.value = iRate.value = "";
+  render();
 }
-function editCategory(i){
-  const n = prompt("नयाँ नाम:", data[i].name);
-  if(n){
-    data[i].name=n;save();render();
+
+/* ========= REMOVE ========= */
+function removeIncome(i){
+  if(confirm("हटाउने?")){
+    incomes.splice(i,1);
+    render();
   }
 }
-function delCategory(i){
-  if(!confirm("हटाउने?")) return;
-  data.splice(i,1);save();render();
-}
-function toggle(i){
-  data[i].open = !data[i].open;
-  save();render();
-}
 
-/* ===== PRODUCT ===== */
-function addProduct(i){
-  const box = document.getElementById("add-"+i);
-  const p={
-    name: box.querySelector(".p-name").value,
-    unit: box.querySelector(".p-unit").value,
-    qty: +box.querySelector(".p-qty").value||0,
-    note: box.querySelector(".p-note").value
-  };
-  if(!p.name || !p.unit){
-    alert("वस्तु/सेवा र इकाई अनिवार्य");
-    return;
-  }
-  data[i].products.unshift(p);
-  box.querySelectorAll("input").forEach(x=>x.value="");
-  save();render();
-}
-function editProduct(i,j){
-  const p = data[i].products[j];
-  p.name = prompt("नाम:",p.name)||p.name;
-  p.unit = prompt("इकाई:",p.unit)||p.unit;
-  p.qty  = +prompt("परिमाण:",p.qty)||p.qty;
-  p.note = prompt("कैफियत:",p.note)||p.note;
-  save();render();
-}
-function delProduct(i,j){
-  if(!confirm("हटाउने?")) return;
-  data[i].products.splice(j,1);
-  save();render();
-}
-
-/* ===== SUMMARY ===== */
-function totalQty(cat){
-  let t=0;
-  cat.products.forEach(p=>t+=p.qty);
-  return t;
-}
-
-/* ===== RENDER ===== */
+/* ========= RENDER ========= */
 function render(){
-  catList.innerHTML="";
-  data.forEach((c,i)=>{
-    const d=document.createElement("div");
-    d.className="category";
-    d.innerHTML=`
-      <div class="cat-head" onclick="toggle(${i})">
-        <b>${c.name}</b>
-        <div>
-          <button class="ghost" type="button"
-            onclick="event.stopPropagation();editCategory(${i})">✏️</button>
-          <button class="danger" type="button"
-            onclick="event.stopPropagation();delCategory(${i})">✖</button>
-        </div>
-      </div>
+  let total = 0;
+  incomeList.innerHTML = "";
 
-      ${c.open?`
-      <div class="cat-body">
-        <div class="item" id="add-${i}">
-          <input class="p-name" placeholder="वस्तु/सेवा">
-          <input class="p-unit" placeholder="इकाई">
-          <input class="p-qty" type="number" placeholder="परिमाण">
-          <input class="p-note" placeholder="कैफियत">
-          <button type="button" onclick="addProduct(${i})">➕</button>
-        </div>
-
-        ${c.products.map((p,j)=>`
-          <div class="item">
-            <span>${p.name}</span>
-            <span>${p.unit}</span>
-            <span>${p.qty}</span>
-            <span>${p.note||""}</span>
-            <div>
-              <button class="ghost" type="button"
-                onclick="editProduct(${i},${j})">✏️</button>
-              <button class="danger" type="button"
-                onclick="delProduct(${i},${j})">✖</button>
-            </div>
-          </div>
-        `).join("")}
-
-        <div class="summary">
-          कुल परिमाण: <b>${totalQty(c)}</b>
-        </div>
-      </div>`:""}
+  incomes.forEach((it,i)=>{
+    const amt = it.qty * it.rate;
+    total += amt;
+    incomeList.innerHTML += `
+      <tr>
+        <td>${it.name}</td>
+        <td>${it.qty}</td>
+        <td>${it.rate}</td>
+        <td class="right">${amt.toFixed(2)}</td>
+        <td><button onclick="removeIncome(${i})">✖</button></td>
+      </tr>
     `;
-    catList.appendChild(d);
   });
-}
-render();
 
-/* ===== NAV ===== */
-function goPrev(){ location.href="business-detail.html"; }
-function goNext(){ location.href="expenses.html"; }
+  totalIncome.innerText = total.toFixed(2);
+
+  // 🔗 AUTO SYNC FOR PROFIT–LOSS
+  localStorage.setItem(
+    "fb_income_summary",
+    JSON.stringify({ total })
+  );
+}
+
+/* ========= NEXT ========= */
+function goNext(){
+  if(!incomes.length){
+    alert("कम्तीमा एक आम्दानी स्रोत थप्नुहोस्");
+    return;
+  }
+  location.href = "profit-loss.html";
+}
+
+render();
 </script>
 
 </body>
