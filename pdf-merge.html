@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>PDF Merge – FarmerBase BP Engine</title>
+
+<style>
+body{
+  font-family: system-ui, sans-serif;
+  background:#f5f7fa;
+  margin:0;
+  padding:20px;
+}
+
+.container{
+  max-width:720px;
+  margin:auto;
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+  box-shadow:0 2px 10px rgba(0,0,0,.08);
+}
+
+h1{
+  margin-top:0;
+  color:#1b5e20;
+}
+
+input[type=file]{
+  margin:10px 0;
+}
+
+ul{
+  list-style:none;
+  padding:0;
+}
+
+li{
+  padding:8px 12px;
+  margin-bottom:6px;
+  background:#e8f5e9;
+  border-radius:6px;
+  cursor:move;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+
+li span{
+  font-size:14px;
+}
+
+button{
+  background:#1b5e20;
+  color:#fff;
+  border:none;
+  padding:10px 18px;
+  border-radius:6px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+button:disabled{
+  background:#aaa;
+  cursor:not-allowed;
+}
+
+.note{
+  font-size:13px;
+  color:#555;
+  margin-top:10px;
+}
+</style>
+
+</head>
+<body>
+
+<div class="container">
+  <h1>PDF Merge</h1>
+
+  <p>
+    एकभन्दा बढी PDF फाइल छान्नुहोस्,  
+    क्रम मिलाएर <b>Merge PDF</b> थिच्नुहोस्।
+  </p>
+
+  <input type="file" id="pdfInput" accept="application/pdf" multiple>
+
+  <ul id="fileList"></ul>
+
+  <button id="mergeBtn" onclick="mergePDF()" disabled>
+    Merge PDF
+  </button>
+
+  <p class="note">
+    ✔️ Drag गरेर क्रम मिलाउन सक्नुहुन्छ<br>
+    ✔️ नयाँ tab मा merged PDF खुल्छ
+  </p>
+</div>
+
+<!-- PDF-lib CDN -->
+<script src="https://unpkg.com/pdf-lib/dist/pdf-lib.min.js"></script>
+
+<script>
+let files = [];
+
+const input = document.getElementById("pdfInput");
+const list = document.getElementById("fileList");
+const mergeBtn = document.getElementById("mergeBtn");
+
+input.addEventListener("change", () => {
+  files = Array.from(input.files);
+  renderList();
+  mergeBtn.disabled = files.length < 2;
+});
+
+function renderList(){
+  list.innerHTML="";
+  files.forEach((f,i)=>{
+    const li=document.createElement("li");
+    li.draggable=true;
+    li.dataset.index=i;
+    li.innerHTML=`
+      <span>${f.name}</span>
+      <span>☰</span>
+    `;
+
+    li.addEventListener("dragstart",e=>{
+      e.dataTransfer.setData("index",i);
+    });
+
+    li.addEventListener("dragover",e=>e.preventDefault());
+
+    li.addEventListener("drop",e=>{
+      const from = e.dataTransfer.getData("index");
+      const to = i;
+      files.splice(to,0,files.splice(from,1)[0]);
+      renderList();
+    });
+
+    list.appendChild(li);
+  });
+}
+
+async function mergePDF(){
+  const mergedPdf = await PDFLib.PDFDocument.create();
+
+  for(const file of files){
+    const bytes = await file.arrayBuffer();
+    const pdf = await PDFLib.PDFDocument.load(bytes);
+    const pages = await mergedPdf.copyPages(pdf, pdf.getPageIndices());
+    pages.forEach(p => mergedPdf.addPage(p));
+  }
+
+  const mergedBytes = await mergedPdf.save();
+  const blob = new Blob([mergedBytes], {type:"application/pdf"});
+  const url = URL.createObjectURL(blob);
+
+  window.open(url, "_blank");
+}
+</script>
+
+</body>
+</html>
