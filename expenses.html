@@ -10,8 +10,22 @@ body{margin:0;font-family:system-ui;background:#f5f7fa}
 header{
   background:#1b5e20;color:#fff;
   padding:10px 16px;
-  display:flex;justify-content:space-between;align-items:center
+  display:flex;
+  justify-content:space-between;
+  align-items:center
 }
+header .right{
+  display:flex;align-items:center;gap:8px
+}
+header button{
+  background:transparent;
+  border:1px solid #c8e6c9;
+  color:#fff;
+  border-radius:4px;
+  padding:2px 6px;
+  cursor:pointer
+}
+
 footer{
   position:fixed;bottom:0;left:0;right:0;
   background:#f1f8f4;border-top:1px solid #ccc;
@@ -67,7 +81,11 @@ button.danger{background:#c62828}
 <!-- HEADER -->
 <header>
   <div><b>FarmerBase BP Engine</b></div>
-  <div id="hdrName"></div>
+  <div class="right">
+    <span id="hdrName"></span>
+    <button type="button" title="नाम सच्याउने"
+      onclick="location.href='login.html'">✏️</button>
+  </div>
 </header>
 
 <div class="container">
@@ -110,14 +128,12 @@ button.danger{background:#c62828}
 </footer>
 
 <script>
-/* ===== IDENTITY ===== */
+/* ===== HEADER IDENTITY FIX ===== */
 const identity = JSON.parse(localStorage.getItem("fb_identity"));
-if(!identity){
-  alert("पहिले Login गर्नुहोस्");
-  location.href="login.html";
+if(identity){
+  document.getElementById("hdrName").textContent =
+    identity.projectName || identity.businessName || "";
 }
-hdrName.textContent =
-  identity.projectName || identity.businessName || "";
 
 /* ===== PRODUCTION PRODUCTS ===== */
 const prod = JSON.parse(localStorage.getItem("fb_production")||"[]");
