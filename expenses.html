@@ -1,1 +1,48 @@
-सदलचम;कस
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Expenses (Safe Mode)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:system-ui;background:#f5f7fa;margin:0}
+.card{background:#fff;margin:16px;padding:16px;border-radius:8px}
+input,button{padding:8px;margin:4px}
+.section{border:1px solid #ccc;margin-top:8px;padding:8px}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h2>चालु खर्च</h2>
+  <input id="runInp" placeholder="उपशीर्षक">
+  <button onclick="addRun()">➕ थप्नुहोस्</button>
+  <div id="runList"></div>
+</div>
+
+<script>
+let run = [];
+
+function addRun(){
+  const inp = document.getElementById("runInp");
+  if(!inp.value){ alert("नाम चाहिन्छ"); return; }
+  run.push(inp.value);
+  inp.value="";
+  render();
+}
+
+function render(){
+  const d = document.getElementById("runList");
+  d.innerHTML="";
+  run.forEach(r=>{
+    const s=document.createElement("div");
+    s.className="section";
+    s.textContent=r;
+    d.appendChild(s);
+  });
+}
+</script>
+
+</body>
+</html>
