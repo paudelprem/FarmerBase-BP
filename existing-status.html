@@ -2,268 +2,272 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Existing Status | FarmerBase BP Engine</title>
+<title>Existing Status – FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-*{box-sizing:border-box}
-body{margin:0;font-family:system-ui;background:#f6f7f9;color:#222}
-:root{--w:980px;--g:#1b5e20;--b:#ddd}
+/* ===== BASE ===== */
+body{
+  margin:0;
+  font-family:system-ui, -apple-system, sans-serif;
+  background:#f5f7fa;
+  color:#222;
+}
+.container{
+  max-width:920px;
+  margin:auto;
+  padding:20px;
+}
+a{text-decoration:none;color:inherit}
 
 /* ===== HEADER ===== */
-.header{
-  position:sticky;top:0;z-index:100;
-  background:#fff;border-bottom:1px solid var(--b)
+header{
+  background:#1b5e20;
+  color:#fff;
+  padding:10px 16px;
 }
-.header-inner{
-  max-width:var(--w);margin:auto;padding:10px 14px
+header .title{
+  font-size:18px;
+  font-weight:600;
 }
-.header h1{margin:0;font-size:16px}
-.header .sub{font-size:12px;color:#555}
+header .sub{
+  font-size:12px;
+  opacity:.9;
+}
+
+/* ===== CARD ===== */
+.card{
+  background:#fff;
+  padding:20px;
+  border-radius:8px;
+  margin-bottom:20px;
+}
+.card h2{
+  margin-top:0;
+  color:#1b5e20;
+}
+
+/* ===== TOPIC BLOCK ===== */
+.topic{
+  border:1px solid #ddd;
+  border-radius:6px;
+  padding:12px;
+  margin-bottom:12px;
+}
+.topic h3{
+  margin:0 0 6px 0;
+  font-size:16px;
+}
+.topic p{
+  margin:0;
+  white-space:pre-wrap;
+  line-height:1.5;
+}
+
+/* ===== ACTIONS ===== */
+.actions{
+  margin-top:8px;
+}
+.actions button{
+  margin-right:6px;
+  border:none;
+  background:#607d8b;
+  color:#fff;
+  padding:4px 10px;
+  border-radius:14px;
+  cursor:pointer;
+  font-size:12px;
+}
+.actions button.delete{
+  background:#c62828;
+}
+
+/* ===== FORM ===== */
+label{
+  display:block;
+  margin-top:10px;
+  font-size:14px;
+}
+input, textarea{
+  width:100%;
+  padding:10px;
+  margin-top:4px;
+  font-size:14px;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+textarea{resize:vertical}
 
 /* ===== NAV ===== */
-.nav-bar{
-  max-width:var(--w);margin:8px auto;padding:0 14px;
-  display:flex;justify-content:space-between
+.nav{
+  display:flex;
+  justify-content:space-between;
+  margin-top:20px;
 }
-.nav-btn{
-  text-decoration:none;font-size:13px;padding:6px 14px;
-  border-radius:20px;border:1px solid #ccc;
-  background:#fafafa;color:#222
+.nav button{
+  padding:10px 16px;
+  border:none;
+  border-radius:20px;
+  background:#1b5e20;
+  color:#fff;
+  cursor:pointer;
 }
-.nav-btn.primary{background:var(--g);color:#fff;border-color:var(--g)}
-.top-nav{position:sticky;top:56px;z-index:90}
-.bottom-nav{position:sticky;bottom:0;z-index:90}
-
-/* ===== MAIN ===== */
-.main{
-  max-width:var(--w);
-  margin:10px auto 20px;
-  padding:0 14px;
-  position:relative;
-  z-index:2
-}
-.card{
-  background:#fff;border:1px solid var(--b);
-  border-radius:8px;margin-bottom:16px
-}
-.card h3{
-  margin:0;padding:10px 12px;
-  background:#f3f5f7;border-bottom:1px solid var(--b);
-  font-size:14px
-}
-.card .body{padding:12px;font-size:13px}
-
-label{display:block;margin-top:6px;font-size:12px;color:#444}
-.value{font-size:13px;margin-bottom:4px}
-
-input,textarea{
-  width:100%;padding:6px;margin-top:4px;
-  border:1px solid #ccc;border-radius:6px;font-size:13px
-}
-input[readonly],textarea[readonly]{
-  background:#f9f9f9;border-color:#eee
+.nav button.secondary{
+  background:#607d8b;
 }
 
-.btn{
-  font-size:12px;padding:4px 10px;margin:4px 4px 0 0;cursor:pointer
-}
-.btn.primary{color:#1b5e20;font-weight:600}
-.btn.danger{color:#b71c1c}
-
-/* ===== TOPIC ===== */
-.topic{
-  border-left:3px solid var(--g);
-  padding-left:10px;margin-top:12px
-}
-
-/* FIX CLICK BLOCK */
-.top-nav,.bottom-nav{pointer-events:auto}
-
-/* PRINT */
-@media print{
-  .nav-bar{display:none}
-  body{background:#fff}
+/* ===== FOOTER ===== */
+footer{
+  text-align:center;
+  padding:14px;
+  font-size:13px;
+  color:#555;
+  border-top:1px solid #ddd;
+  margin-top:30px;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== HEADER ===== -->
-<div class="header">
-  <div class="header-inner">
-    <h1 id="pageTitle">परियोजनाको नाम</h1>
-    <div class="sub" id="pageSub">व्यवसाय / संस्थाको नाम</div>
+<header>
+  <div class="title" id="hdrBiz"></div>
+  <div class="sub" id="hdrProj"></div>
+</header>
+
+<div class="container">
+
+  <div class="card">
+    <h2>हालको अवस्था / पूर्वाधार (Existing Status)</h2>
+    <p>
+      व्यवसायसँग सम्बन्धित हाल उपलब्ध अवस्था,
+      पूर्वाधार, पहुँच र तयारीको विवरण यहाँ लेख्नुहोस्।
+    </p>
   </div>
-</div>
 
-<!-- ===== TOP NAV ===== -->
-<div class="nav-bar top-nav">
-  <a href="short-info.html" class="nav-btn">⬅️ Short Info</a>
-  <a href="business-detail.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
-</div>
+  <!-- ADD / EDIT FORM -->
+  <div class="card">
+    <h3 id="formTitle">नयाँ शीर्षक थप्नुहोस्</h3>
 
-<div class="main">
+    <label>शीर्षक</label>
+    <input id="topicTitle" placeholder="जस्तै: सडक पहुँच">
 
-<!-- ===== IDENTITY (AUTO FROM SHORT-INFO) ===== -->
-<div class="card">
-  <h3>🏢 व्यवसाय परिचय (Auto)</h3>
-  <div class="body">
+    <label>विवरण</label>
+    <textarea id="topicContent" rows="4"
+      placeholder="सडक, बिजुली, पानी, बजार, जनशक्ति आदि बारे विवरण लेख्नुहोस्"></textarea>
 
-    <label>व्यवसाय / संस्था</label>
-    <div class="value" id="vBusiness">—</div>
-
-    <label>परियोजना</label>
-    <div class="value" id="vProject">—</div>
-
-    <label>सञ्चालक</label>
-    <div class="value" id="vOwner">—</div>
-
-    <label>दर्ता / PAN</label>
-    <div class="value" id="vReg">—</div>
-
-    <label>ठेगाना</label>
-    <div class="value" id="vAddress">—</div>
-
-  </div>
-</div>
-
-<!-- ===== INFRA / STATUS ===== -->
-<div class="card">
-  <h3>🏗️ पूर्वाधार तथा अवस्थाको विवरण</h3>
-  <div class="body">
-
-    <button class="btn primary" id="addTopicBtn">
-      ➕ नयाँ विषय थप्नुहोस्
+    <button style="margin-top:12px" onclick="saveTopic()">
+      💾 सुरक्षित गर्नुहोस्
     </button>
-
-    <div id="topicList"></div>
-
   </div>
-</div>
+
+  <!-- TOPIC LIST -->
+  <div class="card">
+    <h3>थपिएका विवरण</h3>
+    <div id="topicList"></div>
+  </div>
+
+  <!-- NAV -->
+  <div class="nav">
+    <button class="secondary" onclick="goBack()">⬅️ Short Info</button>
+    <button onclick="goNext()">Next ➡️</button>
+  </div>
 
 </div>
 
-<!-- ===== BOTTOM NAV ===== -->
-<div class="nav-bar bottom-nav">
-  <a href="short-info.html" class="nav-btn">⬅️ Short Info</a>
-  <a href="business-detail.html" class="nav-btn primary">➡️ व्यवसाय विवरण</a>
-</div>
+<footer>
+  FarmerBase BP Engine<br>
+  Concept Development By:
+  <b>Prem Prasad Paudel</b>
+</footer>
 
 <script>
-/* ======================
-   GLOBAL HELPERS
-====================== */
-function getBusinessIdentity(){
-  const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-  const BID = B.activeId || "b1";
-  return JSON.parse(localStorage.getItem("fb_short_info_"+BID) || "{}");
-}
+/* ===== KEYS ===== */
+const META_KEY = "fb_meta";
+const KEY = "fb_existing_status";
 
-/* ======================
-   HEADER AUTO INJECT
-====================== */
-const info = getBusinessIdentity();
-document.getElementById("pageTitle").textContent =
-  info.projectName || "परियोजनाको नाम";
-document.getElementById("pageSub").textContent =
-  info.businessName || "व्यवसाय / संस्थाको नाम";
+/* ===== HEADER META ===== */
+const meta = JSON.parse(localStorage.getItem(META_KEY)||"{}");
+hdrBiz.textContent = meta.business || "व्यवसाय";
+hdrProj.textContent = meta.project || "परियोजना";
 
-/* ======================
-   IDENTITY PANEL
-====================== */
-vBusiness.textContent = info.businessName || "—";
-vProject.textContent  = info.projectName || "—";
-vOwner.textContent    = info.ownerName || "—";
-vReg.textContent =
-  (info.regNo ? "दर्ता नं: "+info.regNo+" " : "") +
-  (info.panNo ? "| PAN: "+info.panNo : "—");
-vAddress.textContent  = info.address || "—";
+/* ===== DATA ===== */
+let list = JSON.parse(localStorage.getItem(KEY)||"[]");
+let editIndex = null;
 
-/* ======================
-   TOPICS DATA
-====================== */
-const B = JSON.parse(localStorage.getItem("fb_businesses")||"{}");
-const BID = B.activeId || "b1";
-const KEY = "fb_existing_status_"+BID;
-
-let topics = JSON.parse(localStorage.getItem(KEY) || "[]");
-
-function save(){
-  localStorage.setItem(KEY, JSON.stringify(topics));
-  render();
-}
-
-/* ======================
-   ADD TOPIC (SAFE CLICK)
-====================== */
-document.getElementById("addTopicBtn").addEventListener("click",()=>{
-  topics.push({
-    title:"",
-    content:"",
-    edit:true,
-    backup:{}
-  });
-  save();
-});
-
-/* ======================
-   CRUD
-====================== */
-function editTopic(i){
-  topics[i].backup = {...topics[i]};
-  topics[i].edit = true;
-  render();
-}
-function saveTopic(i){
-  topics[i].edit = false;
-  save();
-}
-function cancelTopic(i){
-  topics[i] = {...topics[i].backup, edit:false};
-  save();
-}
-function deleteTopic(i){
-  if(!confirm("यो विषय हटाउने?"))return;
-  topics.splice(i,1); save();
-}
-
-/* ======================
-   RENDER
-====================== */
+/* ===== RENDER ===== */
 function render(){
-  const wrap=document.getElementById("topicList");
-  wrap.innerHTML="";
+  topicList.innerHTML="";
+  if(list.length===0){
+    topicList.innerHTML="<i>अहिलेसम्म केही थपिएको छैन।</i>";
+    return;
+  }
 
-  topics.forEach((t,i)=>{
-    wrap.innerHTML+=`
-      <div class="topic">
-
-        <label>विषय</label>
-        <input ${t.edit?"":"readonly"}
-          value="${t.title||""}"
-          oninput="topics[${i}].title=this.value"
-          onblur="save()">
-
-        <label>विवरण</label>
-        <textarea rows="3" ${t.edit?"":"readonly"}
-          oninput="topics[${i}].content=this.value"
-          onblur="save()">${t.content||""}</textarea>
-
-        ${t.edit?`
-          <button class="btn primary" onclick="saveTopic(${i})">💾 Save</button>
-          <button class="btn" onclick="cancelTopic(${i})">↩️ Cancel</button>
-        `:`
-          <button class="btn primary" onclick="editTopic(${i})">✏️ सच्याउनुहोस्</button>
-        `}
-        <button class="btn danger" onclick="deleteTopic(${i})">🗑️ हटाउनुहोस्</button>
-
+  list.forEach((t,i)=>{
+    const div=document.createElement("div");
+    div.className="topic";
+    div.innerHTML=`
+      <h3>${t.title}</h3>
+      <p>${t.content}</p>
+      <div class="actions">
+        <button onclick="editTopic(${i})">✏️ सच्याउने</button>
+        <button class="delete" onclick="deleteTopic(${i})">🗑 हटाउने</button>
       </div>
     `;
+    topicList.appendChild(div);
   });
 }
 render();
+
+/* ===== SAVE / EDIT ===== */
+function saveTopic(){
+  if(!topicTitle.value || !topicContent.value){
+    alert("शीर्षक र विवरण अनिवार्य छ");
+    return;
+  }
+
+  if(editIndex===null){
+    list.push({
+      title:topicTitle.value,
+      content:topicContent.value
+    });
+  }else{
+    list[editIndex]={
+      title:topicTitle.value,
+      content:topicContent.value
+    };
+    editIndex=null;
+    formTitle.textContent="नयाँ शीर्षक थप्नुहोस्";
+  }
+
+  topicTitle.value="";
+  topicContent.value="";
+  localStorage.setItem(KEY, JSON.stringify(list));
+  render();
+}
+
+function editTopic(i){
+  topicTitle.value=list[i].title;
+  topicContent.value=list[i].content;
+  editIndex=i;
+  formTitle.textContent="शीर्षक सच्याउनुहोस्";
+}
+
+function deleteTopic(i){
+  if(confirm("यो विवरण हटाउने?")){
+    list.splice(i,1);
+    localStorage.setItem(KEY, JSON.stringify(list));
+    render();
+  }
+}
+
+/* ===== NAV ===== */
+function goBack(){
+  location.href="short-info.html";
+}
+function goNext(){
+  location.href="business-detail.html";
+}
 </script>
 
 </body>
