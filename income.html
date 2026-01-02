@@ -1,1 +1,148 @@
-hhhh
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Income | FarmerBase BP Engine</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+body{font-family:system-ui;background:#f4f6f8;margin:0}
+header{background:#2e7d32;color:#fff;padding:10px 16px;font-size:18px}
+.container{max-width:1100px;margin:auto;padding:16px;padding-bottom:90px}
+.box{background:#fff;border-radius:8px;padding:16px;margin-bottom:20px}
+h2{margin-top:0}
+input,button{padding:6px;font-size:14px}
+button{cursor:pointer}
+.green{background:#2e7d32;color:#fff;border:0;border-radius:4px;padding:6px 10px}
+table{width:100%;border-collapse:collapse;margin-top:10px}
+th,td{border-bottom:1px solid #ddd;padding:6px;text-align:left}
+.right{text-align:right}
+.small{font-size:13px;color:#555}
+footer{
+  position:fixed;left:0;right:0;bottom:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:8px 12px;display:flex;justify-content:space-between
+}
+</style>
+</head>
+
+<body>
+<header>FarmerBase BP Engine – Income</header>
+
+<div class="container">
+
+<!-- ===== INFO ===== -->
+<div class="box">
+  <b>आम्दानी विवरण</b><br>
+  उत्पादन वा सेवाको बिक्री परिमाण र मूल्यको आधारमा आम्दानी गणना गरिन्छ।
+</div>
+
+<!-- ===== ADD INCOME ===== -->
+<div class="box">
+  <h2>आम्दानी स्रोत थप्नुहोस्</h2>
+  <input id="iName" placeholder="उत्पादन / सेवा नाम">
+  <input id="iQty" type="number" placeholder="परिमाण">
+  <input id="iRate" type="number" placeholder="प्रति इकाई मूल्य">
+  <button class="green" onclick="addIncome()">+ थप्नुहोस्</button>
+</div>
+
+<!-- ===== LIST ===== -->
+<div class="box">
+  <h2>आम्दानी सूची</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>उत्पादन / सेवा</th>
+        <th>परिमाण</th>
+        <th>दर</th>
+        <th class="right">जम्मा</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody id="incomeList"></tbody>
+  </table>
+</div>
+
+<!-- ===== SUMMARY ===== -->
+<div class="box">
+  <b>कुल आम्दानी:</b>
+  <span id="totalIncome">0.00</span>
+</div>
+
+</div>
+
+<!-- ===== FOOTER NAV ===== -->
+<footer>
+  <button onclick="location.href='capital-source.html'">⬅️</button>
+  <button onclick="goNext()">➡️</button>
+</footer>
+
+<script>
+/* ========= DATA ========= */
+let incomes = JSON.parse(localStorage.getItem("fb_income")) || [];
+
+/* ========= ADD ========= */
+function addIncome(){
+  const name = iName.value.trim();
+  const qty  = +iQty.value || 0;
+  const rate = +iRate.value || 0;
+
+  if(!name || !qty || !rate){
+    alert("नाम, परिमाण र दर अनिवार्य");
+    return;
+  }
+
+  incomes.push({ name, qty, rate });
+  iName.value = iQty.value = iRate.value = "";
+  render();
+}
+
+/* ========= REMOVE ========= */
+function removeIncome(i){
+  if(confirm("हटाउने?")){
+    incomes.splice(i,1);
+    render();
+  }
+}
+
+/* ========= RENDER ========= */
+function render(){
+  let total = 0;
+  incomeList.innerHTML = "";
+
+  incomes.forEach((it,i)=>{
+    const amt = it.qty * it.rate;
+    total += amt;
+    incomeList.innerHTML += `
+      <tr>
+        <td>${it.name}</td>
+        <td>${it.qty}</td>
+        <td>${it.rate}</td>
+        <td class="right">${amt.toFixed(2)}</td>
+        <td><button onclick="removeIncome(${i})">✖</button></td>
+      </tr>
+    `;
+  });
+
+  totalIncome.innerText = total.toFixed(2);
+
+  // 🔗 AUTO SYNC FOR PROFIT–LOSS
+  localStorage.setItem(
+    "fb_income_summary",
+    JSON.stringify({ total })
+  );
+}
+
+/* ========= NEXT ========= */
+function goNext(){
+  if(!incomes.length){
+    alert("कम्तीमा एक आम्दानी स्रोत थप्नुहोस्");
+    return;
+  }
+  location.href = "profit-loss.html";
+}
+
+render();
+</script>
+
+</body>
+</html>
