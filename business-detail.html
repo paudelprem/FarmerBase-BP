@@ -2,160 +2,322 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Business Detail – FarmerBase BP Engine</title>
+<title>Existing Status</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 body{margin:0;font-family:system-ui;background:#f5f7fa}
-.container{max-width:900px;margin:auto;padding:20px}
-.card{background:#fff;padding:20px;border-radius:8px}
-h2{margin-top:0;color:#1b5e20}
-.section{border:1px solid #ddd;border-radius:6px;padding:12px;margin-top:12px}
-.section h4{margin:0;color:#2e7d32}
-.section p{margin:6px 0 0;line-height:1.6}
-.actions{margin-top:6px}
-.actions button{margin-right:6px}
+header{
+  position:sticky;top:0;z-index:1000;
+  background:#1b5e20;color:#fff;
+  padding:8px 16px;
+  display:flex;justify-content:space-between;align-items:center
+}
+footer{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:6px 12px;
+  display:flex;justify-content:space-between
+}
+.container{
+  max-width:1100px;margin:auto;padding:16px;
+  padding-bottom:70px
+}
+.card{
+  background:#fff;padding:16px;border-radius:8px;
+  margin-bottom:16px
+}
+h2{margin:0 0 10px;color:#1b5e20}
+.small{font-size:13px;color:#555}
 
 input,textarea{
-  width:100%;
-  padding:8px;
-  margin-top:6px;
-  font-family:inherit;
+  width:100%;padding:8px;
+  border:1px solid #ccc;border-radius:6px
 }
+button{
+  padding:6px 12px;border:none;border-radius:6px;
+  background:#1b5e20;color:#fff;cursor:pointer
+}
+button.ghost{background:#e8f5e9;color:#1b5e20}
+button.danger{background:#c62828}
 
-.g-header{
-  display:flex;align-items:center;gap:10px;
-  padding:10px;background:#1b5e20;color:#fff;
+.topic{
+  border:1px solid #ddd;border-radius:6px;
+  padding:12px;margin-top:10px
 }
-.g-header button{background:none;border:none;color:#fff;font-size:18px}
-.g-title{flex:1;text-align:center}
-
-.g-footer{
-  display:flex;justify-content:space-between;
-  padding:10px;border-top:1px solid #ccc;
-}
-.g-footer button{
-  padding:8px 14px;border-radius:20px;
-  border:none;background:#1b5e20;color:#fff;
+.topic-head{
+  display:flex;justify-content:space-between;align-items:center
 }
 </style>
 </head>
 
 <body>
 
-<!-- GLOBAL HEADER -->
-<header class="g-header">
-  <button id="prevTop" onclick="goPrev()">⬅️</button>
-  <div class="g-title">
-    <div id="bizHdr"></div>
-    <small id="projHdr"></small>
-  </div>
-  <button id="nextTop" onclick="goNext()">➡️</button>
+<!-- ===== HEADER ===== -->
+<header>
+  <div>FarmerBase BP Engine</div>
+  <div id="hdrBiz"></div>
 </header>
 
 <div class="container">
+
 <div class="card">
-
-<h2>व्यवसाय विवरण (Business Detail)</h2>
-
-<!-- ADD NEW -->
-<label><b>विषय / शीर्षक</b></label>
-<input id="newTitle" placeholder="जस्तै: बजारको हालको अवस्था">
-
-<label><b>विवरण</b></label>
-<textarea id="newDesc" rows="4"
-placeholder="यस विषयमा प्रस्तावको विवरण लेख्नुहोस्"></textarea>
-
-<button style="margin-top:10px" onclick="addSection()">➕ थप्नुहोस्</button>
-
-<hr>
-
-<!-- LIST -->
-<div id="list"></div>
-
-</div>
+  <h2>📌 हालको अवस्था (Existing Status)</h2>
+  <p class="small">
+    यस खण्डमा व्यवसायसँग सम्बन्धित हालको अवस्था,
+    उपलब्ध पूर्वाधार, पहुँच, बजार तथा अन्य सन्दर्भ
+    Paragraph शैलीमा उल्लेख गरिन्छ।
+  </p>
 </div>
 
-<!-- GLOBAL FOOTER -->
-<footer class="g-footer">
-  <button id="prevBottom" onclick="goPrev()">⬅️ अघिल्लो</button>
-  <button id="nextBottom" onclick="goNext()">अर्को ➡️</button>
+<!-- ===== ADD TOPIC ===== -->
+<div class="card">
+  <h2>➕ नयाँ विषय थप्नुहोस्</h2>
+  <input id="topicTitle" placeholder="विषय (जस्तै: पूर्वाधार अवस्था)">
+  <br><br>
+  <textarea id="topicContent" rows="4"
+    placeholder="यस विषयसँग सम्बन्धित विवरण लेख्नुहोस्..."></textarea>
+  <br><br>
+  <button type="button" onclick="addTopic()">थप्नुहोस्</button>
+</div>
+
+<!-- ===== TOPIC LIST ===== -->
+<div id="topicList"></div>
+
+</div>
+
+<!-- ===== FOOTER NAV ===== -->
+<footer>
+  <button type="button" onclick="goPrev()">⬅️</button>
+  <button type="button" onclick="goNext()">➡️</button>
 </footer>
 
 <script>
-/* ===== GLOBAL NAV ===== */
-const flow=[
-"index.html","short-info.html","existing-status.html",
-"business-detail.html","production.html","expenses.html",
-"capital-source.html","income.html","profit-loss.html",
-"executive-summary.html","cover.html"
-];
-const current=location.pathname.split("/").pop();
-const idx=flow.indexOf(current);
-
-function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
-function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
-
-if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
-if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
-
-/* ===== HEADER DATA ===== */
-const meta=JSON.parse(localStorage.getItem("fb_meta")||"{}");
-bizHdr.textContent=meta.business||"व्यवसाय";
-projHdr.textContent=meta.project||"परियोजना";
+/* ===== HEADER IDENTITY ===== */
+const biz = JSON.parse(localStorage.getItem("fb_business")||"{}");
+document.getElementById("hdrBiz").textContent =
+  biz.projectName || biz.businessName || "";
 
 /* ===== DATA ===== */
-const KEY="fb_business_detail";
-let data=JSON.parse(localStorage.getItem(KEY)||"[]");
+const KEY="fb_existing_status";
+let topics = JSON.parse(localStorage.getItem(KEY)) || [];
 
+function save(){
+  localStorage.setItem(KEY, JSON.stringify(topics));
+}
+
+/* ===== ADD ===== */
+function addTopic(){
+  const t = topicTitle.value.trim();
+  const c = topicContent.value.trim();
+  if(!t || !c){ alert("विषय र विवरण दुवै लेख्नुहोस्"); return; }
+  topics.unshift({title:t,content:c});
+  topicTitle.value=""; topicContent.value="";
+  save(); render();
+}
+
+/* ===== EDIT / DELETE ===== */
+function editTopic(i){
+  const nt = prompt("विषय:", topics[i].title);
+  if(!nt) return;
+  const nc = prompt("विवरण:", topics[i].content);
+  if(!nc) return;
+  topics[i]={title:nt,content:nc};
+  save(); render();
+}
+function delTopic(i){
+  if(!confirm("हटाउने?")) return;
+  topics.splice(i,1);
+  save(); render();
+}
+
+/* ===== RENDER ===== */
 function render(){
-  list.innerHTML="";
-  data.forEach((d,i)=>{
-    const div=document.createElement("div");
-    div.className="section";
-    div.innerHTML=`
-      <h4>${d.title}</h4>
-      <p>${d.desc}</p>
-      <div class="actions">
-        <button onclick="editSection(${i})">✏️ सच्याउनु</button>
-        <button onclick="delSection(${i})">🗑️ हटाउनु</button>
-      </div>`;
-    list.appendChild(div);
+  topicList.innerHTML="";
+  topics.forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="topic";
+    d.innerHTML=`
+      <div class="topic-head">
+        <b>${t.title}</b>
+        <div>
+          <button class="ghost" onclick="editTopic(${i})">✏️</button>
+          <button class="danger" onclick="delTopic(${i})">✖</button>
+        </div>
+      </div>
+      <p class="small" style="margin-top:8px">${t.content}</p>
+    `;
+    topicList.appendChild(d);
   });
 }
 render();
 
-/* ===== CRUD ===== */
-function addSection(){
-  if(!newTitle.value || !newDesc.value){
-    alert("विषय र विवरण अनिवार्य छ");
-    return;
-  }
-  data.push({title:newTitle.value, desc:newDesc.value});
-  newTitle.value=""; newDesc.value="";
-  save();
-}
+/* ===== NAV ===== */
+function goPrev(){ location.href="short-info.html"; }
+function goNext(){ location.href="business-detail.html"; }
+</script>
 
-function editSection(i){
-  const t=prompt("विषय सच्याउनुहोस्",data[i].title);
-  if(t===null) return;
-  const d=prompt("विवरण सच्याउनुहोस्",data[i].desc);
-  if(d===null) return;
-  data[i]={title:t, desc:d};
-  save();
-}
+</body>
+</html>
+You sent
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+<meta charset="UTF-8">
+<title>Business Detail</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-function delSection(i){
-  if(confirm("हटाउने हो?")){
-    data.splice(i,1);
-    save();
-  }
+<style>
+body{margin:0;font-family:system-ui;background:#f5f7fa}
+header{
+  position:sticky;top:0;z-index:1000;
+  background:#1b5e20;color:#fff;
+  padding:8px 16px;
+  display:flex;justify-content:space-between;align-items:center
 }
+footer{
+  position:fixed;bottom:0;left:0;right:0;
+  background:#f1f8f4;border-top:1px solid #ccc;
+  padding:6px 12px;
+  display:flex;justify-content:space-between
+}
+.container{
+  max-width:1100px;margin:auto;padding:16px;
+  padding-bottom:70px
+}
+.card{
+  background:#fff;padding:16px;border-radius:8px;
+  margin-bottom:16px
+}
+h2{margin:0 0 10px;color:#1b5e20}
+.small{font-size:13px;color:#555}
+
+input,textarea{
+  width:100%;padding:8px;
+  border:1px solid #ccc;border-radius:6px
+}
+button{
+  padding:6px 12px;border:none;border-radius:6px;
+  background:#1b5e20;color:#fff;cursor:pointer
+}
+button.ghost{background:#e8f5e9;color:#1b5e20}
+button.danger{background:#c62828}
+
+.topic{
+  border:1px solid #ddd;border-radius:6px;
+  padding:12px;margin-top:10px
+}
+.topic-head{
+  display:flex;justify-content:space-between;align-items:center
+}
+</style>
+</head>
+
+<body>
+
+<!-- ===== HEADER ===== -->
+<header>
+  <div>FarmerBase BP Engine</div>
+  <div id="hdrBiz"></div>
+</header>
+
+<div class="container">
+
+<div class="card">
+  <h2>📌 व्यवसाय विवरण (Business Detail)</h2>
+  <p class="small">
+    यस खण्डमा प्रस्तावनासँग सम्बन्धित
+    पृष्ठभूमि, बजार अवस्था, लक्ष्य, रणनीति,
+    तथा व्यवसाय सञ्चालनको स्पष्ट दिशा
+    Paragraph शैलीमा उल्लेख गरिन्छ।
+  </p>
+</div>
+
+<!-- ===== ADD TOPIC ===== -->
+<div class="card">
+  <h2>➕ नयाँ विषय थप्नुहोस्</h2>
+  <input id="topicTitle" placeholder="विषय (जस्तै: बजारको हालको अवस्था)">
+  <br><br>
+  <textarea id="topicContent" rows="4"
+    placeholder="यस विषयसँग सम्बन्धित विवरण लेख्नुहोस्..."></textarea>
+  <br><br>
+  <button type="button" onclick="addTopic()">थप्नुहोस्</button>
+</div>
+
+<!-- ===== TOPIC LIST ===== -->
+<div id="topicList"></div>
+
+</div>
+
+<!-- ===== FOOTER NAV ===== -->
+<footer>
+  <button type="button" onclick="goPrev()">⬅️</button>
+  <button type="button" onclick="goNext()">➡️</button>
+</footer>
+
+<script>
+/* ===== HEADER IDENTITY ===== */
+const biz = JSON.parse(localStorage.getItem("fb_business")||"{}");
+document.getElementById("hdrBiz").textContent =
+  biz.projectName || biz.businessName || "";
+
+/* ===== DATA ===== */
+const KEY="fb_business_detail";
+let topics = JSON.parse(localStorage.getItem(KEY)) || [];
 
 function save(){
-  localStorage.setItem(KEY,JSON.stringify(data));
-  render();
+  localStorage.setItem(KEY, JSON.stringify(topics));
 }
+
+/* ===== ADD ===== */
+function addTopic(){
+  const t = topicTitle.value.trim();
+  const c = topicContent.value.trim();
+  if(!t || !c){ alert("विषय र विवरण दुवै लेख्नुहोस्"); return; }
+  topics.unshift({title:t,content:c});
+  topicTitle.value=""; topicContent.value="";
+  save(); render();
+}
+
+/* ===== EDIT / DELETE ===== */
+function editTopic(i){
+  const nt = prompt("विषय:", topics[i].title);
+  if(!nt) return;
+  const nc = prompt("विवरण:", topics[i].content);
+  if(!nc) return;
+  topics[i]={title:nt,content:nc};
+  save(); render();
+}
+function delTopic(i){
+  if(!confirm("हटाउने?")) return;
+  topics.splice(i,1);
+  save(); render();
+}
+
+/* ===== RENDER ===== */
+function render(){
+  topicList.innerHTML="";
+  topics.forEach((t,i)=>{
+    const d=document.createElement("div");
+    d.className="topic";
+    d.innerHTML=`
+      <div class="topic-head">
+        <b>${t.title}</b>
+        <div>
+          <button class="ghost" onclick="editTopic(${i})">✏️</button>
+          <button class="danger" onclick="delTopic(${i})">✖</button>
+        </div>
+      </div>
+      <p class="small" style="margin-top:8px">${t.content}</p>
+    `;
+    topicList.appendChild(d);
+  });
+}
+render();
+
+/* ===== NAV ===== */
+function goPrev(){ location.href="existing-status.html"; }
+function goNext(){ location.href="production.html"; }
 </script>
 
 </body>
