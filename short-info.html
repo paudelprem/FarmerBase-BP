@@ -6,256 +6,117 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-/* ===== BASE ===== */
-body{
-  margin:0;
-  font-family:system-ui, -apple-system, sans-serif;
-  background:#f5f7fa;
-  color:#222;
-}
-.container{
-  max-width:920px;
-  margin:auto;
-  padding:20px;
-}
-a{text-decoration:none;color:inherit}
+body{margin:0;font-family:system-ui;background:#f5f7fa}
+.container{max-width:900px;margin:auto;padding:20px}
+.card{background:#fff;padding:20px;border-radius:8px}
+label{display:block;margin-top:10px}
+input,textarea{width:100%;padding:8px;margin-top:4px}
 
-/* ===== HEADER ===== */
-header{
-  background:#1b5e20;
-  color:#fff;
-  padding:10px 16px;
+.g-header{
+  display:flex;align-items:center;gap:10px;
+  padding:10px;background:#1b5e20;color:#fff;
 }
-header .title{
-  font-size:18px;
-  font-weight:600;
+.g-header button{
+  background:none;border:none;color:#fff;font-size:18px;
 }
-header .sub{
-  font-size:12px;
-  opacity:.9;
-}
+.g-title{flex:1;text-align:center}
 
-/* ===== CARD ===== */
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:8px;
-  margin-bottom:20px;
+.g-footer{
+  display:flex;justify-content:space-between;
+  padding:10px;border-top:1px solid #ccc;
 }
-.card h2{
-  margin-top:0;
-  color:#1b5e20;
-}
-label{
-  display:block;
-  margin-top:10px;
-  font-size:14px;
-}
-input, textarea, select{
-  width:100%;
-  padding:10px;
-  margin-top:4px;
-  font-size:14px;
-  border-radius:6px;
-  border:1px solid #ccc;
-}
-textarea{resize:vertical}
-
-/* ===== GRID ===== */
-.grid{
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:16px;
-}
-@media(max-width:700px){
-  .grid{grid-template-columns:1fr}
-}
-
-/* ===== NAV ===== */
-.nav{
-  display:flex;
-  justify-content:space-between;
-  margin-top:20px;
-}
-.nav button{
-  padding:10px 16px;
-  border:none;
-  border-radius:20px;
-  background:#1b5e20;
-  color:#fff;
-  cursor:pointer;
-}
-.nav button.secondary{
-  background:#607d8b;
-}
-
-/* ===== FOOTER ===== */
-footer{
-  text-align:center;
-  padding:14px;
-  font-size:13px;
-  color:#555;
-  border-top:1px solid #ddd;
-  margin-top:30px;
+.g-footer button{
+  padding:8px 14px;border-radius:20px;
+  border:none;background:#1b5e20;color:#fff;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <div class="title" id="hdrBiz"></div>
-  <div class="sub" id="hdrProj"></div>
+<!-- GLOBAL HEADER -->
+<header class="g-header">
+  <button id="prevTop" onclick="goPrev()">⬅️</button>
+  <div class="g-title">
+    <div id="bizHdr"></div>
+    <small id="projHdr"></small>
+  </div>
+  <button id="nextTop" onclick="goNext()">➡️</button>
 </header>
 
 <div class="container">
+<div class="card">
+<h2>संक्षिप्त जानकारी</h2>
 
-  <!-- BASIC INFO -->
-  <div class="card">
-    <h2>संक्षिप्त विवरण (Short Info)</h2>
+<label>व्यवसाय / संस्थाको नाम</label>
+<input id="business">
 
-    <div class="grid">
-      <div>
-        <label>व्यवसाय / संस्थाको नाम</label>
-        <input id="businessName">
-      </div>
-      <div>
-        <label>परियोजनाको नाम</label>
-        <input id="projectName">
-      </div>
-    </div>
+<label>परियोजनाको नाम</label>
+<input id="project">
 
-    <label>प्रोपाइटर / प्रतिनिधिको नाम</label>
-    <input id="ownerName">
+<label>प्रोपाइटर / प्रतिनिधि</label>
+<input id="owner">
 
-    <label>सम्पर्क नम्बर</label>
-    <input id="contact">
+<label>सम्पर्क नम्बर</label>
+<input id="contact">
 
-  </div>
+<label>दर्ता नं</label>
+<input id="reg">
 
-  <!-- ADDRESS -->
-  <div class="card">
-    <h2>ठेगाना</h2>
+<label>PAN नं</label>
+<input id="pan">
 
-    <div class="grid">
-      <div>
-        <label>प्रदेश</label>
-        <input id="province">
-      </div>
-      <div>
-        <label>जिल्ला</label>
-        <input id="district">
-      </div>
-      <div>
-        <label>न.पा./गा.पा.</label>
-        <input id="municipality">
-      </div>
-      <div>
-        <label>वडा नं</label>
-        <input id="ward">
-      </div>
-    </div>
-
-    <label>टोल / बस्ती</label>
-    <input id="tole">
-
-    <label>Google Map Link</label>
-    <input id="mapLink" placeholder="https://maps.google.com/...">
-  </div>
-
-  <!-- REGISTRATION -->
-  <div class="card">
-    <h2>दर्ता / कानुनी विवरण</h2>
-
-    <div class="grid">
-      <div>
-        <label>दर्ता मिति</label>
-        <input type="date" id="regDate">
-      </div>
-      <div>
-        <label>दर्ता नं</label>
-        <input id="regNo">
-      </div>
-      <div>
-        <label>दर्ता भएको निकाय</label>
-        <input id="regOffice">
-      </div>
-      <div>
-        <label>PAN नं</label>
-        <input id="panNo">
-      </div>
-    </div>
-
-    <label>अन्य संघ–संस्थासँग आवद्धता (छोटो)</label>
-    <textarea id="affiliation" rows="3"></textarea>
-  </div>
-
-  <!-- NAV -->
-  <div class="nav">
-    <button class="secondary" onclick="goBack()">⬅️ Index</button>
-    <button onclick="saveAndNext()">Next ➡️</button>
-  </div>
-
+<button style="margin-top:14px" onclick="saveInfo()">💾 Save</button>
+</div>
 </div>
 
-<footer>
-  FarmerBase BP Engine<br>
-  Concept Development By:
-  <b>Prem Prasad Paudel</b>
+<!-- GLOBAL FOOTER -->
+<footer class="g-footer">
+  <button id="prevBottom" onclick="goPrev()">⬅️ अघिल्लो</button>
+  <button id="nextBottom" onclick="goNext()">अर्को ➡️</button>
 </footer>
 
 <script>
-/* ===== KEYS ===== */
-const META_KEY = "fb_meta";
-const SHORT_KEY = "fb_short_info";
+/* ===== GLOBAL NAV ===== */
+const flow=[
+"index.html","short-info.html","existing-status.html",
+"business-detail.html","production.html","expenses.html",
+"capital-source.html","income.html","profit-loss.html",
+"executive-summary.html","cover.html"
+];
+const current=location.pathname.split("/").pop();
+const idx=flow.indexOf(current);
 
-/* ===== LOAD META ===== */
-const meta = JSON.parse(localStorage.getItem(META_KEY)||"{}");
-hdrBiz.textContent = meta.business || "व्यवसायको नाम";
-hdrProj.textContent = meta.project || "परियोजना";
+function goPrev(){ if(idx>0) location.href=flow[idx-1]; }
+function goNext(){ if(idx<flow.length-1) location.href=flow[idx+1]; }
 
-/* ===== LOAD SHORT INFO ===== */
-const data = JSON.parse(localStorage.getItem(SHORT_KEY)||"{}");
+if(idx<=0){prevTop.disabled=prevBottom.disabled=true;}
+if(idx>=flow.length-1){nextTop.disabled=nextBottom.disabled=true;}
 
-function fill(id){ if(data[id]) document.getElementById(id).value=data[id]; }
+/* ===== DATA ===== */
+const KEY="fb_meta";
+const data=JSON.parse(localStorage.getItem(KEY)||"{}");
 
-[
-  "businessName","projectName","ownerName","contact",
-  "province","district","municipality","ward","tole",
-  "mapLink","regDate","regNo","regOffice","panNo","affiliation"
-].forEach(fill);
+business.value=data.business||"";
+project.value=data.project||"";
+owner.value=data.owner||"";
+contact.value=data.contact||"";
+reg.value=data.reg||"";
+pan.value=data.pan||"";
 
-/* Prefill from index meta */
-if(!businessName.value) businessName.value = meta.business||"";
-if(!projectName.value) projectName.value = meta.project||"";
-if(!ownerName.value) ownerName.value = meta.owner||"";
+bizHdr.textContent=data.business||"व्यवसाय";
+projHdr.textContent=data.project||"परियोजना";
 
-/* ===== SAVE ===== */
-function saveData(){
-  const obj = {};
-  [
-    "businessName","projectName","ownerName","contact",
-    "province","district","municipality","ward","tole",
-    "mapLink","regDate","regNo","regOffice","panNo","affiliation"
-  ].forEach(id=>{
-    obj[id]=document.getElementById(id).value;
-  });
-
-  localStorage.setItem(SHORT_KEY, JSON.stringify(obj));
-}
-
-/* Auto save on blur */
-document.querySelectorAll("input,textarea")
-  .forEach(el=>el.addEventListener("blur",saveData));
-
-function saveAndNext(){
-  saveData();
-  location.href="existing-status.html";
-}
-
-function goBack(){
-  saveData();
-  location.href="index.html";
+function saveInfo(){
+  localStorage.setItem(KEY,JSON.stringify({
+    business:business.value,
+    project:project.value,
+    owner:owner.value,
+    contact:contact.value,
+    reg:reg.value,
+    pan:pan.value
+  }));
+  alert("Saved");
 }
 </script>
 
