@@ -3,23 +3,114 @@
 <head>
 <meta charset="UTF-8">
 <title>Expenses</title>
+
 <style>
-  body { font-family: Arial; padding: 20px; }
-  table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-  th, td { border: 1px solid #ccc; padding: 8px; text-align: center; }
-  th { background: #f4f4f4; }
-  input, select { width: 100%; padding: 5px; }
-  .btn { padding: 5px 10px; cursor: pointer; }
-  .btn-danger { background: #d9534f; color: #fff; }
-  .btn-edit { background: #0275d8; color: #fff; }
+/* ====== BASIC ====== */
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+}
+h2 { margin: 0; }
+
+/* ====== HEADER ====== */
+.bp-header {
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 15px;
+  padding-bottom: 8px;
+}
+.bp-sub {
+  font-size: 14px;
+  color: #555;
+}
+
+/* ====== TABLE ====== */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 10px;
+}
+th, td {
+  border: 1px solid #ccc;
+  padding: 8px;
+  text-align: center;
+}
+th {
+  background: #f3f3f3;
+}
+
+/* ====== ENTRY ROW ====== */
+.entry-row {
+  background: #fafafa;
+}
+.input {
+  width: 100%;
+  padding: 7px;
+  font-size: 14px;
+}
+.input:disabled {
+  background: #eee;
+}
+
+/* ====== MAPPING ====== */
+.map-box {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+}
+.map-arrow {
+  font-size: 18px;
+  color: #2e7d32;
+  font-weight: bold;
+}
+.percent {
+  width: 70px;
+}
+
+/* ====== BUTTONS ====== */
+.btn {
+  padding: 6px 14px;
+  cursor: pointer;
+  border-radius: 4px;
+  font-size: 14px;
+  border: none;
+}
+.btn-save {
+  background: #2e7d32;
+  color: #fff;
+}
+.btn-edit {
+  background: #0277bd;
+  color: #fff;
+}
+.btn-del {
+  background: #c62828;
+  color: #fff;
+}
+
+/* ====== HINT ====== */
+.page-hint {
+  background: #f9fbe7;
+  padding: 8px;
+  font-size: 14px;
+  margin-bottom: 10px;
+}
 </style>
 </head>
 
 <body>
 
-<h2>खर्च विवरण (Expenses)</h2>
+<!-- ===== HEADER ===== -->
+<div class="bp-header">
+  <h2 id="businessName">बंगुर पालन व्यवसाय</h2>
+  <p class="bp-sub">Business Plan → खर्च विवरण (Expenses)</p>
+</div>
 
-<!-- ENTRY FORM -->
+<p class="page-hint">
+  💡 यहाँ गरिएको खर्च स्वतः सम्बन्धित उत्पादनको लागतमा जोडिन्छ
+</p>
+
+<!-- ===== ENTRY TABLE ===== -->
 <table>
 <thead>
 <tr>
@@ -27,45 +118,48 @@
   <th>प्रकार</th>
   <th>रकम</th>
   <th>आयु (वर्ष)</th>
-  <th>उत्पादन</th>
-  <th>%</th>
+  <th colspan="2">कुन उत्पादनमा खर्च ?</th>
   <th>Action</th>
 </tr>
 </thead>
-<tbody>
+
+<tbody class="entry-row">
 <tr>
-  <td><input id="title"></td>
+  <td><input class="input" id="title" placeholder="जस्तै: दाना खर्च"></td>
 
   <td>
-    <select id="type" onchange="toggleLife()">
+    <select class="input" id="type" onchange="toggleLife()">
       <option value="variable">चालु</option>
       <option value="fixed">स्थिर</option>
     </select>
   </td>
 
-  <td><input type="number" id="amount"></td>
+  <td><input class="input" type="number" id="amount"></td>
 
   <td>
-    <input type="number" id="life" placeholder="स्थिरमा मात्र">
+    <input class="input" type="number" id="life" placeholder="स्थिरमा मात्र">
+  </td>
+
+  <td colspan="2">
+    <div class="map-box">
+      <span class="map-arrow">→</span>
+      <select class="input" id="production">
+        <option value="PROD-01">बंगुर पालन</option>
+        <option value="PROD-02">बाख्रा पालन</option>
+      </select>
+      <input class="input percent" type="number" id="ratio" value="100">
+      %
+    </div>
   </td>
 
   <td>
-    <select id="production">
-      <option value="PROD-01">बंगुर पालन</option>
-      <option value="PROD-02">बाख्रा पालन</option>
-    </select>
-  </td>
-
-  <td><input type="number" id="ratio" value="100"></td>
-
-  <td>
-    <button class="btn" onclick="saveExpense()">Save</button>
+    <button class="btn btn-save" onclick="saveExpense()">Save</button>
   </td>
 </tr>
 </tbody>
 </table>
 
-<!-- LIST -->
+<!-- ===== LIST TABLE ===== -->
 <table>
 <thead>
 <tr>
@@ -81,7 +175,115 @@
 <tbody id="expenseList"></tbody>
 </table>
 
-<script src="expenses.js"></script>
+<script>
+/* ================= LOGIC (LOCKED) ================= */
+
+let expenses = [];
+let editId = null;
+
+function toggleLife() {
+  const type = document.getElementById("type").value;
+  document.getElementById("life").disabled = (type === "variable");
+}
+
+function saveExpense() {
+  const title = titleEl().value;
+  const type = typeEl().value;
+  const amount = Number(amountEl().value);
+  const life = Number(lifeEl().value);
+  const prod = productionEl().value;
+  const ratio = Number(ratioEl().value) || 100;
+
+  if (!title || !amount) {
+    alert("खर्च शीर्षक र रकम अनिवार्य छ");
+    return;
+  }
+
+  const data = {
+    id: editId || Date.now(),
+    title,
+    type,
+    amount,
+    asset_life: type === "fixed" ? life : null,
+    production_map: [
+      { production_id: prod, ratio }
+    ]
+  };
+
+  if (editId) {
+    expenses = expenses.map(e => e.id === editId ? data : e);
+    editId = null;
+  } else {
+    expenses.push(data);
+  }
+
+  clearForm();
+  renderExpenses();
+}
+
+function renderExpenses() {
+  const tbody = document.getElementById("expenseList");
+  tbody.innerHTML = "";
+
+  expenses.forEach((e, i) => {
+    const m = e.production_map[0];
+    tbody.innerHTML += `
+      <tr>
+        <td>${i + 1}</td>
+        <td>${e.title}</td>
+        <td>${e.type === "fixed" ? "स्थिर" : "चालु"}</td>
+        <td>${e.amount}</td>
+        <td>${e.asset_life || "-"}</td>
+        <td>→ ${m.production_id} (${m.ratio}%)</td>
+        <td>
+          <button class="btn btn-edit" onclick="editExpense(${e.id})">Edit</button>
+          <button class="btn btn-del" onclick="deleteExpense(${e.id})">Del</button>
+        </td>
+      </tr>
+    `;
+  });
+}
+
+function editExpense(id) {
+  const e = expenses.find(x => x.id === id);
+  if (!e) return;
+
+  titleEl().value = e.title;
+  typeEl().value = e.type;
+  amountEl().value = e.amount;
+  lifeEl().value = e.asset_life || "";
+  productionEl().value = e.production_map[0].production_id;
+  ratioEl().value = e.production_map[0].ratio;
+
+  toggleLife();
+  editId = id;
+}
+
+function deleteExpense(id) {
+  if (!confirm("Delete गर्ने ?")) return;
+  expenses = expenses.filter(e => e.id !== id);
+  renderExpenses();
+}
+
+function clearForm() {
+  titleEl().value = "";
+  amountEl().value = "";
+  lifeEl().value = "";
+  ratioEl().value = 100;
+  typeEl().value = "variable";
+  toggleLife();
+}
+
+/* ===== helpers ===== */
+const titleEl = () => document.getElementById("title");
+const typeEl = () => document.getElementById("type");
+const amountEl = () => document.getElementById("amount");
+const lifeEl = () => document.getElementById("life");
+const productionEl = () => document.getElementById("production");
+const ratioEl = () => document.getElementById("ratio");
+
+toggleLife();
+</script>
+
 </body>
 </html>
-
