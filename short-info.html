@@ -2,63 +2,231 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>Short Info</title>
+<title>Short Info | BPMS</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body{font-family:Arial;background:#f5f5f5;margin:0}
-header,footer{
- background:#2e7d32;color:#fff;padding:12px 20px;
- display:flex;justify-content:space-between;align-items:center
+body{
+  font-family:"Noto Sans Devanagari","Kalimati","Mangal","Nirmala UI",system-ui,Arial;
+  background:#f4f7f6;
+  margin:0;
 }
-header a,footer a{color:#fff;text-decoration:none;font-weight:bold}
-
 .container{
- max-width:1200px;
- margin:auto;
- background:#fff;
- padding:20px;
- min-height:70vh
+  max-width:900px;
+  margin:25px auto;
+  background:#fff;
+  padding:25px;
+  border-radius:10px;
+}
+h2{margin-top:0;color:#2e7d32}
+
+/* ===== PROGRESS ===== */
+.progress-wrap{
+  background:#e8f5e9;
+  border:1px solid #c8e6c9;
+  padding:12px;
+  border-radius:8px;
+  margin-bottom:15px;
+}
+.progress-title{font-weight:700;margin-bottom:6px}
+.steps{font-size:13px}
+.steps span{padding:3px 6px;border-radius:10px;background:#eee}
+.steps .active{background:#2e7d32;color:#fff}
+.steps .done{background:#a5d6a7}
+
+.bar-wrap{height:8px;background:#ddd;border-radius:6px;overflow:hidden;margin-top:8px}
+.bar{height:100%;background:#2e7d32;width:0%}
+
+/* ===== AUTOSAVE ===== */
+#autosaveStatus{
+  font-size:13px;
+  color:#2e7d32;
+  margin-bottom:10px;
 }
 
-h1{text-align:center;font-size:32px;color:#2e7d32;margin:15px 0}
-
-table{
- width:100%;
- border-collapse:collapse;
- table-layout:fixed
-}
-th,td{
- border:1px solid #ccc;
- padding:8px;
- text-align:center;
- font-size:14px
-}
-th{background:#e8f5e9}
-
-.col-prod{width:180px}
-.col-unit{width:80px}
-.col-qty{width:110px}
-.col-cost{width:140px}
-.col-profitpct{width:110px}
-.col-rate{width:140px}
-.col-sales{width:140px}
-.col-profit{width:140px}
-
-td input{
- width:100%;
- box-sizing:border-box;
- padding:5px
+/* ===== NOTICE ===== */
+#noticeBox{
+  display:none;
+  background:#fff8e1;
+  border:1px solid #ffe082;
+  padding:10px;
+  border-radius:6px;
+  margin-bottom:15px;
+  font-size:14px;
 }
 
-.note{
- font-size:13px;
- color:#555;
- margin-top:10px
+/* ===== FORM ===== */
+label{display:block;font-weight:600;margin-top:14px}
+input,textarea{
+  width:100%;
+  padding:8px;
+  margin-top:6px;
+  font-family:inherit;
+}
+textarea{min-height:70px}
+
+/* ===== NAV ===== */
+.nav{
+  display:flex;
+  justify-content:space-between;
+  margin-top:30px;
+}
+button{
+  padding:8px 16px;
+  border:none;
+  border-radius:6px;
+  cursor:pointer;
+  background:#2e7d32;
+  color:#fff;
+}
+.highlight{
+  border:2px solid #ff9800 !important;
+  background:#fff3e0;
+}
+
+@media print{
+  button,.progress-wrap,#autosaveStatus,#noticeBox{display:none}
 }
 </style>
 </head>
 
 <body>
+
+<div class="container">
+
+<header>
+  <a href="index.html">⬅️ मुख्यपृष्ठमा जानुहोस्</a>
+  <span>संक्षिप्त जानकारी</span>
+  <a href="existing-status.html">वर्तमान अवस्थामा जानुहोस् ➡️</a>
+</header>
+
+<div id="autosaveStatus">💾 Saved</div>
+<div id="noticeBox"></div>
+
+<h2>✏️ व्यवसाय / प्रस्तावनाको संक्षिप्त विवरण</h2>
+
+<label>व्यवसाय / प्रस्तावनाको नाम</label>
+<input id="bp_name">
+
+<label>सञ्चालन हुने स्थान (ठेगाना)</label>
+<input id="bp_location">
+
+<label>सञ्चालन गर्ने संस्था</label>
+<input id="bp_org">
+
+<label>प्रोप्राइटरको नाम</label>
+<input id="bp_owner">
+
+<label>सम्पर्क व्यक्ति</label>
+<input id="bp_contact_person">
+
+<label>सम्पर्क नम्बर</label>
+<input id="bp_phone">
+
+<label>इमेल (optional)</label>
+<input id="bp_email">
+
+<label>उत्पादन / व्यवसायिक प्रकृति</label>
+<textarea id="bp_products"></textarea>
+
+<label>मुख्य बजार</label>
+<input id="bp_market">
+
+<hr>
+
+<label>कुल पूँजी (रु.)</label>
+<input id="bp_capital" type="number">
+
+<button onclick="saveShortInfo()">💾 Save</button>
+<script>
+/* ===== SAFETY ===== */
+let activeKey = localStorage.getItem("activeProject");
+if(!activeKey){
+  alert("पहिले Home बाट Project खोल्नुहोस्");
+  location.href="index.html";
+}
+let project = JSON.parse(localStorage.getItem(activeKey));
+
+/* ===== PROGRESS ===== */
+document.getElementById("progressBar").style.width="14%";
+
+/* ===== LOAD ===== */
+function loadForm(){
+  let s = project.shortInfo||{};
+  for(let k in s){
+    if(document.getElementById(k))
+      document.getElementById(k).value = s[k];
+  }
+}
+loadForm();
+
+/* ===== SAVE ===== */
+function saveShortInfo(){
+  let data={};
+  document.querySelectorAll("input,textarea").forEach(el=>{
+    data[el.id]=el.value||"";
+  });
+  project.shortInfo=data;
+  project.lastEdited=new Date().toLocaleString("ne-NP");
+  localStorage.setItem(activeKey,JSON.stringify(project));
+  autosaveStatus.innerText="✔ Saved";
+  checkNotices();
+}
+
+/* ===== AUTOSAVE ===== */
+let t;
+document.querySelectorAll("input,textarea").forEach(el=>{
+  el.addEventListener("input",()=>{
+    autosaveStatus.innerText="⏳ Saving...";
+    clearTimeout(t);
+    t=setTimeout(saveShortInfo,700);
+  });
+});
+
+/* ===== NOTICES ===== */
+function highlight(id){
+  let e=document.getElementById(id);
+  if(!e) return;
+  e.classList.add("highlight");
+  e.scrollIntoView({behavior:"smooth",block:"center"});
+  setTimeout(()=>e.classList.remove("highlight"),3000);
+}
+function checkNotices(){
+  let n=[];
+  if(!bp_location.value)
+    n.push(`ठेगाना छैन <a href="#" onclick="highlight('bp_location')">[देखाऊ]</a>`);
+  if(!bp_phone.value)
+    n.push(`सम्पर्क नम्बर छैन <a href="#" onclick="highlight('bp_phone')">[देखाऊ]</a>`);
+  if(n.length){
+    noticeBox.style.display="block";
+    noticeBox.innerHTML="ℹ️ <b>सूचना:</b><ul><li>"+n.join("</li><li>")+"</li></ul>";
+  }else noticeBox.style.display="none";
+}
+checkNotices();
+
+/* ===== FINAL LOCK ===== */
+if(project.status==="final"){
+  document.querySelectorAll("input,textarea,button").forEach(b=>{
+    if(b.innerText.includes("Home")||b.innerText.includes("Next")) return;
+    b.disabled=true;b.style.opacity=.7;
+  });
+}
+
+/* ===== NAV ===== */
+function goPrev(){location.href="index.html";}
+function goNext(){saveShortInfo();location.href="business-detail.html";}
+</script>
+
+</body>
+</html>
+
+
+
+
+
+
+
+
 
 <header>
   <a href="index.html">⬅️ मुख्यपृष्ठमा जानुहोस्</a>
