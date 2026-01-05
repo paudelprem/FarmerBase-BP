@@ -2,220 +2,191 @@
 <html lang="ne">
 <head>
 <meta charset="UTF-8">
-<title>FarmerBase BP Engine</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>FarmerBase – Business Plan Management System</title>
 
 <style>
 body{
-  margin:0;
-  font-family:system-ui, -apple-system, sans-serif;
-  background:#f5f7fa;
-  color:#222;
+ font-family:Arial, sans-serif;
+ background:#f5f5f5;
+ margin:0
 }
 header{
-  background:#1b5e20;
-  color:#fff;
-  padding:12px 16px;
+ background:#fff;
+ padding:18px 24px;
+ border-bottom:1px solid #ddd
 }
-header h1{
-  margin:0;
-  font-size:18px;
+h1{
+ margin:0;
+ color:#2e7d32;
+ font-size:32px
 }
-header small{
-  font-size:12px;
-  opacity:.9;
+.section{
+ max-width:1200px;
+ margin:20px auto;
+ background:#e8f5e9;
+ padding:20px;
+ border-radius:8px
 }
-.container{
-  max-width:920px;
-  margin:auto;
-  padding:20px;
+.btn{
+ padding:8px 14px;
+ border:none;
+ cursor:pointer;
+ font-size:14px;
+ border-radius:4px
 }
-.card{
-  background:#fff;
-  padding:20px;
-  border-radius:8px;
-  margin-bottom:20px;
+.btn-green{background:#2e7d32;color:#fff}
+.btn-purple{background:#6a1b9a;color:#fff}
+.btn-outline{
+ background:#fff;
+ color:#2e7d32;
+ border:1px solid #2e7d32;
+ text-decoration:none
 }
-.card h2, .card h3{
-  margin-top:0;
-  color:#1b5e20;
+.btn-outline:hover{
+ background:#2e7d32;
+ color:#fff
 }
-.actions{
-  display:flex;
-  flex-wrap:wrap;
-  gap:12px;
-  margin:20px 0;
+.menu-tabs{
+ margin-top:20px;
+ padding:12px;
+ background:#e8f5e9;
+ border-radius:6px
 }
-.actions button{
-  flex:1;
-  min-width:220px;
-  padding:14px;
-  border:none;
-  border-radius:8px;
-  font-size:15px;
-  cursor:pointer;
-  background:#1b5e20;
-  color:#fff;
+.menu-tabs a{
+ margin-right:14px;
+ text-decoration:none;
+ font-weight:bold;
+ color:#000
 }
-.actions button.secondary{
-  background:#455a64;
+.menu-tabs a:hover{
+ color:#2e7d32;
+ text-decoration:underline
 }
-label{
-  display:block;
-  margin-top:10px;
-  font-size:14px;
+table{
+ width:100%;
+ border-collapse:collapse;
+ margin-top:15px
 }
-input{
-  width:100%;
-  padding:10px;
-  margin-top:4px;
-  font-size:14px;
-  border-radius:6px;
-  border:1px solid #ccc;
+th,td{
+ border:1px solid #ccc;
+ padding:8px;
+ text-align:center
 }
-.status{
-  padding:10px;
-  border-radius:6px;
-  margin-top:10px;
-  font-size:14px;
-}
-.status.draft{background:#fff3cd}
-.status.final{background:#d1e7dd}
-.status.locked{background:#f8d7da}
-footer{
-  margin-top:40px;
-  padding:14px;
-  text-align:center;
-  font-size:13px;
-  color:#555;
-  border-top:1px solid #ddd;
-}
+th{background:#f0f0f0}
 </style>
 </head>
 
 <body>
 
 <header>
-  <h1>FarmerBase BP Engine</h1>
-  <small>कृषकमैत्री व्यवसायिक योजना यन्त्र</small>
+ <h1>🌾 FarmerBase — Business Plan Management System</h1>
 </header>
 
-<div class="container">
+<!-- ================= BUSINESS / PROJECT MANAGEMENT ================= -->
+<div class="section">
+ <h3>📁 Business / Project Management</h3>
 
-  <!-- INTRO -->
-  <div class="card">
-    <h2>किन FarmerBase BP Engine ?</h2>
-    <p>
-      FarmerBase BP Engine किसान तथा साना व्यवसायीलाई
-      आफैं, सजिलै र गणनामा आधारित व्यवसायिक योजना
-      बनाउन सहयोग गर्ने प्रणाली हो।
-    </p>
-  </div>
+ <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+  <input
+    type="text"
+    id="newBizName"
+    placeholder="नयाँ व्यवसाय / परियोजनाको नाम"
+    style="padding:8px;width:260px"
+  >
 
-  <!-- ACTION BUTTONS -->
-  <div class="actions">
-    <button type="button" onclick="showCreate()">
-      ➕ नयाँ व्यवसाय / परियोजना सुरु
-    </button>
-    <button type="button" class="secondary" onclick="continueProposal()">
-      ▶️ अघिल्लो प्रस्ताव Continue
-    </button>
-    <button type="button" class="secondary" onclick="openTools()">
-      📄 Letters / PDF Tools
-    </button>
-  </div>
+  <button class="btn btn-green" onclick="createNewBusiness()">
+    ➕ Create New
+  </button>
 
-  <!-- CREATE BOX -->
-  <div class="card" id="createBox" style="display:none">
-    <h3>नयाँ प्रस्ताव सुरु गर्नुहोस्</h3>
+  <button class="btn btn-purple">⬆️ Import</button>
+  <button class="btn btn-purple">⬇️ Export</button>
 
-    <label>व्यवसाय / संस्थाको नाम</label>
-    <input id="bizName" placeholder="जस्तै: नमूना कृषि फार्म">
-
-    <label>परियोजनाको नाम</label>
-    <input id="projName" placeholder="जस्तै: बंगुर पालन परियोजना">
-
-    <label>प्रोपाइटर / प्रतिनिधिको नाम</label>
-    <input id="ownerName" placeholder="नाम">
-
-    <button type="button" style="margin-top:14px" onclick="startProposal()">
-      सुरु गरौं →
-    </button>
-  </div>
-
-  <!-- STATUS -->
-  <div id="statusBox"></div>
-
+  <a href="pdf-merge.html" class="btn btn-outline">📄 PDF Merge</a>
+  <a href="user-guide.html" class="btn btn-outline">📘 User Guide</a>
+ </div>
 </div>
 
-<footer>
-  FarmerBase BP Engine<br>
-  Concept Development By <b>Prem Prasad Paudel</b><br>
-  Kalika–5, Maneswara, Rasuwa
-</footer>
+<!-- ================= PROGRESS ================= -->
+<div class="section">
+ <h3>📊 Project Progress : <span id="progressPct">0%</span></h3>
+ <div style="background:#ddd;height:12px;border-radius:6px">
+  <div id="progressBar"
+   style="height:12px;width:0%;background:#2e7d32;border-radius:6px">
+  </div>
+ </div>
+</div>
+
+<!-- ================= MENU ================= -->
+<div class="section menu-tabs">
+ <a href="short-info.html">Short Info</a>
+ <a href="business-detail.html">Business Detail</a>
+ <a href="existing-status.html">Existing Status</a>
+ <a href="production.html">Production</a>
+ <a href="expense-demo.html">Expense</a>
+ <a href="capital-source.html">Capital Source</a>
+ <a href="income-demo.html">Income</a>
+ <a href="profit-loss-demo.html">Profit/Loss</a>
+ <a href="profit-distribution.html">Profit Utilization</a>
+ <a href="roi-irr-payback.html">5-Year ROI</a>
+ <a href="full-proposal.html">Full Proposal</a>
+</div>
+
+<!-- ================= MY PROJECTS ================= -->
+<div class="section">
+ <h3>📂 My Projects</h3>
+
+ <table>
+  <thead>
+   <tr>
+    <th>Name</th>
+    <th>Status</th>
+    <th>Ver</th>
+    <th>Last Edited</th>
+    <th>Action</th>
+   </tr>
+  </thead>
+  <tbody id="projectBody">
+   <!-- dynamic -->
+  </tbody>
+ </table>
+</div>
 
 <script>
-/* ===== KEYS ===== */
-const STATUS_KEY = "fb_proposal_status";
-const META_KEY   = "fb_meta";
-
-/* ===== INIT STATUS ===== */
-if(!localStorage.getItem(STATUS_KEY)){
-  localStorage.setItem(STATUS_KEY,"draft");
+/* ===== CREATE NEW BUSINESS ===== */
+function createNewBusiness(){
+ const name=document.getElementById("newBizName").value.trim();
+ if(!name){
+  alert("पहिला व्यवसाय / परियोजनाको नाम लेख्नुहोस् ।");
+  return;
+ }
+ localStorage.setItem("newBusinessName", name);
+ window.location.href="short-info.html";
 }
 
-/* ===== RENDER STATUS ===== */
-function renderStatus(){
-  const st = localStorage.getItem(STATUS_KEY);
-  let cls="draft", txt="Draft अवस्थामा छ";
+/* ===== PROJECT LIST (SIMPLE DEMO) ===== */
+function renderProjectList(){
+ const tbody=document.getElementById("projectBody");
+ tbody.innerHTML="";
 
-  if(st==="final"){ cls="final"; txt="Final अवस्थामा छ"; }
-  if(st==="locked"){ cls="locked"; txt="Locked (Edit गर्न मिल्दैन)"; }
+ const name=localStorage.getItem("bizName");
+ if(!name){
+  tbody.innerHTML="<tr><td colspan='5'>No project yet</td></tr>";
+  return;
+ }
 
-  document.getElementById("statusBox").innerHTML = `
-    <div class="status ${cls}">
-      प्रस्तावको अवस्था: <b>${txt}</b>
-    </div>`;
-}
-renderStatus();
-
-/* ===== SHOW CREATE (FIXED) ===== */
-function showCreate(){
-  const box = document.getElementById("createBox");
-  box.style.display = "block";
-  box.scrollIntoView({ behavior: "smooth" });
-}
-
-/* ===== START PROPOSAL ===== */
-function startProposal(){
-  if(!bizName.value || !projName.value){
-    alert("व्यवसाय र परियोजनाको नाम अनिवार्य छ");
-    return;
-  }
-
-  localStorage.setItem(META_KEY, JSON.stringify({
-    business: bizName.value,
-    project : projName.value,
-    owner   : ownerName.value
-  }));
-
-  localStorage.setItem(STATUS_KEY,"draft");
-  location.href = "short-info.html";
+ tbody.innerHTML=`
+<tr>
+ <td>${name}</td>
+ <td>draft</td>
+ <td>1.0</td>
+ <td>${new Date().toLocaleString()}</td>
+ <td>
+  <button onclick="location.href='short-info.html'">Open</button>
+ </td>
+</tr>`;
 }
 
-/* ===== CONTINUE ===== */
-function continueProposal(){
-  if(!localStorage.getItem(META_KEY)){
-    alert("अघिल्लो प्रस्ताव भेटिएन");
-    return;
-  }
-  location.href = "short-info.html";
-}
-
-/* ===== TOOLS ===== */
-function openTools(){
-  location.href = "create-letter.html";
-}
+renderProjectList();
 </script>
 
 </body>
